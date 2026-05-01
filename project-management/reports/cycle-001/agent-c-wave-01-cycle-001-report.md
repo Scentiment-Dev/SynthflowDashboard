@@ -246,3 +246,31 @@ Rationale:
 
 1. Merge PR #6 once required checks are green under the strict branch protection set.
 2. Continue enforcing Codecov/Bugbot as hard gates for subsequent cycle PRs.
+
+## Final reconciliation update (2026-05-01)
+
+- Additional execution completed after this report's initial draft:
+  - PR #7 opened for post-bootstrap Codecov context validation.
+  - PR #8 executed for post-public verification and merged.
+  - PR #9 executed for fresh strict-context verification and merged.
+- Codecov findings across #7/#8/#9:
+  - `codecov/patch` emits and passes consistently.
+  - `codecov/project` remains non-emitting despite valid `codecov.yml`, successful uploads, and explicit PR metadata overrides in CI.
+- Governance decision applied (Path A unblock):
+  - Temporary strict required-check set used for merge unblock and delivery continuity:
+    - `backend-tests / backend`
+    - `frontend-tests / frontend`
+    - `Coverage and Codecov Upload`
+    - `codecov/patch`
+    - `Cursor Bugbot`
+  - This set remains blocking and enforces real CI execution, Codecov upload success, patch status, and Bugbot pass.
+- Current status:
+  - PR #8 merged: `a307e505aaf1397ff426978cbb27f9aa453632bc`
+  - PR #9 merged: `0e24ef63798937f7280bdd746db1dc0320bfb16d`
+  - Branch protection on `main` currently enforces emitted Path A required checks.
+- Issue reporting completeness:
+  - External blocker and support-ticket-ready evidence are documented in:
+    - `project-management/reports/cycle-001/qa-evidence/codecov-project-status-governance-note.md`
+  - Upload logs used for diagnosis are preserved in:
+    - `project-management/reports/cycle-001/qa-evidence/codecov-upload-pr8.log`
+    - `project-management/reports/cycle-001/qa-evidence/codecov-upload-pr8-latest.log`
