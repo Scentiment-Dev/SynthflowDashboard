@@ -210,7 +210,10 @@ def validate_portal_success(request: PortalSuccessValidationRequest) -> SourceTr
 
 
 def get_subscription_analytics(scenario: str = "baseline") -> SubscriptionAnalyticsResponse:
-    fixture = SUBSCRIPTION_ANALYTICS_FIXTURES.get(scenario, SUBSCRIPTION_ANALYTICS_FIXTURES["baseline"])
+    effective_scenario = (
+        scenario if scenario in SUBSCRIPTION_ANALYTICS_FIXTURES else "baseline"
+    )
+    fixture = SUBSCRIPTION_ANALYTICS_FIXTURES[effective_scenario]
     source_confirmation_status = fixture["source_confirmation_status"]
     overview = SubscriptionOverviewMetrics(**fixture["subscription_overview"])
     portal = PortalJourneyMetrics(**fixture["portal_journey"])
@@ -222,7 +225,7 @@ def get_subscription_analytics(scenario: str = "baseline") -> SubscriptionAnalyt
     )
     trust_label = _calculate_trust_label(source_confirmation)
     fingerprint = _analytics_fingerprint(
-        scenario=scenario,
+        scenario=effective_scenario,
         overview=overview,
         portal=portal,
         source_confirmation=source_confirmation,
@@ -242,7 +245,7 @@ def get_subscription_analytics(scenario: str = "baseline") -> SubscriptionAnalyt
         owner="analytics",
         timestamp=fixture["timestamp"],
         fingerprint=fingerprint,
-        audit_reference=f"audit-subscriptions-{scenario}-20260501",
+        audit_reference=f"audit-subscriptions-{effective_scenario}-20260501",
         source_system="analytics_api",
         source_confirmation_status=source_confirmation_status,
     )

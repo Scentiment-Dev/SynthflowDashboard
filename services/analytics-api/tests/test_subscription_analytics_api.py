@@ -57,6 +57,20 @@ def test_subscription_analytics_metadata_contains_export_audit_fields(client: Te
         assert field in metadata
 
 
+def test_unknown_scenario_uses_baseline_fixture_metadata(client: TestClient) -> None:
+    baseline = client.get("/subscriptions/analytics")
+    unknown = client.get("/subscriptions/analytics", params={"scenario": "not-a-real-scenario"})
+    assert baseline.status_code == 200
+    assert unknown.status_code == 200
+
+    baseline_payload = baseline.json()
+    unknown_payload = unknown.json()
+
+    assert unknown_payload["subscription_overview"] == baseline_payload["subscription_overview"]
+    assert unknown_payload["metric_metadata"]["fingerprint"] == baseline_payload["metric_metadata"]["fingerprint"]
+    assert unknown_payload["metric_metadata"]["audit_reference"] == baseline_payload["metric_metadata"]["audit_reference"]
+
+
 def test_subscription_analytics_requires_subscription_permission(client: TestClient) -> None:
     response = client.get(
         "/subscriptions/analytics",
