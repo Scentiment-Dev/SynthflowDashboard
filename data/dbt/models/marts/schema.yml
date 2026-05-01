@@ -23,5 +23,3 @@ models:
     description: Data freshness mart visible to data quality and governance dashboards.
   - name: mart_trust_label_audit
     description: Audit mart proving trust labels are system-calculated.
-  - name: mart_dashboard_metrics
-    description: API-ready metric summary mart with formula version, source of truth, trust label, freshness, owner, and calculated_at fields.
