@@ -4,18 +4,25 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "subscription_id",
+    "module",
+    "generated_from_fixture",
     "final_subscription_state",
     "source_of_truth_system",
     "source_confirmation_status",
-    "action_attempts",
+    "subscription_overview",
     "portal_journey",
     "shopify_context",
+    "synthflow_journey",
+    "source_confirmation",
     "metric_metadata"
   ],
   "properties": {
-    "subscription_id": {
-      "type": "string"
+    "module": {
+      "type": "string",
+      "const": "subscriptions"
+    },
+    "generated_from_fixture": {
+      "type": "boolean"
     },
     "final_subscription_state": {
       "type": "string",
@@ -29,60 +36,126 @@
       "type": "string",
       "enum": ["confirmed", "pending", "missing"]
     },
-    "action_attempts": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["action", "attempted_at", "source_system", "confirmed"],
-        "properties": {
-          "action": {
-            "type": "string"
-          },
-          "attempted_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "source_system": {
-            "type": "string",
-            "enum": ["stayai", "synthflow", "portal", "shopify"]
-          },
-          "confirmed": {
-            "type": "boolean"
-          }
+    "subscription_overview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subscription_overview_count",
+        "cancellation_requests_count",
+        "confirmed_cancellations_count",
+        "save_retention_attempts_count",
+        "confirmed_retained_subscriptions_count",
+        "pending_stayai_confirmation_count"
+      ],
+      "properties": {
+        "subscription_overview_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cancellation_requests_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "confirmed_cancellations_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "save_retention_attempts_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "confirmed_retained_subscriptions_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pending_stayai_confirmation_count": {
+          "type": "integer",
+          "minimum": 0
         }
       }
     },
     "portal_journey": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["link_sent", "completion_confirmed"],
+      "required": ["portal_link_sent_count", "confirmed_portal_completion_count"],
       "properties": {
-        "link_sent": {
-          "type": "boolean"
+        "portal_link_sent_count": {
+          "type": "integer",
+          "minimum": 0
         },
-        "completion_confirmed": {
-          "type": "boolean"
+        "confirmed_portal_completion_count": {
+          "type": "integer",
+          "minimum": 0
         }
       }
     },
     "shopify_context": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["order_id", "is_secondary_context_only"],
+      "required": ["context_records_available_count", "context_role", "finalization_allowed"],
       "properties": {
-        "order_id": {
-          "type": "string"
+        "context_records_available_count": {
+          "type": "integer",
+          "minimum": 0
         },
-        "is_secondary_context_only": {
+        "context_role": {
+          "type": "string",
+          "const": "context_only"
+        },
+        "finalization_allowed": {
           "type": "boolean",
-          "const": true
+          "const": false
+        }
+      }
+    },
+    "synthflow_journey": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["journey_event_count", "status_breakdown"],
+      "properties": {
+        "journey_event_count": {
+          "type": "integer",
+          "minimum": 0
         },
-        "fulfillment_status": {
-          "type": ["string", "null"]
+        "status_breakdown": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "source_confirmation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_of_truth_system",
+        "source_confirmation_status",
+        "confirmed_records_count",
+        "pending_records_count",
+        "missing_records_count"
+      ],
+      "properties": {
+        "source_of_truth_system": {
+          "type": "string",
+          "enum": ["stayai"]
         },
-        "tracking_number": {
-          "type": ["string", "null"]
+        "source_confirmation_status": {
+          "type": "string",
+          "enum": ["confirmed", "pending", "missing"]
+        },
+        "confirmed_records_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pending_records_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "missing_records_count": {
+          "type": "integer",
+          "minimum": 0
         }
       }
     },
@@ -91,11 +164,14 @@
       "additionalProperties": false,
       "required": [
         "metric_id",
+        "metric_definitions",
+        "filters",
         "formula_version",
         "freshness",
         "trust_label",
         "owner",
         "timestamp",
+        "fingerprint",
         "audit_reference",
         "source_system",
         "source_confirmation_status"
@@ -103,6 +179,15 @@
       "properties": {
         "metric_id": {
           "type": "string"
+        },
+        "metric_definitions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "filters": {
+          "type": "object"
         },
         "formula_version": {
           "type": "string"
@@ -120,6 +205,9 @@
         "timestamp": {
           "type": "string",
           "format": "date-time"
+        },
+        "fingerprint": {
+          "type": "string"
         },
         "audit_reference": {
           "type": "string"

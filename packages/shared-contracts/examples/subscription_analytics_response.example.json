@@ -1,47 +1,62 @@
 {
-  "subscription_id": "sub-2002",
-  "final_subscription_state": "cancelled",
+  "module": "subscriptions",
+  "generated_from_fixture": true,
+  "final_subscription_state": "retained",
   "source_of_truth_system": "stayai",
   "source_confirmation_status": "confirmed",
-  "action_attempts": [
-    {
-      "action": "frequency_change_offer",
-      "attempted_at": "2026-04-29T15:11:00Z",
-      "source_system": "synthflow",
-      "confirmed": true
-    },
-    {
-      "action": "discount_25_offer",
-      "attempted_at": "2026-04-29T15:12:00Z",
-      "source_system": "synthflow",
-      "confirmed": true
-    },
-    {
-      "action": "cancel",
-      "attempted_at": "2026-04-29T15:13:00Z",
-      "source_system": "stayai",
-      "confirmed": true
-    }
-  ],
+  "subscription_overview": {
+    "subscription_overview_count": 120,
+    "cancellation_requests_count": 34,
+    "confirmed_cancellations_count": 11,
+    "save_retention_attempts_count": 23,
+    "confirmed_retained_subscriptions_count": 18,
+    "pending_stayai_confirmation_count": 5
+  },
   "portal_journey": {
-    "link_sent": true,
-    "completion_confirmed": false
+    "portal_link_sent_count": 16,
+    "confirmed_portal_completion_count": 10
   },
   "shopify_context": {
-    "order_id": "gid://shopify/Order/123",
-    "is_secondary_context_only": true,
-    "fulfillment_status": "unfulfilled",
-    "tracking_number": null
+    "context_records_available_count": 116,
+    "context_role": "context_only",
+    "finalization_allowed": false
+  },
+  "synthflow_journey": {
+    "journey_event_count": 148,
+    "status_breakdown": {
+      "completed": 92,
+      "unresolved": 18,
+      "transferred": 21,
+      "abandoned": 17
+    }
+  },
+  "source_confirmation": {
+    "source_of_truth_system": "stayai",
+    "source_confirmation_status": "confirmed",
+    "confirmed_records_count": 115,
+    "pending_records_count": 5,
+    "missing_records_count": 0
   },
   "metric_metadata": {
-    "metric_id": "subscription_action_completion_rate",
-    "formula_version": "v0.3.0",
+    "metric_id": "subscription_analytics_overview",
+    "metric_definitions": [
+      "subscription_action_completion_rate",
+      "confirmed_cancellation_rate",
+      "subscription_save_rate",
+      "portal_completion_rate"
+    ],
+    "filters": {
+      "date_range": "last_7_days",
+      "platforms": ["stayai", "synthflow", "shopify"]
+    },
+    "formula_version": "v0.4.0",
     "freshness": "fresh",
     "trust_label": "high",
     "owner": "analytics",
-    "timestamp": "2026-04-30T00:00:00Z",
-    "audit_reference": "audit-sub-2002-20260430",
-    "source_system": "stayai",
+    "timestamp": "2026-05-01T00:00:00Z",
+    "fingerprint": "3393587d3d7fd964fc8b95fa08817f79420c749836fdeef53cb1bc8258b0bcc4",
+    "audit_reference": "audit-subscriptions-baseline-20260501",
+    "source_system": "analytics_api",
     "source_confirmation_status": "confirmed"
   }
 }

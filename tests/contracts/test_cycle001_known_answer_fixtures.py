@@ -43,6 +43,8 @@ def test_missing_source_data_lowers_trust_or_maps_to_pending_unknown():
     fixture = _read_json("subscription_analytics_response.example.json")
     assert fixture["source_confirmation_status"] in {"confirmed", "pending", "missing"}
     assert fixture["final_subscription_state"] in {"active", "retained", "saved", "cancelled", "pending", "unknown"}
+    assert fixture["subscription_overview"]["pending_stayai_confirmation_count"] >= 0
+    assert fixture["metric_metadata"]["trust_label"] in {"high", "medium", "low", "untrusted"}
 
 
 def test_abandoned_dropped_unresolved_transferred_excluded_from_successful_containment():
