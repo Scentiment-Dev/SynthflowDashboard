@@ -94,6 +94,17 @@
 - Updated `docs/07_dashboard_ui_ux/API_CONTRACT_ALIGNMENT.md` and
   `docs/07_dashboard_ui_ux/FRONTEND_IMPLEMENTATION_MAP.md` with the Cycle 002
   contract surface and source-of-truth rules enforced in the UI.
+- Addressed two Bugbot/Codex Low-severity findings on the original commit:
+  (1) tightened `isSubscriptionAnalyticsShape` to require
+  `generated_from_fixture` to be a boolean and require all required nested
+  contract sections (subscription_overview, portal_journey, shopify_context,
+  synthflow_journey, source_confirmation, metric_metadata) to be plain
+  objects, falling back to fixture instead of promoting a malformed
+  payload to `source: 'api'`; (2) replaced `formatRatio`'s
+  `ratio % 1 === 0` integer check with a Math.round + 1e-9 tolerance check
+  so floating-point noise (e.g. `(3/10)*100 = 30.000000000000004`) no
+  longer produces inconsistent `30.0%` instead of `30%`. Added focused
+  tests for both fixes; Bugbot re-reviewed and reported no issues.
 
 ## Files Created
 
@@ -136,8 +147,10 @@
   (TypeScript-only constructor visibility params and discriminated-union helper
   generics in `apiClient.ts` and `DashboardFilterContext.tsx`, plus a
   type-signature parameter name in the new test file). No regressions.
-- `npm --prefix apps/dashboard-web run test:run`: passed with `73 passed
-  (73)` across `10` test files (was `9` files / `27` tests before this cycle).
+- `npm --prefix apps/dashboard-web run test:run`: passed with `77 passed
+  (77)` across `10` test files (was `9` files / `27` tests before this
+  cycle; 4 additional tests were added in commit `da5e0cf2` to cover the
+  Bugbot-flagged shape-validator and `formatRatio` fixes).
 - `npm --prefix apps/dashboard-web run test:coverage`: passed (above thresholds
   on all four metrics — see Coverage section).
 - `npm --prefix apps/dashboard-web run build`: passed (vite production build
@@ -153,42 +166,36 @@
   - `apps/dashboard-web/coverage/coverage-final.json`
   - `apps/dashboard-web/coverage/clover.xml`
   - `apps/dashboard-web/coverage/base.css` (coverage HTML report assets)
-- Percentages on this branch:
-  - Statements: `98.92%` (367/371)
-  - Branches:   `95.23%` (200/210)
-  - Functions:  `99.31%` (146/147)
-  - Lines:      `99.69%` (329/330)
+- Percentages on this branch (head `da5e0cf2`, post-Bugbot-fix run):
+  - Statements: `98.95%` (378/382)
+  - Branches:   `95.39%` (207/217)
+  - Functions:  `99.32%` (148/149)
+  - Lines:      `99.70%` (336/337)
 - Coverage >= 95%: Yes (all four metrics).
 
 ## Codecov Status
 
-- `codecov/patch` on PR #13: PASS. Codecov bot reported
-  `Patch coverage is 96.17486%` on the diff (above the 95% gate). Backend and
-  frontend Codecov artifact uploads succeeded inside the
-  `Coverage and Codecov Upload` workflow.
-- `Coverage and Codecov Upload` workflow on PR #13: at the time this report
-  was committed the workflow was still IN_PROGRESS, hanging on the optional
-  step `Upload combined coverage to Codecov project status`. This is the same
-  external Codecov platform/context behavior documented in
-  `project-management/reports/cycle-001/qa-evidence/codecov-project-status-governance-note.md`
-  and re-observed by Agent A on Cycle 002 PR #11 (which also did not emit
-  `codecov/project`). The actual coverage data was uploaded successfully
-  (steps 7–14 of the job all completed `success`); only the project-status
-  endpoint upload is hanging.
-- `codecov/project` is not currently emitted on PR #13 for the same external
-  Codecov platform/context reason. Per the Path A enforcement model, this is
-  documented as an external issue while the enforced required checks remain
+- `codecov/patch` on PR #13 (head `da5e0cf2`): PASS. Codecov bot reported
+  patch coverage above the 95% gate.
+- `Coverage and Codecov Upload` workflow on PR #13 (head `da5e0cf2`):
+  PASS in 1m05s. Backend, frontend and ingestion artifact uploads all
+  succeeded.
+- `codecov/project` is not currently emitted on PR #13. Per the Cycle 001
+  governance note
+  (`project-management/reports/cycle-001/qa-evidence/codecov-project-status-governance-note.md`)
+  and Agent A's Cycle 002 report, this is documented as an external Codecov
+  platform/context behavior; Path A required checks remain enforced and
   green.
 
 ## Bugbot Status
 
-- `Cursor Bugbot` on PR #13: status `completed`, conclusion `neutral` ("skipping"
-  per `gh pr checks`). This is a Cursor Bugbot platform decision — Bugbot
-  emitted a non-failing terminal status on the PR head commit
-  (`0ac30b2b1c97361fd6c2f19eb8178f8083ee846d`) without raising any findings.
-  Bugbot is therefore present and not failing. If a Bugbot re-run later
-  produces findings, they will be triaged in a follow-up commit (no
-  `--amend` to avoid force-pushing the published branch).
+- `Cursor Bugbot` on PR #13 (head `da5e0cf2`): status `completed`,
+  conclusion `success` (8m41s). Bugbot final summary: "Bugbot completed
+  review - no issues found".
+- The two prior Bugbot/Codex findings on commit `0ac30b2b` (Low severity:
+  runtime shape validator omitting `generated_from_fixture`, and
+  `formatRatio` floating-point integer check) were addressed in commit
+  `da5e0cf2` and verified clean by Bugbot's re-review.
 
 ## Validation Commands
 
@@ -242,29 +249,28 @@ PowerShell commands actually run during this cycle:
 
 - PR: [PR #13](https://github.com/Scentiment-Dev/SynthflowDashboard/pull/13),
   title `[Wave 01][Cycle 002][Agent B] Subscription UI contract wiring`,
-  base `main`, head commit `0ac30b2b1c97361fd6c2f19eb8178f8083ee846d`.
-- `mergeable`: `MERGEABLE`. `mergeStateStatus`: `BLOCKED` (pending the
-  hanging `Coverage and Codecov Upload` job and any required code-owner
-  review).
-- Check rollup at report-commit time:
-  - `Repo validation and no-drift gates`: pass (4s)
+  base `main`, head commit `da5e0cf249c43dfe7d016b361c76b06cc48a1adf`.
+- `mergeable`: `MERGEABLE`. `mergeStateStatus`: `BLOCKED` solely because no
+  human code-owner review has been recorded yet (`reviewDecision`: empty);
+  no failing or missing CI check is blocking the merge.
+- Final check rollup on head `da5e0cf2`:
+  - `Repo validation and no-drift gates`: pass (6s)
   - `lint-typecheck (backend|frontend|ingestion)`: pass
-  - `backend-tests / backend`: pass
-  - `frontend-tests / frontend`: pass
-  - `ingestion-tests / ingestion`: pass
-  - `contract-tests / contracts`: pass
-  - `dbt-tests / dbt`: pass
-  - `smoke-tests / smoke`: pass
-  - `frontend`: pass
-  - `release-readiness`: pass
-  - `smoke`: pass
-  - `codecov/patch`: pass (`96.17486%` patch coverage on diff)
-  - `Cursor Bugbot`: completed / neutral (no findings emitted)
-  - `Coverage and Codecov Upload`: in_progress, hanging on
-    `Upload combined coverage to Codecov project status` (external Codecov
-    platform/context behavior documented in Cycle 001 QA evidence and again
-    on Cycle 002 PR #11)
-  - `codecov/project`: not emitted (same external behavior)
+  - `backend-tests / backend`: pass (29s)
+  - `frontend-tests / frontend`: pass (46s)
+  - `ingestion-tests / ingestion`: pass (16s)
+  - `contract-tests / contracts`: pass (12s)
+  - `dbt-tests / dbt`: pass (23s)
+  - `smoke-tests / smoke`: pass (9s)
+  - `frontend`: pass (52s)
+  - `release-readiness`: pass (7s)
+  - `smoke`: pass (6s)
+  - `Coverage and Codecov Upload`: PASS (1m05s) — the project-status upload
+    step now completes cleanly on this commit
+  - `codecov/patch`: PASS (above 95% gate)
+  - `Cursor Bugbot`: PASS / `success` (8m41s) — "no issues found"
+  - `codecov/project`: not emitted (documented external Codecov platform
+    behavior; Path A required checks all green)
 
 ## Open Issues
 
@@ -276,24 +282,16 @@ PowerShell commands actually run during this cycle:
   new test file) remain as warnings — no errors. They match the codebase's
   existing tolerance (same pattern in `apiClient.ts` and
   `DashboardFilterContext.tsx`). No coverage or build impact.
-- The `Coverage and Codecov Upload` job is hanging on the optional
-  `Upload combined coverage to Codecov project status` step. This is the
-  same external Codecov platform/context behavior documented in
-  `project-management/reports/cycle-001/qa-evidence/codecov-project-status-governance-note.md`
-  and re-observed by Agent A on Cycle 002 PR #11. The actual coverage data
-  was uploaded successfully (Codecov bot reported 96.17% patch coverage
-  and `codecov/patch` passed); only the project-status upload is hanging.
-- `Cursor Bugbot` returned `neutral` (skipped) on this PR head rather than
-  `pass`. Bugbot is present and not failing; this is a Bugbot platform
-  decision, not a regression.
+- `codecov/project` is not currently emitted by the Codecov platform on
+  this PR. Documented as an external Codecov platform/context behavior
+  per the Cycle 001 governance note; not a regression introduced by this
+  PR. All Path A required checks remain green.
 
 ## Blockers
 
-- No code-level blocker. PR #13 is `MERGEABLE` and only mergeStateStatus
-  blocked because of the hanging Codecov project-status upload step (an
-  external platform/context behavior already documented and accepted in
-  the Cycle 001 governance note and Cycle 002 PR #11) and any required
-  code-owner review.
+- No code-level or CI blocker. PR #13 is `MERGEABLE`. The only outstanding
+  item is human code-owner review, which is governance, not a quality
+  gate.
 
 ## Risks
 
@@ -326,37 +324,36 @@ PowerShell commands actually run during this cycle:
 
 ## Confidence Percentage
 
-- 97%
+- 99%
 
 ## Completion Statement
 
 Cycle 002 Agent B work — moving the subscription analytics frontend from a
 shell to a contract-connected vertical slice — is implemented, deterministic,
-fixture-fallback-safe, visually verified, locally validated above the 95%
-coverage gate on all four coverage metrics with all 73 frontend tests passing,
-opened as PR #13, and confirmed by GitHub as `MERGEABLE`. `codecov/patch` is
-green at 96.17%, all CI test/lint/typecheck/build/contracts/dbt/smoke jobs
-are green, and `Cursor Bugbot` completed without findings (neutral). The only
-non-green item is the optional `Coverage and Codecov Upload` project-status
-upload step, which matches the documented external Codecov platform/context
-behavior — not a regression introduced by this PR.
+fixture-fallback-safe, visually verified, and locally validated above the
+95% coverage gate on all four coverage metrics with all 77 frontend tests
+passing. PR #13 is open against `main`, head `da5e0cf2`, GitHub status
+`MERGEABLE`, every Path A required check is GREEN
+(`Coverage and Codecov Upload`, `codecov/patch`, `Cursor Bugbot`, all
+backend / frontend / ingestion / contract / dbt / smoke / lint-typecheck
+jobs), and the two Bugbot/Codex Low-severity findings on the original
+commit (`generated_from_fixture` not validated; `formatRatio`
+floating-point integer check) were addressed in `da5e0cf2` and re-reviewed
+by Bugbot with conclusion `success` ("no issues found"). The only
+non-emitted check is `codecov/project`, which is the documented external
+Codecov platform/context behavior — not a regression introduced by this
+PR.
 
 ## Recommended Next Steps
 
-1. Watch the Coverage and Codecov Upload workflow until it terminates and
-   confirm the final conclusion (likely will time out on the
-   project-status step as it has on prior PRs in this repo).
-2. If `Coverage and Codecov Upload` ultimately fails specifically on the
-   project-status upload (and not on artifact upload or coverage threshold),
-   document the failure as the same external Codecov platform issue and
-   request PM/Agent C confirmation per the existing governance note.
-3. If Cursor Bugbot re-runs and surfaces findings, address them with new
-   commits (no `--amend` to avoid force-pushing the published branch).
-4. Once required checks settle and code-owner review is complete, merge
-   PR #13.
-5. After merge, consider folding the Cycle 001 module shell into a
+1. Request human code-owner review and merge PR #13 once approved (no
+   technical gate is blocking).
+2. After merge, consider folding the Cycle 001 module shell into a
    separate "legacy view" route or removing it once stakeholders confirm
    the new contract-wired view fully replaces it.
+3. Track the Codecov platform `codecov/project` emission externally; if
+   the Codecov platform begins emitting it again on future PRs, no code
+   change is required.
 
 ## Opus 4.7 Frontend / Visual Use
 
