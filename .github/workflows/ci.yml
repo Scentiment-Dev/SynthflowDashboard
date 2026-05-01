@@ -48,6 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -58,11 +59,11 @@ jobs:
         run: python -m pip install -e "./services/analytics-api[dev]"
       - name: Install ingestion dependencies
         run: python -m pip install -e "./services/ingestion-worker[dev]"
-      - name: Install test dependencies
-        run: python -m pip install pytest pytest-cov jsonschema
-      - name: Run backend coverage gate
+      - name: Install contract test dependencies
+        run: python -m pip install pytest jsonschema pytest-cov
+      - name: Run backend coverage
         run: pytest services/analytics-api/tests tests/contracts tests/integration --cov=services/analytics-api --cov=services/ingestion-worker --cov=packages/shared-contracts --cov-report=term-missing --cov-report=xml
-      - name: Run ingestion coverage artifact
+      - name: Run ingestion coverage for Codecov artifact completeness
         run: pytest services/ingestion-worker/tests --cov=services/ingestion-worker --cov-report=term-missing --cov-report=xml:coverage-ingestion.xml
       - uses: actions/setup-node@v4
         with:
