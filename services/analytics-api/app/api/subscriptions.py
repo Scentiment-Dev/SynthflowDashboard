@@ -6,10 +6,12 @@ from app.schemas.source_truth import PortalSuccessValidationRequest, SourceTruth
 from app.schemas.subscription import (
     SubscriptionActionConfirmationRequest,
     SubscriptionActionConfirmationResponse,
+    SubscriptionAnalyticsResponse,
     SubscriptionSummary,
 )
 from app.services.subscription_service import (
     confirm_subscription_action,
+    get_subscription_analytics,
     get_subscription_summary,
     validate_portal_success,
 )
@@ -22,6 +24,14 @@ def summary(
     _: UserContext = Depends(require_api_permission(Permission.READ_SUBSCRIPTIONS)),
 ) -> SubscriptionSummary:
     return get_subscription_summary()
+
+
+@router.get("/analytics", response_model=SubscriptionAnalyticsResponse)
+def analytics(
+    scenario: str = "baseline",
+    _: UserContext = Depends(require_api_permission(Permission.READ_SUBSCRIPTIONS)),
+) -> SubscriptionAnalyticsResponse:
+    return get_subscription_analytics(scenario)
 
 
 @router.post("/actions/confirm", response_model=SubscriptionActionConfirmationResponse)
