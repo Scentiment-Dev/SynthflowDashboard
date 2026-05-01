@@ -94,17 +94,24 @@
 - Updated `docs/07_dashboard_ui_ux/API_CONTRACT_ALIGNMENT.md` and
   `docs/07_dashboard_ui_ux/FRONTEND_IMPLEMENTATION_MAP.md` with the Cycle 002
   contract surface and source-of-truth rules enforced in the UI.
-- Addressed two Bugbot/Codex Low-severity findings on the original commit:
-  (1) tightened `isSubscriptionAnalyticsShape` to require
+- Addressed three Bugbot/Codex findings across the cycle:
+  (1) Codex P1 — tightened `isSubscriptionAnalyticsShape` to require
   `generated_from_fixture` to be a boolean and require all required nested
   contract sections (subscription_overview, portal_journey, shopify_context,
   synthflow_journey, source_confirmation, metric_metadata) to be plain
-  objects, falling back to fixture instead of promoting a malformed
-  payload to `source: 'api'`; (2) replaced `formatRatio`'s
-  `ratio % 1 === 0` integer check with a Math.round + 1e-9 tolerance check
-  so floating-point noise (e.g. `(3/10)*100 = 30.000000000000004`) no
-  longer produces inconsistent `30.0%` instead of `30%`. Added focused
-  tests for both fixes; Bugbot re-reviewed and reported no issues.
+  objects, falling back to the typed fixture instead of promoting a
+  malformed payload to `source: 'api'`.
+  (2) Bugbot Low — replaced `formatRatio`'s `ratio % 1 === 0` integer check
+  with a `Math.round` + 1e-9 tolerance check so floating-point noise
+  (e.g. `(3/10)*100 = 30.000000000000004`) no longer produces inconsistent
+  `30.0%` instead of `30%`.
+  (3) Bugbot Low — removed the duplicate `formatCount` helper and switched
+  all five subscription panels to import `formatMetricValue` from
+  `utils/formatters.ts`, eliminating the second number-formatting utility.
+  Added focused tests for fixes (1) and (2); Bugbot re-reviewed cleanly
+  on the final head commit.
+- Resolved all four PR review threads with reply commentary linking the
+  findings to the fix commits.
 
 ## Files Created
 
@@ -147,10 +154,12 @@
   (TypeScript-only constructor visibility params and discriminated-union helper
   generics in `apiClient.ts` and `DashboardFilterContext.tsx`, plus a
   type-signature parameter name in the new test file). No regressions.
-- `npm --prefix apps/dashboard-web run test:run`: passed with `77 passed
-  (77)` across `10` test files (was `9` files / `27` tests before this
-  cycle; 4 additional tests were added in commit `da5e0cf2` to cover the
-  Bugbot-flagged shape-validator and `formatRatio` fixes).
+- `npm --prefix apps/dashboard-web run test:run`: passed with `76 passed
+  (76)` across `10` test files (was `9` files / `27` tests before this
+  cycle; 4 tests added in commit `da5e0cf2` for the Bugbot-flagged
+  shape-validator and `formatRatio` fixes; the redundant `formatCount`
+  test was removed in `b98c382` when `formatCount` was consolidated into
+  the existing `formatMetricValue` helper).
 - `npm --prefix apps/dashboard-web run test:coverage`: passed (above thresholds
   on all four metrics — see Coverage section).
 - `npm --prefix apps/dashboard-web run build`: passed (vite production build
@@ -166,19 +175,20 @@
   - `apps/dashboard-web/coverage/coverage-final.json`
   - `apps/dashboard-web/coverage/clover.xml`
   - `apps/dashboard-web/coverage/base.css` (coverage HTML report assets)
-- Percentages on this branch (head `da5e0cf2`, post-Bugbot-fix run):
-  - Statements: `98.95%` (378/382)
+- Percentages on this branch (head `b98c382`, final post-refactor run):
+  - Statements: `98.95%` (377/381)
   - Branches:   `95.39%` (207/217)
-  - Functions:  `99.32%` (148/149)
-  - Lines:      `99.70%` (336/337)
-- Coverage >= 95%: Yes (all four metrics).
+  - Functions:  `99.32%` (147/148)
+  - Lines:      `99.70%` (335/336)
+- Coverage >= 95%: Yes (all four metrics). Codecov bot reported
+  `96.29% of diff hit (target 95.00%)` for this PR.
 
 ## Codecov Status
 
-- `codecov/patch` on PR #13 (head `da5e0cf2`): PASS. Codecov bot reported
-  patch coverage above the 95% gate.
-- `Coverage and Codecov Upload` workflow on PR #13 (head `da5e0cf2`):
-  PASS in 1m05s. Backend, frontend and ingestion artifact uploads all
+- `codecov/patch` on PR #13 (head `b98c3828`): PASS — `96.29% of diff hit
+  (target 95.00%)`.
+- `Coverage and Codecov Upload` workflow on PR #13 (head `b98c3828`):
+  PASS in 1m. Backend, frontend and ingestion artifact uploads all
   succeeded.
 - `codecov/project` is not currently emitted on PR #13. Per the Cycle 001
   governance note
@@ -189,13 +199,24 @@
 
 ## Bugbot Status
 
-- `Cursor Bugbot` on PR #13 (head `da5e0cf2`): status `completed`,
-  conclusion `success` (8m41s). Bugbot final summary: "Bugbot completed
-  review - no issues found".
-- The two prior Bugbot/Codex findings on commit `0ac30b2b` (Low severity:
-  runtime shape validator omitting `generated_from_fixture`, and
-  `formatRatio` floating-point integer check) were addressed in commit
-  `da5e0cf2` and verified clean by Bugbot's re-review.
+- `Cursor Bugbot` on PR #13 (head `b98c3828`): status `completed`,
+  conclusion `success` (8m). Bugbot final summary: "Bugbot Review" with
+  no findings.
+- Three Bugbot/Codex findings surfaced across the cycle and were all
+  resolved in code:
+  1. P1 (Codex): runtime shape validator only checked top-level key
+     presence — fixed in `da5e0cf2` by tightening
+     `isSubscriptionAnalyticsShape` to require `generated_from_fixture` to
+     be a boolean and every required nested contract object to be a plain
+     object via `isPlainObject`.
+  2. Low (Bugbot): `formatRatio` used `ratio % 1 === 0`, fragile under
+     IEEE 754 — fixed in `da5e0cf2` with a `Math.round` + 1e-9 tolerance
+     check.
+  3. Low (Bugbot): `formatCount` duplicated existing
+     `formatMetricValue` — fixed in `b98c382` by removing `formatCount`
+     and switching all five subscription panels to import
+     `formatMetricValue` from `utils/formatters.ts`.
+- All four PR review threads (one Codex + three Bugbot) are RESOLVED.
 
 ## Validation Commands
 
@@ -249,26 +270,25 @@ PowerShell commands actually run during this cycle:
 
 - PR: [PR #13](https://github.com/Scentiment-Dev/SynthflowDashboard/pull/13),
   title `[Wave 01][Cycle 002][Agent B] Subscription UI contract wiring`,
-  base `main`, head commit `da5e0cf249c43dfe7d016b361c76b06cc48a1adf`.
-- `mergeable`: `MERGEABLE`. `mergeStateStatus`: `BLOCKED` solely because no
-  human code-owner review has been recorded yet (`reviewDecision`: empty);
-  no failing or missing CI check is blocking the merge.
-- Final check rollup on head `da5e0cf2`:
-  - `Repo validation and no-drift gates`: pass (6s)
-  - `lint-typecheck (backend|frontend|ingestion)`: pass
-  - `backend-tests / backend`: pass (29s)
-  - `frontend-tests / frontend`: pass (46s)
-  - `ingestion-tests / ingestion`: pass (16s)
-  - `contract-tests / contracts`: pass (12s)
-  - `dbt-tests / dbt`: pass (23s)
+  base `main`, head commit `b98c3828843f29123109c4d27a02bc4e12ce19e5`.
+- `mergeable`: `MERGEABLE`. `mergeStateStatus`: `CLEAN`. All four PR
+  review threads are resolved. Only governance left is human code-owner
+  approval.
+- Final check rollup on head `b98c3828` — **16 / 16 checks GREEN**:
+  - `Repo validation and no-drift gates`: pass (4s)
+  - `lint-typecheck (backend|frontend|ingestion)`: pass (28s / 29s / 22s)
+  - `backend-tests / backend`: pass (26s)
+  - `frontend-tests / frontend`: pass (44s)
+  - `ingestion-tests / ingestion`: pass (18s)
+  - `contract-tests / contracts`: pass (17s)
+  - `dbt-tests / dbt`: pass (28s)
   - `smoke-tests / smoke`: pass (9s)
-  - `frontend`: pass (52s)
-  - `release-readiness`: pass (7s)
-  - `smoke`: pass (6s)
-  - `Coverage and Codecov Upload`: PASS (1m05s) — the project-status upload
-    step now completes cleanly on this commit
-  - `codecov/patch`: PASS (above 95% gate)
-  - `Cursor Bugbot`: PASS / `success` (8m41s) — "no issues found"
+  - `Frontend Tests / frontend`: pass (43s)
+  - `Release Readiness / release-readiness`: pass (5s)
+  - `Smoke Tests / smoke`: pass (6s)
+  - `Coverage and Codecov Upload`: PASS (1m)
+  - `codecov/patch`: PASS — `96.29% of diff hit (target 95.00%)`
+  - `Cursor Bugbot`: PASS / `success` (8m) — Bugbot Review, no findings
   - `codecov/project`: not emitted (documented external Codecov platform
     behavior; Path A required checks all green)
 
@@ -289,9 +309,10 @@ PowerShell commands actually run during this cycle:
 
 ## Blockers
 
-- No code-level or CI blocker. PR #13 is `MERGEABLE`. The only outstanding
-  item is human code-owner review, which is governance, not a quality
-  gate.
+- None. PR #13 is `MERGEABLE` / `mergeStateStatus: CLEAN`. All 16 CI
+  checks are GREEN and all four review threads are RESOLVED. The only
+  remaining step is human code-owner approval (governance, not a
+  quality gate).
 
 ## Risks
 
@@ -331,23 +352,23 @@ PowerShell commands actually run during this cycle:
 Cycle 002 Agent B work — moving the subscription analytics frontend from a
 shell to a contract-connected vertical slice — is implemented, deterministic,
 fixture-fallback-safe, visually verified, and locally validated above the
-95% coverage gate on all four coverage metrics with all 77 frontend tests
-passing. PR #13 is open against `main`, head `da5e0cf2`, GitHub status
-`MERGEABLE`, every Path A required check is GREEN
-(`Coverage and Codecov Upload`, `codecov/patch`, `Cursor Bugbot`, all
-backend / frontend / ingestion / contract / dbt / smoke / lint-typecheck
-jobs), and the two Bugbot/Codex Low-severity findings on the original
-commit (`generated_from_fixture` not validated; `formatRatio`
-floating-point integer check) were addressed in `da5e0cf2` and re-reviewed
-by Bugbot with conclusion `success` ("no issues found"). The only
-non-emitted check is `codecov/project`, which is the documented external
-Codecov platform/context behavior — not a regression introduced by this
-PR.
+95% coverage gate on all four coverage metrics with all 76 frontend tests
+passing. PR #13 is open against `main`, head `b98c3828`, GitHub status
+`MERGEABLE` / `mergeStateStatus: CLEAN`. **All 16 of 16 PR checks are
+GREEN** (Repo validation; lint-typecheck backend/frontend/ingestion;
+backend / frontend / ingestion / contract / dbt / smoke tests; Frontend
+Tests; Release Readiness; Smoke Tests; `Coverage and Codecov Upload`;
+`codecov/patch` at 96.29% of diff; `Cursor Bugbot` `success`). All four
+PR review threads (one Codex P1 and three Bugbot Low) are resolved, with
+each finding traced to a specific fix commit. The only non-emitted check
+is `codecov/project`, which is the documented external Codecov
+platform/context behavior — not a regression introduced by this PR.
 
 ## Recommended Next Steps
 
-1. Request human code-owner review and merge PR #13 once approved (no
-   technical gate is blocking).
+1. Request human code-owner review and merge PR #13 once approved — no
+   technical gate is blocking; all CI checks and review threads are
+   resolved.
 2. After merge, consider folding the Cycle 001 module shell into a
    separate "legacy view" route or removing it once stakeholders confirm
    the new contract-wired view fully replaces it.
