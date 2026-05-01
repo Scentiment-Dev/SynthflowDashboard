@@ -62,7 +62,7 @@ jobs:
       - name: Install contract test dependencies
         run: python -m pip install pytest jsonschema pytest-cov
       - name: Run backend coverage
-        run: pytest services/analytics-api/tests tests/contracts tests/integration --cov=services/analytics-api --cov=services/ingestion-worker --cov=packages/shared-contracts --cov-report=term-missing --cov-report=xml
+        run: pytest services/analytics-api/tests tests/contracts tests/integration --cov=services/analytics-api --cov=services/ingestion-worker --cov=packages/shared-contracts --cov-report=term-missing --cov-report=xml --cov-config=.coveragerc.analytics
       - name: Run ingestion coverage for Codecov artifact completeness
         run: pytest services/ingestion-worker/tests --cov=services/ingestion-worker --cov-report=term-missing --cov-report=xml:coverage-ingestion.xml
       - uses: actions/setup-node@v4
@@ -87,6 +87,7 @@ jobs:
         with:
           files: ./coverage.xml,./coverage-ingestion.xml
           flags: backend
+          use_oidc: true
           fail_ci_if_error: false
       - name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -94,4 +95,5 @@ jobs:
         with:
           files: ./apps/dashboard-web/coverage/lcov.info
           flags: frontend
+          use_oidc: true
           fail_ci_if_error: false
