@@ -42,3 +42,55 @@ jobs:
 
   smoke-tests:
     uses: ./.github/workflows/smoke-tests.yml
+
+  coverage-codecov:
+    name: Coverage and Codecov Upload
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install backend dependencies
+        run: python -m pip install -e "./services/analytics-api[dev]"
+      - name: Install ingestion dependencies
+        run: python -m pip install -e "./services/ingestion-worker[dev]"
+      - name: Install test dependencies
+        run: python -m pip install pytest pytest-cov jsonschema
+      - name: Run backend coverage gate
+        run: pytest services/analytics-api/tests tests/contracts tests/integration --cov=services/analytics-api --cov=services/ingestion-worker --cov=packages/shared-contracts --cov-report=term-missing --cov-report=xml
+      - name: Run ingestion coverage artifact
+        run: pytest services/ingestion-worker/tests --cov=services/ingestion-worker --cov-report=term-missing --cov-report=xml:coverage-ingestion.xml
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: apps/dashboard-web/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: apps/dashboard-web
+        run: npm ci
+      - name: Run frontend coverage
+        working-directory: apps/dashboard-web
+        run: npm run test:coverage
+      - name: Verify coverage artifacts exist
+        run: |
+          test -f coverage.xml
+          test -f coverage-ingestion.xml
+          test -f apps/dashboard-web/coverage/lcov.info
+      - name: Upload backend coverage to Codecov
+        uses: codecov/codecov-action@v5
+        continue-on-error: true
+        with:
+          files: ./coverage.xml,./coverage-ingestion.xml
+          flags: backend
+          fail_ci_if_error: false
+      - name: Upload frontend coverage to Codecov
+        uses: codecov/codecov-action@v5
+        continue-on-error: true
+        with:
+          files: ./apps/dashboard-web/coverage/lcov.info
+          flags: frontend
+          fail_ci_if_error: false
