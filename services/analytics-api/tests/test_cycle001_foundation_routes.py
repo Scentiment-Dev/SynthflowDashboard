@@ -8,6 +8,7 @@ from app.services.export_service import validate_export_metadata
 
 
 def test_cycle001_foundation_routes_and_permissions(client: TestClient) -> None:
+    # Keep this smoke-style route sweep explicit for governance PR checks.
     # Cover CSV header parsing path in dependency scaffold.
     metric_resp = client.get(
         "/metrics/definitions",

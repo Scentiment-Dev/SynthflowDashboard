@@ -61,41 +61,43 @@ jobs:
         run: python -m pip install -e "./services/ingestion-worker[dev]"
       - name: Install contract test dependencies
         run: python -m pip install pytest jsonschema pytest-cov
-      - name: Run coverage gate
+      - name: Run backend coverage
         run: pytest services/analytics-api/tests tests/contracts tests/integration --cov=services/analytics-api --cov=services/ingestion-worker --cov=packages/shared-contracts --cov-report=term-missing --cov-report=xml --cov-fail-under=95 --cov-config=.coveragerc.analytics
       - name: Run ingestion coverage for Codecov artifact completeness
         run: pytest services/ingestion-worker/tests --cov=services/ingestion-worker --cov-report=term-missing --cov-report=xml:coverage-ingestion.xml
-      - name: Upload coverage to Codecov (attempt 1)
-        id: codecov_upload_1
-        uses: codecov/codecov-action@v5
-        continue-on-error: true
+      - uses: actions/setup-node@v4
         with:
-          files: ./coverage.xml,./coverage-ingestion.xml
-          fail_ci_if_error: true
-          use_oidc: true
-          use_legacy_upload_endpoint: true
-      - name: Upload coverage to Codecov (attempt 2)
-        id: codecov_upload_2
-        if: steps.codecov_upload_1.outcome == 'failure'
-        uses: codecov/codecov-action@v5
-        continue-on-error: true
-        with:
-          files: ./coverage.xml,./coverage-ingestion.xml
-          fail_ci_if_error: true
-          use_oidc: true
-          use_legacy_upload_endpoint: true
-      - name: Upload coverage to Codecov (attempt 3)
-        id: codecov_upload_3
-        if: steps.codecov_upload_1.outcome == 'failure' && steps.codecov_upload_2.outcome == 'failure'
-        uses: codecov/codecov-action@v5
-        continue-on-error: true
-        with:
-          files: ./coverage.xml,./coverage-ingestion.xml
-          fail_ci_if_error: true
-          use_oidc: true
-          use_legacy_upload_endpoint: true
-      - name: Warn if all Codecov upload attempts failed
-        if: steps.codecov_upload_1.outcome == 'failure' && steps.codecov_upload_2.outcome == 'failure' && steps.codecov_upload_3.outcome == 'failure'
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: apps/dashboard-web/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: apps/dashboard-web
+        run: npm install
+      - name: Run frontend coverage
+        working-directory: apps/dashboard-web
+        run: npm run test:coverage
+      - name: Verify coverage artifacts exist
         run: |
-          echo "::warning::Codecov upload failed on all retry attempts (upstream service issue)."
-          echo "::warning::Local 95% coverage gate already passed in this job."
+          test -f coverage.xml
+          test -f coverage-ingestion.xml
+          test -f apps/dashboard-web/coverage/lcov.info
+      - name: Upload backend coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.xml,./coverage-ingestion.xml
+          flags: backend
+          use_oidc: true
+          fail_ci_if_error: true
+      - name: Upload frontend coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./apps/dashboard-web/coverage/lcov.info
+          flags: frontend
+          use_oidc: true
+          fail_ci_if_error: true
+      - name: Upload combined coverage to Codecov project status
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.xml,./coverage-ingestion.xml,./apps/dashboard-web/coverage/lcov.info
+          use_oidc: true
+          fail_ci_if_error: true
