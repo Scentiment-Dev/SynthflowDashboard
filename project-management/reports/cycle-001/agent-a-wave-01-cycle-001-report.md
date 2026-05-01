@@ -102,6 +102,7 @@
 ## PR / Check Status
 
 - PR/check status: PR opened at `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/1`.
+- GitHub Actions check suite: pending (`gh pr checks 1` shows backend/contracts/ingestion/dbt/lint/release-readiness/smoke jobs queued or running).
 - Bugbot status: not run yet (no completed Bugbot result recorded).
 - Codecov status: not run yet (no completed Codecov result recorded).
 
