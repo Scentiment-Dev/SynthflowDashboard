@@ -63,12 +63,15 @@ jobs:
         run: python -m pip install pytest jsonschema pytest-cov
       - name: Run coverage gate
         run: pytest services/analytics-api/tests tests/contracts tests/integration --cov=services/analytics-api --cov=packages/shared-contracts --cov-report=term-missing --cov-report=xml --cov-fail-under=95
+      - name: Run ingestion coverage for Codecov artifact completeness
+        working-directory: services/ingestion-worker
+        run: pytest tests --cov=app --cov-report=term-missing --cov-report=xml:../../coverage-ingestion.xml
       - name: Upload coverage to Codecov (attempt 1)
         id: codecov_upload_1
         uses: codecov/codecov-action@v5
         continue-on-error: true
         with:
-          files: ./coverage.xml
+          files: ./coverage.xml,./coverage-ingestion.xml
           fail_ci_if_error: true
           use_oidc: true
           use_legacy_upload_endpoint: true
@@ -78,7 +81,7 @@ jobs:
         uses: codecov/codecov-action@v5
         continue-on-error: true
         with:
-          files: ./coverage.xml
+          files: ./coverage.xml,./coverage-ingestion.xml
           fail_ci_if_error: true
           use_oidc: true
           use_legacy_upload_endpoint: true
@@ -88,7 +91,7 @@ jobs:
         uses: codecov/codecov-action@v5
         continue-on-error: true
         with:
-          files: ./coverage.xml
+          files: ./coverage.xml,./coverage-ingestion.xml
           fail_ci_if_error: true
           use_oidc: true
           use_legacy_upload_endpoint: true
