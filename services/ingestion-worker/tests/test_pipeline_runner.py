@@ -6,10 +6,11 @@ from app.pipelines.runner import IngestionPipelineRunner
 from app.schemas.raw_event import RawSource
 from app.storage.local_jsonl_store import LocalJsonlStore
 
+SAMPLE_DIR = Path(__file__).resolve().parents[1] / "app" / "sample_payloads"
+
 
 def test_pipeline_runner_writes_normalized_events(tmp_path: Path) -> None:
-    sample_dir = Path("app/sample_payloads")
-    connectors = build_connectors(sample_dir)
+    connectors = build_connectors(SAMPLE_DIR)
     runner = IngestionPipelineRunner(
         pipeline_name="Stay.ai subscriptions",
         connector=connectors[RawSource.STAYAI],

@@ -21,7 +21,7 @@ OFFICIAL_OUTCOME_SOURCES: dict[RawSource, set[str]] = {
     RawSource.SHOPIFY: {"order_created", "fulfillment_updated", "tracking_updated", "customer_updated"},
     RawSource.PORTAL: {"portal_completed"},
     RawSource.LIVE_AGENT: {"agent_transfer", "case_created", "case_resolved"},
-    RawSource.SYNTHFLOW: {"call_started", "intent_captured", "node_reached", "call_abandoned", "call_completed"},
+    RawSource.SYNTHFLOW: set(),
 }
 
 FORBIDDEN_CLAIMS: dict[RawSource, set[str]] = {

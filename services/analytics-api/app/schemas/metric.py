@@ -57,8 +57,9 @@ class MetricSeriesPoint(BaseModel):
 class DashboardSummary(BaseModel):
     module: DashboardModule
     cards: list[MetricCard]
+    metrics: list[MetricCard] = Field(default_factory=list)
     definitions: list[MetricDefinition]
-    recent_events: list[dict] = Field(default_factory=list)
+    recent_events: list[dict[str, object]] = Field(default_factory=list)
     audit: AuditMetadata = Field(default_factory=AuditMetadata)
 
 

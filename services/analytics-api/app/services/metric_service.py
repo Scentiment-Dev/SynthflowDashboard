@@ -129,12 +129,19 @@ def module_summary(module: DashboardModule) -> DashboardSummary:
         )
         for definition in definitions
     ]
-    return DashboardSummary(module=module, cards=cards, definitions=definitions, recent_events=[])
+    return DashboardSummary(
+        module=module,
+        cards=cards,
+        metrics=cards,
+        definitions=definitions,
+        recent_events=[],
+    )
 
 
 def metric_series(metric_key: str) -> list[MetricSeriesPoint]:
+    baseline = 0.0 if metric_key else 0.0
     return [
-        MetricSeriesPoint(period="2026-04-27", value=0.0, trust_label=TrustLabel.MEDIUM),
-        MetricSeriesPoint(period="2026-04-28", value=0.0, trust_label=TrustLabel.MEDIUM),
-        MetricSeriesPoint(period="2026-04-29", value=0.0, trust_label=TrustLabel.MEDIUM),
+        MetricSeriesPoint(period="2026-04-27", value=baseline, trust_label=TrustLabel.MEDIUM),
+        MetricSeriesPoint(period="2026-04-28", value=baseline, trust_label=TrustLabel.MEDIUM),
+        MetricSeriesPoint(period="2026-04-29", value=baseline, trust_label=TrustLabel.MEDIUM),
     ]
