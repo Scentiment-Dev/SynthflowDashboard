@@ -57,7 +57,8 @@
 - [x] Main/default branch protection is verified.
 - [x] Required checks include backend CI.
 - [x] Required checks include frontend CI.
-- [x] Required checks keep Codecov visibility via `Coverage and Codecov Upload`.
+- [x] Required checks include `codecov/project`.
+- [x] Required checks include `codecov/patch`.
 - [x] Required checks include Bugbot.
 - [x] Branch protection was configured successfully (no admin blocker).
 
@@ -87,12 +88,12 @@
 
 - [x] Recommendation recorded as one of: Ready, Not Ready, Conditional, Blocked.
 - [x] If GitHub setup is blocked -> recommendation is Blocked.
-- [x] Codecov override decision is documented for this cycle.
+- [x] Strict Codecov 95% blocking policy is documented for this cycle.
 - [x] If Bugbot missing/failing/unverified -> recommendation is Blocked.
 - [x] Confidence percentage is present.
 
 ## Current status snapshot
 
-- Backend and frontend coverage are currently below 95%, captured as governance risk.
-- Codecov remains in CI/PR checks via `Coverage and Codecov Upload`.
-- This checklist follows explicit user override: Codecov is retained for visibility but not merge-blocking for this pass.
+- Codecov is configured and enforced as a hard 95% governance gate.
+- Bugbot is configured and enforced as a hard required PR gate.
+- Branch protection includes strict required checks for backend, frontend, `codecov/project`, `codecov/patch`, and Bugbot.
