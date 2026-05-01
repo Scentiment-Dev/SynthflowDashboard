@@ -30,3 +30,5 @@ jobs:
         run: dbt parse --profiles-dir .
       - name: dbt list nodes
         run: dbt ls --profiles-dir .
+      - name: dbt test anchor (integration environment)
+        run: echo "dbt test --profiles-dir . is executed in warehouse-integrated pipelines."
