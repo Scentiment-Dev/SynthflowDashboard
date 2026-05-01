@@ -64,8 +64,7 @@ jobs:
       - name: Run coverage gate
         run: pytest services/analytics-api/tests tests/contracts tests/integration --cov=services/analytics-api --cov=packages/shared-contracts --cov-report=term-missing --cov-report=xml --cov-fail-under=95
       - name: Run ingestion coverage for Codecov artifact completeness
-        working-directory: services/ingestion-worker
-        run: pytest tests --cov=app --cov-report=term-missing --cov-report=xml:../../coverage-ingestion.xml
+        run: pytest services/ingestion-worker/tests --cov=services/ingestion-worker --cov-report=term-missing --cov-report=xml:coverage-ingestion.xml
       - name: Upload coverage to Codecov (attempt 1)
         id: codecov_upload_1
         uses: codecov/codecov-action@v5
