@@ -6,7 +6,7 @@
 - Wave number: 01
 - Cycle number: 002
 - Branch name: `agent-c/wave-01/cycle-002-quality-gate-no-drift-review`
-- PR URL: TBD (created after governance changes are committed and pushed)
+- PR URL: [PR #14](https://github.com/Scentiment-Dev/SynthflowDashboard/pull/14)
 
 ## Assigned Work Summary
 
