@@ -72,7 +72,7 @@ jobs:
           cache-dependency-path: apps/dashboard-web/package-lock.json
       - name: Install frontend dependencies
         working-directory: apps/dashboard-web
-        run: npm ci
+        run: npm install
       - name: Run frontend coverage
         working-directory: apps/dashboard-web
         run: npm run test:coverage
