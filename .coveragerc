@@ -4,9 +4,6 @@ omit =
     services/analytics-api/app/db/*
     services/analytics-api/app/models/*
     services/analytics-api/app/schemas/event.py
-    services/ingestion-worker/app/*
-    services/ingestion-worker/app/*/*
-    services/ingestion-worker/app/*/*/*
 
 [report]
 skip_empty = True
