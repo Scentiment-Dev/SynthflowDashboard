@@ -1,101 +1,109 @@
 # Agent B Wave 01 Cycle 001 Report
 
 - Agent name: Cursor Agent B (Frontend / Dashboard / UI / UX)
-- Date/time: 2026-04-30 19:48 (UTC-5)
+- Date/time: 2026-04-30 22:57 (UTC-5)
 - Wave number: 01
 - Cycle number: 001
 - Requested branch name: `agent-b/wave-01/cycle-001-subscription-dashboard-shell`
 - Actual working root used: `C:\Synthflow_Dashboard`
-- Actual git status: valid git repository, active branch pushed to origin
+- Actual git status:
+  - ` M apps/dashboard-web/tsconfig.tsbuildinfo`
+  - ` M project-management/reports/cycle-001/agent-b-wave-01-cycle-001-report.md`
+  - `?? .coverage`
+  - `?? coverage-ingestion.xml`
+  - `?? coverage.xml`
+  - `?? services/ingestion-worker/.coverage`
 
 ## GitHub Setup Actions Taken
 
-1. Root detection and preflight run:
+1. Root detection protocol run:
+   - Declared root selected: `C:\Synthflow_Dashboard`
+   - Nested root `C:\Synthflow_Dashboard\Synthflow_Dashboard` not used.
+2. Preflight run:
    - `git --version` success
    - `git status --short` success
    - `git rev-parse --show-toplevel` success (`C:/Synthflow_Dashboard`)
-2. Branch setup run:
-   - `git checkout -b agent-b/wave-01/cycle-001-subscription-dashboard-shell` success
-3. Remote/auth diagnostics:
-   - Initial `git fetch origin` and `git ls-remote` failed with invalid credentials
-   - `gh auth status` showed invalid active `GH_TOKEN` override
-4. Root cause:
-   - Global `GH_TOKEN` env var is present and invalid
-   - It overrides keyring auth for both `gh` and git credential helper
-5. Recovery:
-   - Removed `GH_TOKEN` in-session before gh/git commands
-   - `gh auth status` then showed valid active account (`KevinGarrett-Scentiment`)
-   - `git ls-remote --heads` success
-   - `git fetch origin` success
-   - `git push -u origin agent-b/wave-01/cycle-001-subscription-dashboard-shell` success
-6. PR creation:
-   - `gh pr create` success
-   - PR URL: `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/2`
+3. Setup lock:
+   - `C:\Synthflow_Dashboard_GITHUB_SETUP_LOCK` acquired.
+4. Remote verification:
+   - `git ls-remote --heads https://github.com/Scentiment-Dev/SynthflowDashboard.git` initially failed due invalid token.
+5. Auth recovery:
+   - Cleared invalid `GH_TOKEN` in-session (`Remove-Item Env:GH_TOKEN -ErrorAction SilentlyContinue`)
+   - Re-ran `gh auth status` and `git ls-remote` successfully.
+6. Branch/PR:
+   - Branch confirmed: `agent-b/wave-01/cycle-001-subscription-dashboard-shell`
+   - Pushed branch and created PR `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/5`
 
 ## Backup Path Created
 
-- Not created in this run (repo already initialized; no `git init`/clone repair path executed).
+- Not created (backup step not applicable because no `git init` or clone-copy repo repair path was required).
 
 ## Inspection Summary (B1)
 
-- Project nested under `C:\Synthflow_Dashboard\Synthflow_Dashboard`: no (declared root used)
+- Actual working root: `C:\Synthflow_Dashboard`
+- Nested under `C:\Synthflow_Dashboard\Synthflow_Dashboard`: No
+- GitHub setup succeeded: Yes (after clearing invalid env token override)
 - Current branch: `agent-b/wave-01/cycle-001-subscription-dashboard-shell`
 - Remote URL: `https://github.com/Scentiment-Dev/SynthflowDashboard.git`
-- Frontend app path: `apps/dashboard-web` exists
-- Frontend structure confirmed:
-  - `apps/dashboard-web/src`
-  - `apps/dashboard-web/src/components`
-  - `apps/dashboard-web/src/pages`
-  - `apps/dashboard-web/src/routes`
-  - `apps/dashboard-web/src/hooks`
-  - `apps/dashboard-web/src/data`
+- Existing frontend app path: `apps/dashboard-web`
 - Framework/package manager evidence:
-  - React + TypeScript + Vite + Tailwind + React Router + Recharts
-  - npm scripts present for `lint`, `typecheck`, `test`, `build`
+  - React + TypeScript + Vite + React Router + Recharts
+  - npm scripts in `apps/dashboard-web/package.json`
 - Page/routing structure:
-  - `/subscriptions` route exists in `apps/dashboard-web/src/routes/DashboardRoutes.tsx`
+  - `apps/dashboard-web/src/routes/DashboardRoutes.tsx`
+  - all requested module routes present
 - Component layout:
-  - Dashboard shell via `DashboardModulePage` with shared layout + module components
+  - `apps/dashboard-web/src/layouts/DashboardLayout.tsx`
+  - `apps/dashboard-web/src/components/dashboard/DashboardModulePage.tsx`
 - Existing chart/table/filter libraries:
-  - Recharts chart components
-  - Metric/event tables
-  - Date/platform/segment filters
+  - `recharts`, custom table/filter components
 - Existing frontend test framework:
   - Vitest + Testing Library
-- Shared contracts available:
-  - `packages/shared-contracts/schemas/*.schema.json`
-  - `packages/shared-contracts/examples/*.example.json`
+- Existing frontend coverage tooling:
+  - `npm --prefix apps/dashboard-web run test:coverage`
+  - Vitest V8 provider and enforced thresholds
+- Existing shared contracts available:
+  - `packages/shared-contracts/schemas/subscription_analytics_response.schema.json`
+  - `packages/shared-contracts/examples/*.json`
+- Existing Codecov config:
+  - `codecov.yml` enforces project/patch 95%
+- Existing Bugbot evidence:
+  - `Cursor Bugbot` check is present on PR #5 (currently `IN_PROGRESS`)
 - Existing docs paths:
-  - `docs/07_dashboard_ui_ux` exists
-  - `docs/06_analytics_modules` exists
-  - `project-management/reports` exists
-- Missing/incomplete frontend paths from requested list:
-  - None missing
-- PM expectation mismatches vs local files:
-  - Prior "not a git repository" blocker no longer applies
-  - Active issue is invalid global `GH_TOKEN` override, not repository structure
+  - `docs/07_dashboard_ui_ux`, `docs/06_analytics_modules`, `project-management/reports`
+- Missing/incomplete frontend paths:
+  - None from the requested list.
+- PM mismatch observed:
+  - Prompt’s prior git-root blocker no longer applies; root is already a valid git repository.
 
 ## Assigned Work Summary
 
-- Execute GitHub setup/recovery protocol first
-- Validate Cycle 001 subscription dashboard shell foundation
-- Confirm required UI state visibility with non-production placeholders
-- Run requested frontend validation commands
-- Produce cycle report with evidence
+- Complete GitHub setup/recovery protocol.
+- Validate/implement subscription dashboard shell foundation.
+- Ensure all required UI states are visible and testable.
+- Run full frontend validation/coverage matrix.
+- Produce cycle report with evidence and blockers.
 
 ## Completed Work Summary (B2/B3)
 
-- GitHub setup/recovery protocol executed and documented
-- Branch created and pushed to origin
-- PR opened with required title
-- Existing subscription dashboard shell foundation validated (no unsafe backend-truth hardcoding)
-- Required 14 UI states confirmed present and readable via existing shell components
-- Validation command matrix executed and captured exactly
-- Report updated with root-cause auth diagnosis and resolved branch/PR status
+- Verified existing subscription dashboard shell foundation without introducing backend-truth logic.
+- Confirmed all 14 required placeholder states exist in `SubscriptionStateReadinessPanel`.
+- Added comprehensive frontend test suites covering:
+  - required subscription state placeholders
+  - permission denied/empty/loading/error and API source branches
+  - routes and page wrappers
+  - filter context behavior and reset
+  - API client and dashboard service wrappers
+  - export-audit success/failure paths
+  - branch-heavy chart/header/helper utilities
+  - `useDashboardSummary` success/failure/unmount cleanup paths
+- Enforced 95% frontend coverage thresholds in `apps/dashboard-web/vite.config.ts`.
+- Generated frontend `lcov.info` coverage artifact.
+- Opened PR #5 and captured real check evidence.
 
 ## Required UI States Coverage
 
-Validated in existing frontend shell:
+Validated and test-covered:
 
 1. Loading
 2. Empty
@@ -114,13 +122,17 @@ Validated in existing frontend shell:
 
 ## Files Created
 
-- None in this run.
+- `apps/dashboard-web/src/tests/SubscriptionShellStates.test.tsx`
+- `apps/dashboard-web/src/tests/ServicesRoutesAndState.test.tsx`
+- `apps/dashboard-web/src/tests/BranchCoverage.test.tsx`
+- `apps/dashboard-web/src/tests/UseDashboardSummary.test.tsx`
 
 ## Files Modified
 
+- `apps/dashboard-web/package.json`
+- `apps/dashboard-web/package-lock.json`
+- `apps/dashboard-web/vite.config.ts`
 - `project-management/reports/cycle-001/agent-b-wave-01-cycle-001-report.md`
-- `apps/dashboard-web/package-lock.json` (validation/dependency side effect, unstaged)
-- `apps/dashboard-web/tsconfig.tsbuildinfo` (typecheck/build artifact side effect, unstaged)
 
 ## Files Deleted
 
@@ -128,82 +140,135 @@ Validated in existing frontend shell:
 
 ## Tests Run
 
-- `npm --prefix apps/dashboard-web run test` -> pass (5 files, 5 tests)
+- `npm --prefix apps/dashboard-web run test`
+- `npm --prefix apps/dashboard-web run test:run`
+- `npm --prefix apps/dashboard-web run test:coverage`
 
 ## Test Results
 
-- Frontend tests: pass
-- Lint: pass with warnings only
+- Frontend tests: pass (`9` files, `27` tests)
+- Lint: pass with existing warnings only (`4` warnings, `0` errors)
 - Typecheck: pass
-- Build: pass with chunk size warning
-- Make frontend targets: unsupported in current environment
+- Build: pass (chunk-size warning)
+
+## Frontend Coverage Commands Run
+
+- `npm --prefix apps/dashboard-web run test:coverage`
+
+## Frontend Coverage Artifact Paths
+
+- `apps/dashboard-web/coverage/lcov.info`
+
+## Actual Frontend Coverage Percentage
+
+- Statements: `98.91%`
+- Branches: `95.52%`
+- Functions: `99.00%`
+- Lines: `99.38%`
+
+## Whether Frontend Coverage Is >= 95%
+
+- Yes.
+
+## Codecov Configuration Status
+
+- `codecov.yml` exists and enforces `95%` for project and patch.
+- CI includes `Coverage and Codecov Upload` job and `codecov/codecov-action@v5`.
+
+## Codecov 95% Threshold Status
+
+- Repo-level policy configured at 95%: Yes.
+- Frontend local coverage >=95% across all required dimensions: Yes.
+
+## Codecov PR/Check Status
+
+- PR #5 check `Coverage and Codecov Upload`: `COMPLETED / SUCCESS`.
+- No separate Codecov PR status context (e.g., `codecov/project` or `codecov/patch`) is visible yet on PR #5.
+
+## Codecov Blocker Details
+
+- Codecov blocker: no dedicated Codecov PR status context is currently visible on PR #5; strict gate requires real Codecov status evidence.
+
+## Bugbot Setup Status
+
+- Verified: Bugbot is installed/configured enough to create a real PR check (`Cursor Bugbot`) on PR #5.
+
+## Bugbot PR/Check Status
+
+- `Cursor Bugbot`: `IN_PROGRESS` (not yet completed).
+
+## Bugbot Blocker Details
+
+- Bugbot blocker: Bugbot check has not completed yet on PR #5, so merge readiness cannot be claimed.
 
 ## Validation Commands Run
 
 1. `npm --prefix apps/dashboard-web install` -> pass
-2. `npm --prefix apps/dashboard-web run lint` -> pass (4 warnings, 0 errors)
+2. `npm --prefix apps/dashboard-web run lint` -> pass with warnings
 3. `npm --prefix apps/dashboard-web run typecheck` -> pass
 4. `npm --prefix apps/dashboard-web run test` -> pass
-5. `npm --prefix apps/dashboard-web run build` -> pass
-6. `make test-frontend` -> failed (`Unsupported make target: test-frontend`)
-7. `make lint-frontend` -> failed (`Unsupported make target: lint-frontend`)
-8. `make build-frontend` -> failed (`Unsupported make target: build-frontend`)
-
-## PR / Check Status
-
-- PR status: open
-- PR URL: `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/2`
-- Bugbot status: not run in this execution
-- Codecov status: not run in this execution
-- Check status: pending/not reviewed in this execution
+5. `npm --prefix apps/dashboard-web run test:run` -> pass
+6. `npm --prefix apps/dashboard-web run test:coverage` -> pass (`>=95%`)
+7. `npm --prefix apps/dashboard-web run build` -> pass
+8. `make test-frontend` -> failed (`Unsupported make target: test-frontend`)
+9. `make lint-frontend` -> failed (`Unsupported make target: lint-frontend`)
+10. `make build-frontend` -> failed (`Unsupported make target: build-frontend`)
+11. `make coverage-frontend` -> failed (`Unsupported make target: coverage-frontend`)
 
 ## Visual Evidence Status
 
-- Screenshot capture status: not captured in this run
-- Reason: no net-new UI code was required for this continuation; work focused on auth recovery, validation, and PR/report completion
-- Alternate evidence: validated implementation files
-  - `apps/dashboard-web/src/components/dashboard/SubscriptionStateReadinessPanel.tsx`
-  - `apps/dashboard-web/src/components/dashboard/DashboardModulePage.tsx`
-  - `apps/dashboard-web/src/components/dashboard/ApiStateBanner.tsx`
+- Screenshots were not captured.
+- Limitation: no automated browser screenshot step was available in this execution path.
+- Alternate evidence provided through component and test files plus passing frontend CI checks.
+
+## PR/Check Status
+
+- PR URL: `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/5`
+- Branch push status: success
+- CI checks: all visible CI checks complete and passing
+- Codecov upload workflow: passing
+- Bugbot: still in progress
+- Task merge-readiness: blocked pending Bugbot completion and explicit Codecov status context evidence
 
 ## Open Issues
 
-- Invalid global `GH_TOKEN` can re-break gh/git unless removed or corrected
-- `make *-frontend` targets unsupported in current environment
-- Existing lint warnings remain in baseline frontend code
+- Global `GH_TOKEN` in environment is invalid and can break auth until cleared.
+- `make *-frontend` targets are unavailable in current Make setup.
+- Bugbot check has not completed yet.
+- Dedicated Codecov PR status context is not yet visible.
 
 ## Blockers
 
-- No hard blocker for current cycle completion
+- Bugbot check incomplete on PR #5.
+- Missing explicit Codecov status context evidence on PR #5.
 
 ## Risks
 
-- Auth regression risk persists while invalid global `GH_TOKEN` remains configured
-- Local side-effect file changes may be committed unintentionally if not reviewed
+- Declaring completion early could violate required Bugbot/Codecov hard gates.
+- Future GH automation may fail if invalid `GH_TOKEN` remains globally configured.
 
 ## Drift Concerns
 
-- Placeholder copy must remain explicit about non-production state to prevent metric-truth drift
+- Keep placeholders explicitly non-production until backend contract wiring is complete.
+- Do not display final subscription outcomes without Stay.ai-confirmed state/action evidence.
 
 ## Handoffs Required
 
-- Kevin/PM: remove or correct global invalid `GH_TOKEN`
-- QA/review: run Bugbot and Codecov on PR `#2`
-- Backend handoff: wire placeholders to Agent A contract-backed endpoints when available
+- PM/Agent C: verify why dedicated Codecov status context is not appearing despite successful upload job.
+- PM/Agent C: monitor Bugbot check completion and triage if it stalls or fails.
+- Agent B follow-up: capture final Bugbot and Codecov status evidence and update report confidence/completion.
 
 ## Confidence Percentage
 
-- 98%
+- 96%
 
 ## Completion Statement
 
-- Cycle 001 Agent B dashboard-shell foundation is validated and documented.
-- Branch is pushed and PR is open.
-- No Bugbot/Codecov completion claim is made without actual check evidence.
+- Agent B frontend foundation, tests, and local/frontend coverage gate are complete and validated.
+- Cycle 001 remains not fully complete under strict rules until Bugbot is complete and Codecov status evidence is explicit on PR.
 
 ## Recommended Next Steps
 
-1. Remove or fix global `GH_TOKEN` to avoid recurring auth failures.
-2. Run Bugbot and Codecov on PR `#2`.
-3. Decide whether to keep or discard local-only changes in `package-lock.json` and `tsconfig.tsbuildinfo`.
-4. Add screenshot evidence if PM requires visual artifacts despite no new UI code changes in this continuation.
+1. Wait for `Cursor Bugbot` on PR #5 to complete and record final conclusion.
+2. Confirm dedicated Codecov PR status (`codecov/project` and `codecov/patch`) is present; if absent, escalate governance/config issue.
+3. Once both checks are explicitly visible and successful, update confidence to >=97 and mark cycle merge-ready.
