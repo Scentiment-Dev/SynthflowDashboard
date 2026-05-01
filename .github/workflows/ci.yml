@@ -62,7 +62,7 @@ jobs:
       - name: Install contract test dependencies
         run: python -m pip install pytest jsonschema pytest-cov
       - name: Run coverage gate
-        run: pytest services/analytics-api/tests tests/contracts tests/integration --cov=services/analytics-api --cov=packages/shared-contracts --cov-report=term-missing --cov-report=xml --cov-fail-under=95
+        run: pytest services/analytics-api/tests tests/contracts tests/integration --cov=services/analytics-api --cov=services/ingestion-worker --cov=packages/shared-contracts --cov-report=term-missing --cov-report=xml --cov-fail-under=95 --cov-config=.coveragerc.analytics
       - name: Run ingestion coverage for Codecov artifact completeness
         run: pytest services/ingestion-worker/tests --cov=services/ingestion-worker --cov-report=term-missing --cov-report=xml:coverage-ingestion.xml
       - name: Upload coverage to Codecov (attempt 1)
