@@ -1,43 +1,58 @@
 # Agent C Wave 01 Cycle 001 Report
 
 - Agent name: Cursor Agent C - QA / Governance / PR Review / No-Drift
-- Date/time: 2026-04-30T19:11:00-05:00
+- Date/time: 2026-04-30T20:14:00-05:00
 - Wave number: 01
 - Cycle number: 001
 - Requested branch name: `agent-c/wave-01/cycle-001-governance-qa-foundation`
+- Actual working root used: `C:\Synthflow_Dashboard`
 
-## Actual Git Status
+## Actual git status
 
-- Root checked: `C:\Synthflow_Dashboard`
-- `git rev-parse --show-toplevel`: failed (`fatal: not a git repository (or any of the parent directories): .git`)
-- `git status --short`: failed (`fatal: not a git repository (or any of the parent directories): .git`)
-- `git branch --show-current`: failed (`fatal: not a git repository (or any of the parent directories): .git`)
-- Nested `.git` folder scan: none found under `C:\Synthflow_Dashboard`
-- Git blocker status: active
+- Repository status: valid git repo.
+- `git rev-parse --show-toplevel`: `C:/Synthflow_Dashboard`.
+- `git branch --show-current`: `agent-c/wave-01/cycle-001-governance-qa-foundation`.
+- `git status --short`: clean before report update; this report and checklist are now modified.
+- Nested root check (`C:\Synthflow_Dashboard\Synthflow_Dashboard`): not used; declared root is actual project root.
+- Remote URL: `https://github.com/Scentiment-Dev/SynthflowDashboard.git`.
 
-Git/branch blocker: C:\Synthflow_Dashboard is not currently a git repository, so the requested branch could not be created or switched. Work was completed in local-only governance mode. PR creation, Bugbot status, Codecov status, and merge-readiness validation are blocked until Kevin/PM connects this folder to the actual GitHub repository or provides the correct cloned repo path.
+## GitHub setup actions taken
 
-## Assigned Work Summary
+- Ran root discovery and preflight commands.
+- Confirmed repo is already initialized; repair paths (`git init`, clone-copy repair) were not required.
+- Verified remote is reachable with `git ls-remote --heads`.
+- Diagnosed auth failure cause: invalid `GH_TOKEN` environment override caused `gh` and `git` authentication errors.
+- Removed `GH_TOKEN` in-session before GitHub operations; access to target org/repo then succeeded.
+- Confirmed requested Agent C branch exists and is active.
 
-- Execute required root/git preflight and handle git blocker safely.
-- Inspect governance/QA/reporting paths and existing evidence.
-- Build Cycle 001 governance QA checklist with explicit blocked states where required.
-- Review Agent A/B reports and validate no-drift/source-of-truth alignment using local artifacts.
+## Backup path created
+
+- No backup created in this run, because repo repair actions were not needed (no init/clone/push recovery flow executed).
+
+## Assigned work summary
+
+- Execute mandatory GitHub setup/recovery protocol before governance work.
+- Inspect required governance/doc/report/test paths and detect any missing structure.
+- Create/update Cycle 001 QA checklist with GitHub evidence, no-drift gates, and PR governance gates.
+- Review Agent A and Agent B reports for completeness and confidence.
+- Validate no-drift governance rules across representative backend/frontend/docs artifacts.
 - Produce Agent C cycle report with merge-readiness recommendation.
 
-## Completed Work Summary
+## Completed work summary
 
-- Ran required preflight and confirmed root is not a git repository.
-- Entered local-only governance mode and did not run `git init`, branch creation, or PR actions.
-- Inspected requested paths, GitHub templates/workflows, QA docs, security/export docs, tests path, and report paths.
-- Confirmed Agent A and Agent B cycle reports exist and reviewed both for required sections and confidence fields.
-- Performed no-drift evidence spot-checks against frontend and shared-contract artifacts.
-- Created Cycle 001 governance checklist at `project-management/reports/cycle-001/review-checklists/cycle-001-governance-qa-checklist.md`.
-- Created this Agent C report.
+- Executed mandatory setup protocol sections (root detection, preflight, auth diagnostics, branch setup path).
+- Verified the true working root and active branch.
+- Confirmed required folders and governance artifacts exist.
+- Reviewed existing Agent A and Agent B cycle reports.
+- Queried PR evidence for Agent A and Agent B (`gh pr view` and `gh pr checks`) and captured statuses.
+- Created Agent C PR and validated its check suite to green:
+  - `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/3`
+- Updated Cycle 001 governance checklist to reflect current evidence and unresolved gates.
+- Rewrote Agent C report to remove stale git-blocked assumptions and document current truth.
 
-## Structure Inspection Results (C1)
+## Governance structure inspection results (C1)
 
-Requested paths status:
+Requested paths:
 
 - Exists: `.github/`
 - Exists: `project-management/reports/`
@@ -50,181 +65,218 @@ Requested paths status:
 - Exists: `services/ingestion-worker/`
 - Exists: `packages/shared-contracts/`
 
-Existing GitHub templates/workflows:
+GitHub templates/workflows present:
 
-- `.github/PULL_REQUEST_TEMPLATE.md` present
-- `.github/ISSUE_TEMPLATE/agent_task.yml` present
-- `.github/ISSUE_TEMPLATE/change_request.yml` present
-- Multiple CI/workflow files present under `.github/workflows/`
+- `.github/PULL_REQUEST_TEMPLATE.md`
+- `.github/ISSUE_TEMPLATE/agent_task.yml`
+- `.github/ISSUE_TEMPLATE/change_request.yml`
+- Workflow files under `.github/workflows/` including `ci.yml`, `governance-validation.yml`, `backend-tests.yml`, `frontend-tests.yml`, `dbt-tests.yml`, and `smoke-tests.yml`.
 
-Existing QA/security/export docs:
+Existing report/evidence paths:
 
-- `docs/10_qa_acceptance/` contains QA strategy/checklist/evidence docs.
-- `docs/11_security_governance_rbac/` contains RBAC/export/trust/backfill governance docs.
-- `docs/13_reporting_exports/EXPORT_REQUIREMENTS.md` present.
+- `project-management/reports/cycle-001/agent-a-wave-01-cycle-001-report.md`
+- `project-management/reports/cycle-001/agent-b-wave-01-cycle-001-report.md`
+- `project-management/reports/cycle-001/review-checklists/cycle-001-governance-qa-checklist.md`
+- `project-management/reports/cycle-001/qa-evidence/README.md`
 
-Existing report folders and evidence paths:
+Mismatch between PM expectations and local files:
 
-- `project-management/reports/cycle-001/` exists.
-- Agent reports found:
-  - `project-management/reports/cycle-001/agent-a-wave-01-cycle-001-report.md`
-  - `project-management/reports/cycle-001/agent-b-wave-01-cycle-001-report.md`
-- `project-management/reports/cycle-001/qa-evidence/`: created this cycle by Agent C (`README.md` placeholder).
-- `project-management/reports/cycle-001/review-checklists/`: created this cycle by Agent C.
+- Previous "not a git repository" blocker is no longer true for current state.
+- Current blocker is governance evidence gap for Bugbot/Codecov, not repository availability.
 
-Mismatch between PM expectations and local state:
+## Cycle 001 QA checklist (C2)
 
-- GitHub repo URL is provided, but local root is not connected to a git repository.
-- PR-linked governance checks cannot be executed from current local root.
-
-## Cycle 001 QA Checklist (C2)
-
-- Checklist created: `project-management/reports/cycle-001/review-checklists/cycle-001-governance-qa-checklist.md`
+- Checklist updated: `project-management/reports/cycle-001/review-checklists/cycle-001-governance-qa-checklist.md`.
 - Checklist includes:
-  - Agent A/B/C report completeness checks
+  - GitHub setup/recovery evidence
+  - Agent A/B/C report completeness
   - changed-file scope validation
-  - tests/validation evidence checks
-  - Bugbot/Codecov blocked status
+  - tests/validation evidence
+  - Bugbot status
+  - Codecov status
   - no-drift/source-of-truth validation
-  - branch/PR governance checks
+  - branch naming and PR title/body checks
   - permission/RBAC/export/audit/trust-label governance
   - merge-readiness recommendation
 
-## No-Drift Validation Findings (C3)
+## No-drift validation findings (C3)
 
 Evidence reviewed:
 
+- `services/analytics-api/app/services/subscription_service.py`
+- `services/analytics-api/app/services/cancellation_service.py`
+- `services/analytics-api/app/services/rbac_service.py`
 - `apps/dashboard-web/src/components/dashboard/SubscriptionStateReadinessPanel.tsx`
-- `apps/dashboard-web/src/components/dashboard/DashboardModulePage.tsx`
-- `packages/shared-contracts/schemas/subscription_analytics_response.schema.json`
-- `packages/shared-contracts/examples/shopify_subscription_secondary_context.example.json`
-- `packages/shared-contracts/examples/portal_link_sent_not_completed.example.json`
-- `packages/shared-contracts/examples/stayai_cancellation_outcome_confirmed.example.json`
+- `apps/dashboard-web/src/components/dashboard/ApiStateBanner.tsx`
+- `docs/13_reporting_exports/EXPORT_REQUIREMENTS.md`
+- `docs/11_security_governance_rbac/TRUST_LABEL_ENFORCEMENT.md`
+- `docs/11_security_governance_rbac/BACKEND_PERMISSION_MODEL.md`
+- `docs/11_security_governance_rbac/BACKFILL_GOVERNANCE_POLICY.md`
 
-Findings:
+Validation outcomes:
 
-- Stay.ai final subscription ownership remains explicit in schema/UI language.
-- Shopify context remains secondary and non-finalizing.
-- Synthflow journey evidence is treated as journey context, not final state truth.
-- Portal link sent is explicitly separated from completion confirmation.
-- Trust label handling is documented as calculated/non-manual.
-- Frontend includes blocked state when server-side permission deny is returned.
-- UI markers are labeled as placeholders and non-production outcomes.
-- Export/audit metadata governance appears represented in schema/docs references.
+1. Stay.ai final subscription ownership: preserved in backend service descriptions and readiness states.
+2. Shopify order context limitation: maintained as secondary context and non-finalizer.
+3. Synthflow ownership: retained as journey/operational evidence, not final subscription state source.
+4. Portal link sent != completion: explicitly enforced in frontend guidance and subscription wording.
+5. Successful containment exclusion rules: represented in governance rules and no-drift policy set.
+6. Trust label non-manual elevation: explicit in trust-label governance doc and frontend messaging.
+7. Server-side explicit deny: explicit in RBAC service logic and backend permission model docs.
+8. UI placeholders not production logic: explicitly called out in frontend readiness components.
+9. Missing source data not guessed into final outcomes: represented via blocked/pending states in UI guidance.
+10. Backfill not base scope: explicit in backfill governance policy.
 
-Residual governance risks:
+## Agent A/B report review status (C4)
 
-- Agent A and Agent B both report pre-existing test/tooling failures that may obscure regressions until baseline is stabilized.
-- Without git/PR context, Bugbot/Codecov and merge gating cannot be validated.
+Agent A report review status: reviewed.
 
-## Agent A/B Report Review (C4)
+- Required fields largely present, including confidence (98%), changed files, tests, blockers, risks, and handoffs.
+- Report still contains stale initial git-blocker narrative from earlier run context, but branch/PR evidence is present.
 
-Agent A review status: reviewed.
+Agent B report review status: reviewed.
 
-- Confidence percentage present: yes (98%).
-- Git blocker handling: present.
-- Changed files: present.
-- Test commands/results: present.
-- Validation evidence and blocked PR/check/Bugbot/Codecov status: present.
-- Open blockers/risks/drift/handoffs: present.
+- Required fields present, including confidence (98%), setup handling, changed files, tests, blockers, risks, and handoffs.
+- PR evidence present with URL and command outcomes.
 
-Agent B review status: reviewed.
+If either report changes later, governance should be re-run against latest content.
 
-- Confidence percentage present: yes (97%).
-- Git blocker handling: present.
-- Changed files: present.
-- Test commands/results: present.
-- Validation evidence and blocked PR/check/Bugbot/Codecov status: present.
-- Open blockers/risks/drift/handoffs: present.
+## PR governance (C5)
 
-## PR Governance (C5)
+Agent A PR evidence:
 
-PR governance blocked because C:\Synthflow_Dashboard is not currently a git repository and no PR evidence is available.
+- PR: `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/1`
+- Title: `[Wave 01][Cycle 001][Agent A] Subscription backend foundation`
+- Branch: `agent-a/wave-01/cycle-001-subscription-backend-foundation` -> `main`
+- State: merged
+- Checks: all listed checks pass.
 
-## Files Created
+Agent B PR evidence:
+
+- PR: `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/2`
+- Title: `[Wave 01][Cycle 001][Agent B] Subscription dashboard shell`
+- Branch: `agent-b/wave-01/cycle-001-subscription-dashboard-shell` -> `main`
+- State: merged
+- Checks: all listed checks pass.
+
+Governance caveat:
+
+- Open PR list is currently empty because both reviewed PRs are already merged.
+- No Bugbot or Codecov evidence found in PR checks/comments reviewed during this cycle.
+- Agent C governance PR remains open with all listed CI checks passing.
+
+## Files created
+
+- None.
+
+## Files modified
 
 - `project-management/reports/cycle-001/review-checklists/cycle-001-governance-qa-checklist.md`
-- `project-management/reports/cycle-001/qa-evidence/README.md`
 - `project-management/reports/cycle-001/agent-c-wave-01-cycle-001-report.md`
 
-## Files Modified
+## Files deleted
 
 - None.
 
-## Files Deleted
-
-- None.
-
-## Validation Commands Run
+## Validation commands run
 
 Executed from `C:\Synthflow_Dashboard`:
 
-1. `cd C:\Synthflow_Dashboard`
-2. `Get-Location`
-3. `Get-ChildItem -Force`
+1. Root detection and listing script from protocol step 0.
+2. `git --version`
+3. `git status --short`
 4. `git rev-parse --show-toplevel`
-5. `git status --short`
+5. `git remote -v`
 6. `git branch --show-current`
-7. Nested git scan command (`Get-ChildItem -Recurse -Force -Directory -Filter .git`)
-8. Path existence and governance inventory commands for requested folders and report/docs/workflow evidence
+7. `git ls-remote --heads https://github.com/Scentiment-Dev/SynthflowDashboard.git`
+8. `gh --version`
+9. `gh auth status`
+10. `gh repo view Scentiment-Dev/SynthflowDashboard`
+11. `git fetch origin`
+12. Branch create/switch command for `agent-c/wave-01/cycle-001-governance-qa-foundation`
+13. `gh pr view 1 --json ...`
+14. `gh pr view 2 --json ...`
+15. `gh pr checks 1`
+16. `gh pr checks 2`
+17. `gh pr view 1 --json files`
+18. `gh pr view 2 --json files`
+19. `gh pr create --base main --head agent-c/wave-01/cycle-001-governance-qa-foundation --title "[Wave 01][Cycle 001][Agent C] Governance QA foundation" --body ...`
+20. `gh pr checks 3`
+21. `gh pr view 3 --json number,state,mergeStateStatus,isDraft,url`
+22. `gh api repos/Scentiment-Dev/SynthflowDashboard/commits/<pr3_head_sha>/check-runs --jq '.check_runs[].name'`
 
-## Tests Run
+## Tests run
 
-- No new test suite executed by Agent C in this cycle (governance review layer only).
+- No new local test suite run by Agent C in this governance cycle.
+- Agent A/B test evidence and PR checks were reviewed instead.
 
-## Test Results
+## Test results
 
-- Not applicable for Agent C implementation scope this cycle.
-- Agent A/B reported results were reviewed from their reports; no PR checks available due git blocker.
+- Agent C direct test execution: not applicable for this documentation/governance update.
+- Agent A/B PR checks: pass for listed CI jobs on PR #1 and PR #2.
 
-## PR/Check Status
+## PR/check status
 
-- PR/check status: blocked (no git repository / no branch / no PR evidence).
-- Bugbot status: blocked (no PR available).
-- Codecov status: blocked (no PR available).
+- Agent C PR #3: `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/3` (open, merge state CLEAN).
+- Agent C PR #3 checks: all listed checks pass (green).
+- Agent A PR #1: merged; checks pass.
+- Agent B PR #2: merged; checks pass.
 
-## Open Issues
+## Bugbot status
 
-- Root folder is not a git repository.
-- PR-linked checks and governance cannot be fully executed without branch/PR context.
-- Baseline failures reported by Agent A/B require follow-up before merge-ready claim.
+- Implementation status: not implemented in current repo CI/config surface (no Bugbot workflow/config references found in `.github/workflows` or repository scan).
+- Execution status: not run for PR #1, PR #2, or PR #3 because no Bugbot integration is configured.
+- Status: blocked by missing implementation (not just missing run evidence).
+
+## Codecov status
+
+- Implementation status: not implemented in current repo CI/config surface (no Codecov workflow step/action, no `codecov.yml`, and no repo references found).
+- Execution status: not run for PR #1, PR #2, or PR #3 because no Codecov integration is configured.
+- Status: blocked by missing implementation (not just missing run evidence).
+
+## Open issues
+
+- Invalid global `GH_TOKEN` remains a recurring auth risk unless corrected at environment level.
+- Bugbot and Codecov are not currently implemented in this repository, so evidence cannot be produced without adding integrations.
 
 ## Blockers
 
-- Primary blocker: no git repository at `C:\Synthflow_Dashboard`.
+- No hard GitHub setup blocker remains.
+- Governance completion for merge-readiness remains blocked by missing Bugbot/Codecov implementation and resulting evidence gap.
 
 ## Risks
 
-- Governance quality gates depending on PR checks (Bugbot/Codecov) cannot be validated in current state.
-- Merge-readiness cannot be asserted safely without repository linkage and PR evidence.
+- Token override can intermittently break gh/git operations and produce misleading auth failures.
+- Merged PRs without Bugbot/Codecov implementation and evidence reduce audit confidence.
 
-## Drift Concerns
+## Drift concerns
 
-- Risk of over-claiming completion if local-only evidence is treated as PR-ready status.
-- Existing failing tests/tooling reported by Agent A/B may hide drift if unresolved.
+- Risk of over-claiming merge readiness without Bugbot/Codecov proof.
+- Historical stale report sections (from prior blocked state) can cause governance confusion if not updated.
 
-## Handoffs Required
+## Handoffs required
 
-- Kevin/PM: connect `C:\Synthflow_Dashboard` to the actual cloned git repository (or provide correct repo path).
-- Agent A/B owners: resolve reported baseline test/tooling failures and refresh evidence once git/PR workflow is enabled.
-- PM/Governance: rerun PR governance pass after real branch/PR creation.
+- Kevin/PM: remove or correct global `GH_TOKEN` to prevent auth drift.
+- DevOps/PM: implement Bugbot and Codecov integrations in GitHub workflows/repository settings (or approve and document a formal waiver).
+- QA/PM: after implementation, run Bugbot and collect Codecov evidence for PR #1, PR #2, and PR #3.
+- Governance owner: re-run final readiness gate once Bugbot/Codecov evidence is available.
 
-## Merge-Readiness Recommendation
+## Merge-readiness recommendation
 
-- **Blocked** (required by Cycle 001 rules while git is blocked).
+- **Not Ready**
+- Rationale: CI and branch/PR evidence are healthy, but Bugbot and Codecov are not implemented in the current repository, so required governance evidence cannot be generated.
 
-## Confidence Percentage
+## Confidence percentage
 
 - 98%
 
-## Completion Statement
+## Completion statement
 
-- Governance foundation for Cycle 001 is complete locally (checklist + evidence review + no-drift validation + Agent C report), but PR-readiness and merge-readiness remain blocked until this folder is connected to the real git repository and PR-based checks can run.
+- Cycle 001 Agent C governance foundation has been executed with current-state evidence, including GitHub setup validation, path inspection, no-drift checks, PR governance review, and a green CI check suite on Agent C PR #3; merge-readiness remains not-ready until Bugbot/Codecov evidence is captured.
 
-## Recommended Next Steps
+## Recommended next steps
 
-1. Connect local folder to valid git clone and rerun git preflight.
-2. Create/switch to `agent-c/wave-01/cycle-001-governance-qa-foundation`.
-3. Re-run governance review against actual branch diff and real PR.
-4. Run/collect Bugbot and Codecov statuses on the real PR.
-5. Re-evaluate merge-readiness after blockers and baseline failures are addressed.
+1. Fix global `GH_TOKEN` at shell/profile level to eliminate recurring auth failures.
+2. Implement Bugbot workflow/integration for repository PRs.
+3. Implement Codecov workflow/integration (`codecov-action` or approved equivalent) and configure coverage reporting.
+4. Run Bugbot and capture Codecov evidence for PR #1, PR #2, and PR #3 under `project-management/reports/cycle-001/qa-evidence/`.
+5. Re-evaluate merge-readiness after implementation and evidence attachment.
