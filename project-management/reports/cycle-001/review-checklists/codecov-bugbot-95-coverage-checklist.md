@@ -97,3 +97,19 @@
 - Codecov is configured and enforced as a hard 95% governance gate.
 - Bugbot is configured and enforced as a hard required PR gate.
 - Branch protection includes strict required checks for backend, frontend, `codecov/project`, `codecov/patch`, and Bugbot.
+
+## Final reconciliation update (Path A)
+
+- Date/time: 2026-05-01T11:12:00-05:00
+- [x] PR #8 merged under emitted strict gate set while external `codecov/project` non-emission remained open.
+- [x] PR #9 fresh verification executed and merged under emitted strict gate set.
+- [x] `codecov/patch` is emitted and passing.
+- [ ] `codecov/project` is emitted and passing.
+- [x] Path A required checks currently enforced on `main`:
+  - `backend-tests / backend`
+  - `frontend-tests / frontend`
+  - `Coverage and Codecov Upload`
+  - `codecov/patch`
+  - `Cursor Bugbot`
+- [x] External blocker and support escalation template documented:
+  - `project-management/reports/cycle-001/qa-evidence/codecov-project-status-governance-note.md`
