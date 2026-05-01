@@ -39,15 +39,15 @@
 
 - Execute mandatory GitHub setup/recovery protocol before governance edits.
 - Verify/create Cycle 001 governance assets for CI/Codecov/Bugbot no-drift enforcement.
-- Apply approved override: keep Codecov visible in PR checks, but make it non-blocking for merge readiness in this cycle pass.
+- Enforce strict Codecov 95% quality gates for both project and patch status checks.
 - Verify Bugbot and branch-protection check status with real GitHub evidence.
 - Review Agent A/B reports and produce Agent C governance recommendation.
 
 ## Completed work summary
 
-- Added `codecov.yml` with informational status mode under approved override.
-- Updated `.github/workflows/ci.yml` to keep backend + frontend coverage generation and Codecov uploads while making Codecov non-blocking (`continue-on-error`, `fail_ci_if_error: false`).
-- Updated `.github/PULL_REQUEST_TEMPLATE.md` to keep Codecov in required review visibility while removing it as a hard blocker.
+- Updated `codecov.yml` to strict 95% blocking policy for project and patch checks.
+- Updated `.github/workflows/ci.yml` so backend/frontend coverage and Codecov uploads are blocking (`--cov-fail-under=95`, `fail_ci_if_error: true`).
+- Updated `.github/PULL_REQUEST_TEMPLATE.md` and governance language to reflect strict blocking gates.
 - Created `project-management/reports/cycle-001/review-checklists/codecov-bugbot-95-coverage-checklist.md`.
 - Verified Bugbot check visibility on merged PRs (#4, #5).
 - Configured branch protection required checks on `main` to include:

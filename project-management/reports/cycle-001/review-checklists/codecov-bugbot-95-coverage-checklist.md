@@ -34,15 +34,15 @@
 ## Coverage and Codecov gates
 
 - [x] `codecov.yml` exists.
-- [x] `codecov.yml` exists with informational status configuration under override.
+- [x] `codecov.yml` enforces strict project and patch targets at 95%.
 - [x] CI workflow exists at `.github/workflows/ci.yml` (or equivalent).
 - [x] Backend coverage artifact produced (`coverage.xml`).
 - [x] Frontend coverage artifact produced (`apps/dashboard-web/coverage/lcov.info`).
 - [x] Codecov upload step uses `codecov/codecov-action`.
 - [x] Codecov upload step remains in CI and PR checks (`Coverage and Codecov Upload`).
-- [x] Codecov upload is non-blocking under approved override (`continue-on-error`, `fail_ci_if_error: false`).
-- [x] Coverage below 95% is tracked but does not block merge under override.
-- [x] Missing `CODECOV_TOKEN` is tracked as a risk, not a blocker, under override.
+- [x] Codecov upload is blocking (`fail_ci_if_error: true`) and fails CI when upload fails.
+- [x] Coverage below 95% is a merge blocker.
+- [x] Missing `CODECOV_TOKEN` (if required by Codecov mode) is a merge blocker.
 
 ## Bugbot gates (hard blockers)
 
