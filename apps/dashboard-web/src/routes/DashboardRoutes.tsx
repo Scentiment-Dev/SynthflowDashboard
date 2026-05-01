@@ -6,7 +6,7 @@ import CancellationRetentionPage from '../pages/CancellationRetentionPage';
 import OrderStatusPage from '../pages/OrderStatusPage';
 import EscalationsPage from '../pages/EscalationsPage';
 import DataQualityPage from '../pages/DataQualityPage';
-import GovernancePage from '../pages/GovernancePage';
+import { GovernancePage } from '../pages/GovernancePage';
 import ExportsPage from '../pages/ExportsPage';
 
 export default function DashboardRoutes() {

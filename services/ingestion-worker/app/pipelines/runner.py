@@ -9,7 +9,6 @@ from app.core.errors import DeadLetterRecord, SourceTruthViolation
 from app.core.retry import run_with_retries
 from app.pipelines.normalize_events import normalize_event
 from app.schemas.pipeline import PipelineResult
-from app.schemas.raw_event import RawEvent
 from app.storage.local_jsonl_store import LocalJsonlStore
 
 logger = logging.getLogger(__name__)

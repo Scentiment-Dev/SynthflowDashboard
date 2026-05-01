@@ -22,7 +22,7 @@ class ExportAuditRecord(BaseModel):
     requested_by: str
     module: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    filters: dict
+    filters: dict[str, object]
     metric_keys: list[str]
     definitions_included: bool
     trust_labels_included: bool
