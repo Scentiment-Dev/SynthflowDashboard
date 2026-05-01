@@ -24,5 +24,4 @@ def validate_context(
     request: ShopifyOrderContextValidationRequest,
     _: UserContext = Depends(require_api_permission(Permission.READ_ORDER_STATUS)),
 ) -> ShopifyOrderContextValidationResponse:
-    normalized_request = request
-    return validate_shopify_context(normalized_request)
+    return validate_shopify_context(request)
