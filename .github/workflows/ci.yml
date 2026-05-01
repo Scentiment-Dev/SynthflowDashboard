@@ -63,10 +63,37 @@ jobs:
         run: python -m pip install pytest jsonschema pytest-cov
       - name: Run coverage gate
         run: pytest services/analytics-api/tests tests/contracts tests/integration --cov=services/analytics-api --cov=services/ingestion-worker --cov=packages/shared-contracts --cov-report=term-missing --cov-report=xml --cov-fail-under=95
-      - name: Upload coverage to Codecov
+      - name: Upload coverage to Codecov (attempt 1)
+        id: codecov_upload_1
         uses: codecov/codecov-action@v5
+        continue-on-error: true
         with:
           files: ./coverage.xml
           fail_ci_if_error: true
           use_oidc: true
           use_legacy_upload_endpoint: true
+      - name: Upload coverage to Codecov (attempt 2)
+        id: codecov_upload_2
+        if: steps.codecov_upload_1.outcome == 'failure'
+        uses: codecov/codecov-action@v5
+        continue-on-error: true
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: true
+          use_oidc: true
+          use_legacy_upload_endpoint: true
+      - name: Upload coverage to Codecov (attempt 3)
+        id: codecov_upload_3
+        if: steps.codecov_upload_1.outcome == 'failure' && steps.codecov_upload_2.outcome == 'failure'
+        uses: codecov/codecov-action@v5
+        continue-on-error: true
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: true
+          use_oidc: true
+          use_legacy_upload_endpoint: true
+      - name: Fail if all Codecov upload attempts failed
+        if: steps.codecov_upload_1.outcome == 'failure' && steps.codecov_upload_2.outcome == 'failure' && steps.codecov_upload_3.outcome == 'failure'
+        run: |
+          echo "Codecov upload failed on all retry attempts."
+          exit 1
