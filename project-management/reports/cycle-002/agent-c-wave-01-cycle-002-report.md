@@ -110,15 +110,15 @@
 - `gh api repos/Scentiment-Dev/SynthflowDashboard/branches/main/protection`
 - `gh api repos/Scentiment-Dev/SynthflowDashboard/commits/22f21e499cb237e4a2ea9109f8614db360db6ea0/status`
 - `gh api repos/Scentiment-Dev/SynthflowDashboard/commits/8669ad41e7827ecb26c5693802db6ae6ec24c9e1/status`
+- `gh pr checks 14`
+- `gh pr view 14 --json number,url,state,mergeable,mergeStateStatus,statusCheckRollup,headRefOid`
 
 ## PR / Check Status
 
 - Agent A PR #11 status: merged at `2026-05-01T18:13:38Z`.
 - Agent B PR #13 status: merged at `2026-05-01T20:05:14Z`.
-- Agent C PR #14 status: open, `mergeStateStatus: BLOCKED` while checks run.
-- PR #14 current checks observed:
-  - Passing: `Coverage and Codecov Upload`, `codecov/patch`, backend/frontend/ingestion/contract/dbt/smoke, lint-typecheck, release-readiness, no-drift gates.
-  - Pending: `Cursor Bugbot`.
+- Agent C PR #14 status: open, `mergeable: MERGEABLE`, `mergeStateStatus: CLEAN`.
+- PR #14 checks: all 14 checks passing, including required `Coverage and Codecov Upload`, `codecov/patch`, and `Cursor Bugbot`.
 - Required Path A checks verified as green for both PRs.
 - `codecov/project` remains non-emitting; treated as platform/context issue, not local configuration drift.
 
@@ -192,6 +192,6 @@
 
 ## Recommended Next Steps
 
-1. Open and merge this Agent C governance PR after CI checks pass.
+1. Merge Agent C governance PR #14.
 2. Keep Path A required checks unchanged until stable `codecov/project` emission is restored.
 3. Continue requiring explicit model declarations and confidence percentages in every cycle report.
