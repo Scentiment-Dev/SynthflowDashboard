@@ -21,12 +21,28 @@ const REQUIRED_TOP_LEVEL_KEYS: Array<keyof SubscriptionAnalyticsResponse> = [
   'synthflow_journey',
   'source_confirmation',
   'metric_metadata',
+  'generated_from_fixture',
 ];
 
+const REQUIRED_NESTED_OBJECT_KEYS: Array<keyof SubscriptionAnalyticsResponse> = [
+  'subscription_overview',
+  'portal_journey',
+  'shopify_context',
+  'synthflow_journey',
+  'source_confirmation',
+  'metric_metadata',
+];
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 function isSubscriptionAnalyticsShape(value: unknown): value is SubscriptionAnalyticsResponse {
-  if (!value || typeof value !== 'object') return false;
-  const candidate = value as Record<string, unknown>;
-  return REQUIRED_TOP_LEVEL_KEYS.every((key) => key in candidate);
+  if (!isPlainObject(value)) return false;
+  if (!REQUIRED_TOP_LEVEL_KEYS.every((key) => key in value)) return false;
+  if (!REQUIRED_NESTED_OBJECT_KEYS.every((key) => isPlainObject(value[key]))) return false;
+  if (typeof value.generated_from_fixture !== 'boolean') return false;
+  return true;
 }
 
 function isPermissionDenied(error: unknown): boolean {

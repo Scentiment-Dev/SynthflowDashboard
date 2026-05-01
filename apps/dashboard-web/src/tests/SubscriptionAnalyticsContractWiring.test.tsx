@@ -155,6 +155,57 @@ describe('useSubscriptionAnalytics', () => {
     });
   });
 
+  it('falls back to fixture when nested contract objects are null', async () => {
+    const baselineForBroken = JSON.parse(
+      JSON.stringify(SUBSCRIPTION_ANALYTICS_FIXTURES.baseline),
+    ) as SubscriptionAnalyticsResponse;
+    (baselineForBroken as unknown as Record<string, unknown>).subscription_overview = null;
+    vi.spyOn(dashboardApi, 'getSubscriptionAnalytics').mockResolvedValueOnce(baselineForBroken);
+
+    render(<HookProbe />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(
+        /subscription analytics response shape mismatch/i,
+      );
+    });
+  });
+
+  it('falls back to fixture when generated_from_fixture is missing or non-boolean', async () => {
+    const broken = JSON.parse(
+      JSON.stringify(SUBSCRIPTION_ANALYTICS_FIXTURES.baseline),
+    ) as SubscriptionAnalyticsResponse;
+    (broken as unknown as Record<string, unknown>).generated_from_fixture = 'no';
+    vi.spyOn(dashboardApi, 'getSubscriptionAnalytics').mockResolvedValueOnce(broken);
+
+    render(<HookProbe />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(
+        /subscription analytics response shape mismatch/i,
+      );
+    });
+  });
+
+  it('falls back to fixture when a nested contract field is an array instead of object', async () => {
+    const broken = JSON.parse(
+      JSON.stringify(SUBSCRIPTION_ANALYTICS_FIXTURES.baseline),
+    ) as SubscriptionAnalyticsResponse;
+    (broken as unknown as Record<string, unknown>).portal_journey = [];
+    vi.spyOn(dashboardApi, 'getSubscriptionAnalytics').mockResolvedValueOnce(broken);
+
+    render(<HookProbe />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(
+        /subscription analytics response shape mismatch/i,
+      );
+    });
+  });
+
   it('coerces non-Error rejections into a string message', async () => {
     vi.spyOn(dashboardApi, 'getSubscriptionAnalytics').mockRejectedValueOnce('boom');
 
@@ -334,6 +385,13 @@ describe('subscription analytics state helpers', () => {
     expect(formatRatio(50, 100)).toBe('50%');
     expect(formatRatio(33, 100)).toBe('33%');
     expect(formatRatio(2, 7)).toMatch(/%$/);
+  });
+
+  it('formats ratios that are integers despite floating-point noise as whole percentages', () => {
+    expect(formatRatio(3, 10)).toBe('30%');
+    expect(formatRatio(7, 10)).toBe('70%');
+    expect(formatRatio(9, 10)).toBe('90%');
+    expect(formatRatio(1, 3)).toMatch(/^33\.\d%$/);
   });
 
   it('returns the right tone for every final subscription state', () => {

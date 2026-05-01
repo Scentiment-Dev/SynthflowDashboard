@@ -264,8 +264,12 @@ export function formatCount(value: number): string {
   return value.toLocaleString();
 }
 
+const RATIO_INTEGER_TOLERANCE = 1e-9;
+
 export function formatRatio(numerator: number, denominator: number): string {
   if (denominator <= 0) return 'n/a';
   const ratio = (numerator / denominator) * 100;
-  return `${ratio.toFixed(ratio % 1 === 0 ? 0 : 1)}%`;
+  const rounded = Math.round(ratio);
+  const isEffectivelyInteger = Math.abs(ratio - rounded) < RATIO_INTEGER_TOLERANCE;
+  return `${ratio.toFixed(isEffectivelyInteger ? 0 : 1)}%`;
 }
