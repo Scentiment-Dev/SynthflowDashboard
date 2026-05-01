@@ -100,7 +100,7 @@
 
 ## PR / Check Status
 
-- PR: [PR #11](https://github.com/Scentiment-Dev/SynthflowDashboard/pull/11), state `OPEN`, merge state `CLEAN`.
+- PR: [PR #11](https://github.com/Scentiment-Dev/SynthflowDashboard/pull/11), state `MERGED`, merged at `2026-05-01T18:13:38Z`, merge commit `c97a73c808ea2e7289b072c851d2e51eae2b7830`.
 - All emitted checks are passing on latest head, including backend/frontend/ingestion/contracts/dbt/smoke, lint/typecheck, `Coverage and Codecov Upload`, `codecov/patch`, and `Cursor Bugbot`.
 - `codecov/project` is absent/non-emitting on this PR and documented as external Codecov context behavior.
 
@@ -135,6 +135,6 @@
 
 ## Recommended Next Steps
 
-1. Proceed with merge decision for PR #11 now that emitted required checks are green and merge state is `CLEAN`.
-2. Keep documenting `codecov/project` non-emission as an external Codecov/platform context issue while Path A required checks remain green.
-3. Hand off the updated `subscription_analytics_response` contract/example and `GET /subscriptions/analytics` endpoint details to Agent B.
+1. Keep documenting `codecov/project` non-emission as an external Codecov/platform context issue while Path A required checks remain green.
+2. Hand off the updated `subscription_analytics_response` contract/example and `GET /subscriptions/analytics` endpoint details to Agent B.
+3. Proceed with downstream frontend integration and QA validation against the merged backend contract slice.
