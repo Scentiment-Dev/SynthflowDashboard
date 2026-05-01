@@ -1,5 +1,9 @@
 import { apiGet, apiPost } from './apiClient';
 import type { DashboardModule, DashboardSummary, MetricDefinition, MetricSeriesPoint } from '../types/metrics';
+import type {
+  SubscriptionAnalyticsResponse,
+  SubscriptionAnalyticsScenario,
+} from '../types/subscriptionAnalytics';
 
 export type ExportAuditRequest = {
   requested_by: string;
@@ -29,9 +33,13 @@ export type ExportAuditRecord = {
 };
 
 export const buildModuleSummaryUrl = (module: DashboardModule) => `/metrics/modules/${module}/summary`;
+export const buildSubscriptionAnalyticsUrl = (scenario: SubscriptionAnalyticsScenario = 'baseline') =>
+  `/subscriptions/analytics?scenario=${encodeURIComponent(scenario)}`;
 export const getDashboardModules = () => apiGet<DashboardModule[]>('/metrics/modules');
 export const getDashboardSummary = (module: DashboardModule) => apiGet<DashboardSummary>(buildModuleSummaryUrl(module));
 export const getMetricDefinitions = () => apiGet<MetricDefinition[]>('/metrics/definitions');
 export const getMetricSeries = (metricKey: string) => apiGet<MetricSeriesPoint[]>(`/metrics/${metricKey}/series`);
 export const getNoDriftRules = () => apiGet<{ rules: string[] }>('/governance/no-drift-rules');
 export const createExportAudit = (request: ExportAuditRequest) => apiPost<ExportAuditRecord, ExportAuditRequest>('/exports/audit', request);
+export const getSubscriptionAnalytics = (scenario: SubscriptionAnalyticsScenario = 'baseline') =>
+  apiGet<SubscriptionAnalyticsResponse>(buildSubscriptionAnalyticsUrl(scenario));
