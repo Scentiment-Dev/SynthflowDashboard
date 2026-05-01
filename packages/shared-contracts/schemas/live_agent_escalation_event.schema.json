@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "title": "Live Agent Escalation Event",
+  "required": [
+    "event_id",
+    "call_id",
+    "event_type",
+    "occurred_at"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string"
+    },
+    "call_id": {
+      "type": "string"
+    },
+    "event_type": {
+      "type": "string"
+    },
+    "transfer_connected": {
+      "type": "boolean"
+    },
+    "queue_abandoned": {
+      "type": "boolean"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+name: Agent Task
+about: Track a Cursor agent implementation task
+labels: [agent-task]
+body:
+  - type: input
+    id: wave
+    attributes:
+      label: Wave
+      placeholder: Wave 9
+    validations:
+      required: true
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Agent
+      options:
+        - Cursor Agent A
+        - Cursor Agent B
+        - Cursor Agent C
+        - AI PM
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Describe exactly what should change.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Include checks and no-drift expectations.
+    validations:
+      required: true

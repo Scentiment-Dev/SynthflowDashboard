@@ -1,0 +1,30 @@
+name: Release Readiness
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  release-readiness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate repo structure
+        run: python -S scripts/validate_repo_structure.py
+      - name: Validate no-drift rules
+        run: python -S scripts/validate_no_drift_rules.py
+      - name: Validate Wave 8 agent system
+        run: python -S scripts/validate_wave8_agent_system.py
+      - name: Validate Wave 9 QA/CI
+        run: python -S scripts/validate_wave9_qa_ci.py
+      - name: Generate QA evidence packet
+        run: python -S scripts/qa_collect_evidence.py
+      - name: Upload QA evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-evidence
+          path: .qa-evidence/

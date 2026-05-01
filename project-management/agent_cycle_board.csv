@@ -1,0 +1,6 @@
+task_id,wave,owner,goal,primary_path,required_checks,status
+wave_09_ci_matrix,9,Cursor Agent C,Expand GitHub Actions into full CI matrix,.github/workflows/,make validate-structure; make validate-no-drift; make validate-wave8,not_started
+wave_09_backend_tests,9,Cursor Agent A,Add API contract and backend smoke tests,services/analytics-api/tests/,pytest or documented dependency gap,not_started
+wave_09_ingestion_tests,9,Cursor Agent A,Add ingestion pipeline and dead-letter tests,services/ingestion-worker/tests/,pytest or documented dependency gap,not_started
+wave_09_frontend_tests,9,Cursor Agent B,Add route and UI no-drift visibility tests,apps/dashboard-web/src/tests/,npm test or documented dependency gap,not_started
+wave_09_dbt_tests,9,Cursor Agent C,Document and wire dbt parse/test workflow,data/dbt/tests/,dbt parse/test or documented dependency gap,not_started

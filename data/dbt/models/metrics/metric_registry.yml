@@ -1,0 +1,51 @@
+version: 2
+models:
+  - name: mart_dashboard_metrics
+    description: Dashboard-ready metric registry and calculated metric values. Every metric must include formula version, source of truth, trust label, freshness, owner, timestamp, and no manual trust elevation.
+    columns:
+      - name: metric_key
+        tests: [not_null, unique]
+      - name: display_name
+        tests: [not_null]
+      - name: formula_version
+        tests: [not_null]
+      - name: source_of_truth
+        tests: [not_null]
+      - name: trust_label
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Confirmed', 'Pending Confirmation', 'Partial Evidence', 'Stale', 'Missing', 'Conflicting', 'Unverified']
+      - name: manual_trust_elevation_allowed
+        tests:
+          - accepted_values:
+              values: [false]
+exposures:
+  - name: dashboard_overview_module
+    type: dashboard
+    maturity: low
+    url: http://localhost:5173/
+    depends_on:
+      - ref('mart_dashboard_metrics')
+      - ref('mart_source_freshness')
+    owner:
+      name: Scentiment Analytics
+      email: analytics@scentiment.internal
+  - name: subscription_analytics_module
+    type: dashboard
+    maturity: low
+    depends_on:
+      - ref('mart_subscription_analytics')
+      - ref('mart_dashboard_metrics')
+    owner:
+      name: Scentiment Analytics
+      email: analytics@scentiment.internal
+  - name: cancellation_retention_module
+    type: dashboard
+    maturity: low
+    depends_on:
+      - ref('mart_retention_analytics')
+      - ref('mart_dashboard_metrics')
+    owner:
+      name: Scentiment Analytics
+      email: analytics@scentiment.internal

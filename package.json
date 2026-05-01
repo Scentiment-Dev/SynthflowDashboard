@@ -1,0 +1,26 @@
+{
+  "name": "scentiment-analytics-dashboard-root",
+  "version": "0.9.0-wave9",
+  "private": true,
+  "description": "Root workspace for Scentiment automated phone support analytics dashboard.",
+  "workspaces": [
+    "apps/dashboard-web"
+  ],
+  "scripts": {
+    "dev:web": "npm --prefix apps/dashboard-web run dev",
+    "build:web": "npm --prefix apps/dashboard-web run build",
+    "test:web": "npm --prefix apps/dashboard-web run test:run",
+    "typecheck:web": "npm --prefix apps/dashboard-web run typecheck",
+    "lint:web": "npm --prefix apps/dashboard-web run lint",
+    "validate:structure": "python -S scripts/validate_repo_structure.py",
+    "validate:no-drift": "python -S scripts/validate_no_drift_rules.py",
+    "validate:wave8": "python -S scripts/validate_wave8_agent_system.py",
+    "validate:wave9": "python -S scripts/validate_wave9_qa_ci.py",
+    "qa:evidence": "python -S scripts/qa_collect_evidence.py",
+    "qa:gates": "python -S scripts/run_local_quality_gates.py",
+    "manifest": "python -S scripts/generate_repo_manifest.py"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

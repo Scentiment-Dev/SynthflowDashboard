@@ -1,0 +1,25 @@
+name: Smoke Tests
+
+on:
+  workflow_call:
+  pull_request:
+    paths:
+      - 'docker-compose.yml'
+      - 'services/**'
+      - 'apps/dashboard-web/**'
+      - 'tests/smoke/**'
+      - '.github/workflows/smoke-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run local smoke-test skeleton
+        run: pytest tests/smoke

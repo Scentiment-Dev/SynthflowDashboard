@@ -1,0 +1,6 @@
+rule_key,rule_text,owner,launch_blocker_if_missing
+default_explicit_deny,"Permissions are enforced server-side using explicit deny.",governance,true
+trust_labels_system_calculated,"Trust labels are system-calculated and cannot be manually elevated.",governance,true
+export_metadata_required,"Exports must include filters, definitions, trust labels, freshness, formula versions, owner, timestamp, fingerprint, and audit reference.",governance,true
+backfill_governed_only,"Historical backfill is not base launch scope unless handled through a governed reprocess/backfill pipeline.",governance,true
+portal_completion_required,"Portal success requires confirmed portal completion, not link sent.",governance,true

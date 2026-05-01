@@ -1,0 +1,9 @@
+module,module_label,primary_mart,frontend_route,backend_endpoint,owner
+subscriptions,Subscription Analytics,mart_subscription_analytics,/subscriptions,/metrics/modules/subscriptions/summary,Agent A + Agent B
+cancellations,Cancellation Analytics,mart_retention_analytics,/cancellations,/metrics/modules/cancellations/summary,Agent A + Agent B
+retention,Retention Analytics,mart_retention_analytics,/retention,/metrics/modules/retention/summary,Agent A + Agent B
+order_status,Order Status Analytics,mart_order_status_analytics,/order-status,/metrics/modules/order_status/summary,Agent A + Agent B
+escalations,Escalations,mart_escalation_analytics,/escalations,/metrics/modules/escalations/summary,Agent A + Agent B
+data_quality,Data Quality,mart_source_freshness,/data-quality,/metrics/modules/data_quality/summary,Agent A + Agent C
+governance,Governance,mart_trust_label_audit,/governance,/metrics/modules/governance/summary,Agent A + Agent C
+exports,Exports,mart_dashboard_metrics,/exports,/exports/audit,Agent A + Agent C

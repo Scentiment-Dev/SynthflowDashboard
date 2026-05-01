@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Subscription Analytics Response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "subscription_id",
+    "final_subscription_state",
+    "source_of_truth_system",
+    "source_confirmation_status",
+    "action_attempts",
+    "portal_journey",
+    "shopify_context",
+    "metric_metadata"
+  ],
+  "properties": {
+    "subscription_id": {
+      "type": "string"
+    },
+    "final_subscription_state": {
+      "type": "string",
+      "enum": ["active", "retained", "saved", "cancelled", "pending", "unknown"]
+    },
+    "source_of_truth_system": {
+      "type": "string",
+      "enum": ["stayai"]
+    },
+    "source_confirmation_status": {
+      "type": "string",
+      "enum": ["confirmed", "pending", "missing"]
+    },
+    "action_attempts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action", "attempted_at", "source_system", "confirmed"],
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "attempted_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source_system": {
+            "type": "string",
+            "enum": ["stayai", "synthflow", "portal", "shopify"]
+          },
+          "confirmed": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "portal_journey": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["link_sent", "completion_confirmed"],
+      "properties": {
+        "link_sent": {
+          "type": "boolean"
+        },
+        "completion_confirmed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "shopify_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["order_id", "is_secondary_context_only"],
+      "properties": {
+        "order_id": {
+          "type": "string"
+        },
+        "is_secondary_context_only": {
+          "type": "boolean",
+          "const": true
+        },
+        "fulfillment_status": {
+          "type": ["string", "null"]
+        },
+        "tracking_number": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "metric_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "metric_id",
+        "formula_version",
+        "freshness",
+        "trust_label",
+        "owner",
+        "timestamp",
+        "audit_reference",
+        "source_system",
+        "source_confirmation_status"
+      ],
+      "properties": {
+        "metric_id": {
+          "type": "string"
+        },
+        "formula_version": {
+          "type": "string"
+        },
+        "freshness": {
+          "type": "string"
+        },
+        "trust_label": {
+          "type": "string",
+          "enum": ["high", "medium", "low", "untrusted"]
+        },
+        "owner": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "audit_reference": {
+          "type": "string"
+        },
+        "source_system": {
+          "type": "string",
+          "enum": ["stayai", "synthflow", "portal", "shopify", "warehouse", "analytics_api"]
+        },
+        "source_confirmation_status": {
+          "type": "string",
+          "enum": ["confirmed", "pending", "missing"]
+        }
+      }
+    }
+  }
+}

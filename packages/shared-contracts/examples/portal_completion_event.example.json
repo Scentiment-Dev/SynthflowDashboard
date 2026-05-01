@@ -1,0 +1,7 @@
+{
+  "event_id": "evt-portal-001",
+  "portal_session_id": "portal-001",
+  "event_type": "portal_completed",
+  "completed": true,
+  "occurred_at": "2026-04-29T12:10:00Z"
+}

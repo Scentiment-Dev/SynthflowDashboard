@@ -1,0 +1,8 @@
+{
+  "event_id": "evt-action-001",
+  "subscription_id": "sub-3002",
+  "event_type": "subscription_action_confirmed",
+  "confirmed_state": "active",
+  "cancellation_reason": null,
+  "occurred_at": "2026-04-30T10:05:00Z"
+}

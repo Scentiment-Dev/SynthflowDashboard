@@ -1,0 +1,19 @@
+{
+  "environment": "local",
+  "apiBaseUrl": "http://localhost:8000",
+  "dashboardBaseUrl": "http://localhost:5173",
+  "featureFlags": {
+    "subscriptionAnalytics": true,
+    "cancellationRetentionAnalytics": true,
+    "orderStatusAnalytics": true,
+    "governanceExports": true,
+    "historicalBackfill": false
+  },
+  "sourceOfTruth": {
+    "subscriptions": "stay_ai",
+    "orders": "shopify",
+    "callJourneys": "synthflow",
+    "portalCompletion": "portal_completion_events",
+    "escalations": "live_agent_or_ringcx"
+  }
+}

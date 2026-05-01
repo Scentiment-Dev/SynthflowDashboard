@@ -1,0 +1,47 @@
+[
+  {
+    "task_id": "wave_09_ci_matrix",
+    "wave": "9",
+    "owner": "Cursor Agent C",
+    "goal": "Expand GitHub Actions into full CI matrix",
+    "primary_path": ".github/workflows/",
+    "required_checks": "make validate-structure; make validate-no-drift; make validate-wave8",
+    "status": "not_started"
+  },
+  {
+    "task_id": "wave_09_backend_tests",
+    "wave": "9",
+    "owner": "Cursor Agent A",
+    "goal": "Add API contract and backend smoke tests",
+    "primary_path": "services/analytics-api/tests/",
+    "required_checks": "pytest or documented dependency gap",
+    "status": "not_started"
+  },
+  {
+    "task_id": "wave_09_ingestion_tests",
+    "wave": "9",
+    "owner": "Cursor Agent A",
+    "goal": "Add ingestion pipeline and dead-letter tests",
+    "primary_path": "services/ingestion-worker/tests/",
+    "required_checks": "pytest or documented dependency gap",
+    "status": "not_started"
+  },
+  {
+    "task_id": "wave_09_frontend_tests",
+    "wave": "9",
+    "owner": "Cursor Agent B",
+    "goal": "Add route and UI no-drift visibility tests",
+    "primary_path": "apps/dashboard-web/src/tests/",
+    "required_checks": "npm test or documented dependency gap",
+    "status": "not_started"
+  },
+  {
+    "task_id": "wave_09_dbt_tests",
+    "wave": "9",
+    "owner": "Cursor Agent C",
+    "goal": "Document and wire dbt parse/test workflow",
+    "primary_path": "data/dbt/tests/",
+    "required_checks": "dbt parse/test or documented dependency gap",
+    "status": "not_started"
+  }
+]

@@ -1,0 +1,30 @@
+[project]
+name = "scentiment-ingestion-worker"
+version = "0.9.0"
+description = "Safe ingestion and normalization worker for Scentiment support analytics."
+requires-python = ">=3.11"
+dependencies = [
+  "pydantic>=2.6",
+  "pydantic-settings>=2.2",
+  "python-json-logger>=2.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.6",
+  "mypy>=1.8"
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+ignore_missing_imports = true

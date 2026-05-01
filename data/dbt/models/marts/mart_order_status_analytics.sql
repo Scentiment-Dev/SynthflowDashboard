@@ -1,0 +1,20 @@
+select
+    journey_id,
+    call_id,
+    customer_id,
+    synthflow_order_id,
+    order_id,
+    order_name,
+    fulfillment_status,
+    shipping_method,
+    has_preorder_tag,
+    is_order_source_of_truth,
+    shopify_context_found,
+    abandoned,
+    dropped_off,
+    unresolved,
+    order_status_resolved_with_shopify_context,
+    case when shopify_context_found then 'Confirmed' else 'Missing' end as trust_label,
+    '{{ var("formula_version") }}' as formula_version,
+    current_timestamp as calculated_at
+from {{ ref('int_order_status_outcomes') }}

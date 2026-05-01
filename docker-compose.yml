@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sdash}
+      POSTGRES_USER: ${POSTGRES_USER:-sdash}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sdash}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./data/warehouse/schema:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sdash} -d ${POSTGRES_DB:-sdash}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  analytics-api:
+    build: ./services/analytics-api
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  ingestion-worker:
+    build: ./services/ingestion-worker
+    env_file: .env
+    command: ["python", "-m", "app.main", "--once"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  dashboard-web:
+    build: ./apps/dashboard-web
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000
+    ports:
+      - "5173:5173"
+    depends_on:
+      - analytics-api
+
+volumes:
+  postgres_data:

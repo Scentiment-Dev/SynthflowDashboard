@@ -1,0 +1,63 @@
+[
+  {
+    "wave": 1,
+    "status": "complete_locked",
+    "owner": "AI PM",
+    "name": "Attachment Intake and Source Audit"
+  },
+  {
+    "wave": 2,
+    "status": "complete_locked",
+    "owner": "AI PM",
+    "name": "Development Repo Skeleton"
+  },
+  {
+    "wave": 3,
+    "status": "complete_locked",
+    "owner": "Cursor Agent A",
+    "name": "Backend/API Skeleton"
+  },
+  {
+    "wave": 4,
+    "status": "complete_locked",
+    "owner": "Cursor Agent B",
+    "name": "Frontend Dashboard Skeleton"
+  },
+  {
+    "wave": 5,
+    "status": "complete_locked",
+    "owner": "Cursor Agent A",
+    "name": "Data/Analytics Skeleton"
+  },
+  {
+    "wave": 6,
+    "status": "complete_locked",
+    "owner": "Cursor Agent A",
+    "name": "Ingestion and Connector Skeleton"
+  },
+  {
+    "wave": 7,
+    "status": "complete_locked",
+    "owner": "Cursor Agent C",
+    "name": "Governance, RBAC, Export, Audit Skeleton"
+  },
+  {
+    "wave": 8,
+    "status": "complete_locked",
+    "owner": "AI PM + Cursor Agent C",
+    "name": "Cursor Agent System and PM Workflow"
+  },
+  {
+    "wave": 9,
+    "status": "complete_locked",
+    "owner": "Cursor Agent C",
+    "name": "QA/Test/CI/CD Skeleton"
+  },
+  {
+    "wave": 10,
+    "status": "complete_locked",
+    "owner": "AI PM",
+    "name": "Project Pack, Rehydration Pack, Validation, Fallback Archives",
+    "completed_at": "2026-04-30T16:33:03Z"
+  }
+]

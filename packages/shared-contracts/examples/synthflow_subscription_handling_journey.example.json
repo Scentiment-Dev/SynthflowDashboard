@@ -1,0 +1,23 @@
+{
+  "journey_id": "journey-1001",
+  "call_id": "sf-call-1001",
+  "source": "synthflow",
+  "events": [
+    {
+      "event_type": "intent_captured",
+      "intent": "subscription_cancellation",
+      "occurred_at": "2026-04-30T10:01:00Z"
+    },
+    {
+      "event_type": "retention_offer_presented",
+      "offer_type": "frequency_change",
+      "occurred_at": "2026-04-30T10:02:00Z"
+    },
+    {
+      "event_type": "portal_link_sent",
+      "portal_session_id": "portal-7001",
+      "occurred_at": "2026-04-30T10:03:00Z"
+    }
+  ],
+  "contains_final_subscription_outcome": false
+}

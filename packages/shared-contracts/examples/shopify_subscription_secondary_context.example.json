@@ -1,0 +1,9 @@
+{
+  "order_id": "gid://shopify/Order/789",
+  "created_at": "2026-04-30T10:00:00Z",
+  "tags": ["subscription_related"],
+  "shipping_method": "Standard",
+  "fulfillment_status": "fulfilled",
+  "subscription_finalization_allowed": false,
+  "context_role": "secondary_only"
+}

@@ -1,0 +1,8 @@
+{
+  "event_id": "evt-save-001",
+  "subscription_id": "sub-3004",
+  "event_type": "subscription_saved",
+  "confirmed_state": "retained",
+  "cancellation_reason": null,
+  "occurred_at": "2026-04-30T10:12:00Z"
+}

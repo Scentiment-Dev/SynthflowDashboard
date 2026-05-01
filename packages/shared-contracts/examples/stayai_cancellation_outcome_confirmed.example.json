@@ -1,0 +1,8 @@
+{
+  "event_id": "evt-cancel-001",
+  "subscription_id": "sub-3003",
+  "event_type": "subscription_cancelled",
+  "confirmed_state": "cancelled",
+  "cancellation_reason": "cost_too_high",
+  "occurred_at": "2026-04-30T10:10:00Z"
+}

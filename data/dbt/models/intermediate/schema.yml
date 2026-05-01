@@ -1,0 +1,30 @@
+version: 2
+models:
+  - name: int_subscription_action_attempts
+    description: Subscription action attempts from Synthflow journey evidence, including non-cancellation actions and cancellation/retention actions.
+    columns:
+      - name: journey_id
+        tests: [not_null]
+      - name: action_family
+        tests:
+          - accepted_values:
+              values: ['non_cancel', 'cancellation', 'retention', 'handoff', 'unknown']
+  - name: int_subscription_official_outcomes
+    description: Official subscription outcomes from Stay.ai only. Synthflow acceptance or Shopify context cannot create save/cancel outcomes.
+    columns:
+      - name: subscription_id
+        tests: [not_null]
+  - name: int_retention_offer_events
+    description: Retention offer events extracted from Synthflow, with Cost Too High funnel sequence checkpoints.
+  - name: int_portal_completion_evidence
+    description: Portal evidence split into diagnostic link-sent evidence and confirmed portal completion evidence.
+  - name: int_subscription_journeys
+    description: Journey-level subscription model joining Synthflow, portal, and Stay.ai official outcomes.
+  - name: int_cancellation_retention_paths
+    description: Cancellation and retention paths with locked offer sequencing and official outcomes.
+  - name: int_containment_abandonment
+    description: Containment candidate logic that excludes abandoned, dropped-off, unresolved, failed, escalation-only, and link-sent-only journeys from success.
+  - name: int_source_freshness
+    description: Source freshness status by platform with SLA labels.
+  - name: int_metric_inputs
+    description: Normalized metric numerator/denominator inputs for dashboard marts.

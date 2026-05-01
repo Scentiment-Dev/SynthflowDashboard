@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "title": "Synthflow Call Event",
+  "required": [
+    "event_id",
+    "call_id",
+    "event_type",
+    "occurred_at"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string"
+    },
+    "call_id": {
+      "type": "string"
+    },
+    "event_type": {
+      "type": "string"
+    },
+    "intent": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "branch": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "abandoned": {
+      "type": "boolean"
+    },
+    "unresolved": {
+      "type": "boolean"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

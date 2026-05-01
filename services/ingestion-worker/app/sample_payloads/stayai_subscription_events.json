@@ -1,0 +1,31 @@
+[
+  {
+    "cursor": "001",
+    "event_type": "frequency_changed",
+    "external_id": "stay-sub-2001-save",
+    "occurred_at": "2026-04-29T15:03:00Z",
+    "payload": {
+      "customer_id": "cust-1001",
+      "outcome": "retained",
+      "retention_offer": "frequency_change",
+      "subscription_id": "sub-2001"
+    },
+    "source": "stayai"
+  },
+  {
+    "cursor": "002",
+    "event_type": "subscription_cancelled",
+    "external_id": "stay-sub-2002-cancel",
+    "occurred_at": "2026-04-29T15:13:00Z",
+    "payload": {
+      "cancel_reason": "cost_too_high",
+      "customer_id": "cust-1002",
+      "offers_declined": [
+        "frequency_change",
+        "25_percent_off"
+      ],
+      "subscription_id": "sub-2002"
+    },
+    "source": "stayai"
+  }
+]

@@ -1,0 +1,177 @@
+{
+  "generated_at": "2026-04-30T16:33:13.275275+00:00",
+  "wave": 9,
+  "status": "qa_test_ci_cd_skeleton_locked",
+  "workflow_count": 10,
+  "test_file_count": 24,
+  "workflows": [
+    {
+      "path": ".github/workflows/backend-tests.yml",
+      "sha256": "b6509e4697714b17078271d791c753a5af3ed72950df116728f05a4e0c920354"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "3e3aba8846467d8e5fe62fdbd66ee8140e7cfb27813a4af9a462e44abac3770b"
+    },
+    {
+      "path": ".github/workflows/contract-tests.yml",
+      "sha256": "27176e5252f3a057d02140a2be0f1975498e889cd67cd2403b1aeecb33791f4c"
+    },
+    {
+      "path": ".github/workflows/dbt-tests.yml",
+      "sha256": "780c15d6b7ebff172a9c4638b8cbd25e7b18ac00bb5568e5d3f6862d1840330a"
+    },
+    {
+      "path": ".github/workflows/frontend-tests.yml",
+      "sha256": "a2d25ac79a49e2e1eae9d7cf3f8c29fb61e760763af3ea12d04050156b5a28d4"
+    },
+    {
+      "path": ".github/workflows/governance-validation.yml",
+      "sha256": "f85692e8addcf49ff39b1045f2b29f78d24b4a0e9440ce1b348b6546f5e63a6c"
+    },
+    {
+      "path": ".github/workflows/ingestion-tests.yml",
+      "sha256": "afc70a82de46bef8f572647997f268af2925baf90e3de45bcac23ac18da2ed41"
+    },
+    {
+      "path": ".github/workflows/lint-typecheck.yml",
+      "sha256": "d45145dadae420bc9072ce3671b43f9cba7bcd64255c582fc5a9ee2b7857d407"
+    },
+    {
+      "path": ".github/workflows/release-readiness.yml",
+      "sha256": "3f081c1ac70297e8e2a055f02ce2a98e02b46ba42d0eac953afef0e9692904de"
+    },
+    {
+      "path": ".github/workflows/smoke-tests.yml",
+      "sha256": "4c01e1ff7645a8b7a87aa8a6bc9023e34cbed54f6c7c2b3e0bcd9a7ce6a4dc8d"
+    }
+  ],
+  "tests": [
+    {
+      "path": "services/analytics-api/tests/test_exports.py",
+      "sha256": "ccf35b26ab673f4beb7db50f0abf64d943c8243dd9834a12f9520eb0760de64b"
+    },
+    {
+      "path": "services/analytics-api/tests/test_health.py",
+      "sha256": "6dca9e7e0d3475a2733a7e55d4430f4a85ff4efb04ea5143cc1a828261a0fae4"
+    },
+    {
+      "path": "services/analytics-api/tests/test_metrics.py",
+      "sha256": "bb3022cee23653b48a678c32cfc66cf41ca51e9e818cc56d60b5712f2603539c"
+    },
+    {
+      "path": "services/analytics-api/tests/test_source_truth_rules.py",
+      "sha256": "493f9023df80d13f3fa9af8d9d432a7b829d5a60ce5e303448887064c145ada9"
+    },
+    {
+      "path": "services/analytics-api/tests/test_wave7_audit_service.py",
+      "sha256": "c44dc76718540fbf0380e505fae7f4682b3f76d485254b9697f0c57477567496"
+    },
+    {
+      "path": "services/analytics-api/tests/test_wave7_rbac_governance.py",
+      "sha256": "ff7f510674600bde902376a3fdc3991ac16dd72005ea5305ffd61221ccba89f6"
+    },
+    {
+      "path": "services/analytics-api/tests/test_wave9_api_contracts.py",
+      "sha256": "fd0debd090b50e8631afa7885af40130e6fad8438575976367889441bc7ebbb6"
+    },
+    {
+      "path": "services/analytics-api/tests/test_wave9_export_audit_contract.py",
+      "sha256": "6d8b634b55fc0d768960e7200a55aa72c37fabdd78e549483e813add6173e962"
+    },
+    {
+      "path": "services/analytics-api/tests/test_wave9_no_drift_service_rules.py",
+      "sha256": "c680cd59c2161c3d3187849dfb0850a40ee491544ab03fe3a8cc8dfa5a001d00"
+    },
+    {
+      "path": "services/ingestion-worker/tests/test_connector_safety.py",
+      "sha256": "bc879283cf04c22099fd156f336d1195cca31b1213eaca86779b816eea5c9264"
+    },
+    {
+      "path": "services/ingestion-worker/tests/test_no_drift_normalization.py",
+      "sha256": "5dbe8b76e0ca8fbef75c2499268954ef6889d908107c00bfe23abc42521c5833"
+    },
+    {
+      "path": "services/ingestion-worker/tests/test_normalize_events.py",
+      "sha256": "c31d966b0daaf25da91dbc26313a1420606390aed699f060fca84355536cb10a"
+    },
+    {
+      "path": "services/ingestion-worker/tests/test_pipeline_runner.py",
+      "sha256": "95dfcc28b247d43583820bbaa412ae739602df4159ab7ae174d710eee645450d"
+    },
+    {
+      "path": "services/ingestion-worker/tests/test_retry.py",
+      "sha256": "ed05f5c1627f9c96f4bb0f95031aa78534dd42948f830528c6f5ffe570012faf"
+    },
+    {
+      "path": "services/ingestion-worker/tests/test_sample_payloads.py",
+      "sha256": "8a561ff44d6979a618d332cc5901fc92be99b8e8c425c2795302d12b79ea724c"
+    },
+    {
+      "path": "services/ingestion-worker/tests/test_wave9_connector_registry.py",
+      "sha256": "02cfc2d3298e8828461aaaf84778de369cd817fea75f51a19779a754c82b0586"
+    },
+    {
+      "path": "services/ingestion-worker/tests/test_wave9_normalization_contracts.py",
+      "sha256": "acb0fc0866c5e6464ce35eb17f18fe91528eb293683574b2f92f011f3619c400"
+    },
+    {
+      "path": "services/ingestion-worker/tests/test_wave9_sample_payloads.py",
+      "sha256": "48719178fc5e9045d7ff739c102d87bf975077b077b21386181d08abb6d2c600"
+    },
+    {
+      "path": "tests/contracts/test_backend_frontend_contract_alignment.py",
+      "sha256": "1a98a8550914916b9b1d3c8354ec4545569610cb2d37a01b48a418c522fd2235"
+    },
+    {
+      "path": "tests/contracts/test_json_schema_examples.py",
+      "sha256": "cce5b94139859a3a76eab12dd5cf80176c4338d29aee8c84d7a3dd844a04d217"
+    },
+    {
+      "path": "tests/contracts/test_no_drift_contract_anchors.py",
+      "sha256": "99e9502ea03b9658db0c515d884b3983e6b89a4f028f34d3d9df8e4bd07c5dcc"
+    },
+    {
+      "path": "tests/integration/test_governance_export_audit_flow.py",
+      "sha256": "e00dad0d4dcc3bd580e89d0d47a27fb03cbf421b6ee1211fb24f91fb12290495"
+    },
+    {
+      "path": "tests/integration/test_ingestion_to_backend_contract.py",
+      "sha256": "2f074d49cd705ef0068ba73a434f438243bc4e589341aed41b502775f9c304de"
+    },
+    {
+      "path": "tests/smoke/test_local_stack_contract_smoke.py",
+      "sha256": "97c1c30b0be0582ec5b098a2a7e3d3a0580512c19b2c72a2cb2d1dc3f355a865"
+    }
+  ],
+  "docs": [
+    {
+      "path": "docs/10_qa_acceptance/WAVE_09_QA_TEST_CI_CD_SKELETON.md",
+      "sha256": "370601e15119fedd0c7eca3924ddc042f25ee0e9855a3ae62d801a42fdecce23"
+    },
+    {
+      "path": "docs/10_qa_acceptance/LOCAL_TEST_MATRIX.md",
+      "sha256": "1fa1bf043d00e22370a8c575f55140dfd873eb4695eccdd75eeafc75967bab64"
+    },
+    {
+      "path": "docs/10_qa_acceptance/CI_CD_GATE_MAP.md",
+      "sha256": "3ee8c57183700b6e6caedf58438aa0cb00798a928310564ed0001a42dd9b9094"
+    },
+    {
+      "path": "docs/10_qa_acceptance/CONTRACT_TEST_STRATEGY.md",
+      "sha256": "92b740ee4e3fdd8c632b3d99509880781367c3e8be68f71fa695b704af19c0f1"
+    },
+    {
+      "path": "docs/00_read_me_first/NO_DRIFT_RULES.md",
+      "sha256": "dc171a2a78ade1ed01e633dee789630de1375efe06f892de1b665e1724f618a8"
+    }
+  ],
+  "no_drift_summary": [
+    "Portal success requires confirmed portal completion, not link sent.",
+    "Stay.ai remains source of truth for subscription save/cancel/state outcomes.",
+    "Shopify remains order/customer/product/order-status context source of truth.",
+    "Trust labels cannot be manually elevated.",
+    "Permissions are enforced server-side using explicit deny.",
+    "Exports require filters, definitions, trust labels, freshness, formula versions, owner, timestamp, fingerprint, and audit reference."
+  ]
+}

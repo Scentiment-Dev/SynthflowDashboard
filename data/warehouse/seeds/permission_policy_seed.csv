@@ -1,0 +1,6 @@
+policy_key,role_name,permission_key,explicit_deny_default,owner
+admin_all,admin,*,true,governance
+analyst_export,analyst,export:metrics,true,governance
+support_read,support_lead,read:metrics,true,governance
+qa_audit,qa_reviewer,read:audit,true,governance
+viewer_read_metrics,viewer,read:metrics,true,governance

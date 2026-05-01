@@ -1,0 +1,38 @@
+[
+  {
+    "cursor": "001",
+    "event_type": "call_started",
+    "external_id": "sf-call-1001-start",
+    "occurred_at": "2026-04-29T15:00:00Z",
+    "payload": {
+      "call_id": "sf-call-1001",
+      "customer_id": "cust-1001",
+      "intent": "subscription_cancellation"
+    },
+    "source": "synthflow"
+  },
+  {
+    "cursor": "002",
+    "event_type": "intent_captured",
+    "external_id": "sf-call-1001-intent",
+    "occurred_at": "2026-04-29T15:01:00Z",
+    "payload": {
+      "call_id": "sf-call-1001",
+      "customer_id": "cust-1001",
+      "intent": "cost_too_high"
+    },
+    "source": "synthflow"
+  },
+  {
+    "cursor": "003",
+    "event_type": "call_abandoned",
+    "external_id": "sf-call-1002-transfer",
+    "occurred_at": "2026-04-29T15:10:00Z",
+    "payload": {
+      "call_id": "sf-call-1002",
+      "customer_id": "cust-1002",
+      "dropoff_node": "retention_offer_2"
+    },
+    "source": "synthflow"
+  }
+]

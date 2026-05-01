@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "title": "Portal Completion Event",
+  "required": [
+    "event_id",
+    "portal_session_id",
+    "event_type",
+    "occurred_at",
+    "completed"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string"
+    },
+    "portal_session_id": {
+      "type": "string"
+    },
+    "event_type": {
+      "type": "string"
+    },
+    "completed": {
+      "type": "boolean"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

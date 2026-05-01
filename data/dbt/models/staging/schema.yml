@@ -1,0 +1,47 @@
+version: 2
+models:
+  - name: stg_synthflow_calls
+    description: Canonicalized Synthflow journey events. This model identifies intent, branch, offers, handoffs, abandonment, unresolved, and transfer evidence, but never marks official subscription outcomes.
+    columns:
+      - name: event_id
+        tests: [not_null, unique]
+      - name: call_id
+        tests: [not_null]
+      - name: event_source
+        tests:
+          - accepted_values:
+              values: ['synthflow']
+  - name: stg_stayai_subscriptions
+    description: Canonicalized Stay.ai subscription action and outcome evidence. This model is the official subscription outcome source.
+    columns:
+      - name: event_id
+        tests: [not_null, unique]
+      - name: subscription_id
+        tests: [not_null]
+      - name: event_source
+        tests:
+          - accepted_values:
+              values: ['stayai']
+  - name: stg_shopify_orders
+    description: Canonicalized Shopify order context. Shopify can confirm order context, but cannot confirm subscription saves or cancellations.
+    columns:
+      - name: order_id
+        tests: [not_null, unique]
+      - name: event_source
+        tests:
+          - accepted_values:
+              values: ['shopify']
+  - name: stg_portal_events
+    description: Portal handoff events. `confirmed_portal_completion` is true only when completion is explicitly confirmed.
+    columns:
+      - name: event_id
+        tests: [not_null, unique]
+      - name: portal_session_id
+        tests: [not_null]
+  - name: stg_live_agent_escalations
+    description: Live-agent and RingCX escalation events used for transfer and downstream resolution analytics.
+    columns:
+      - name: event_id
+        tests: [not_null, unique]
+      - name: call_id
+        tests: [not_null]

@@ -1,0 +1,60 @@
+version: 2
+sources:
+  - name: raw
+    description: Raw event landing schema populated by ingestion workers. Raw tables are append-only except Shopify order context upserts.
+    schema: raw
+    freshness:
+      warn_after: {count: 12, period: hour}
+      error_after: {count: 48, period: hour}
+    tables:
+      - name: synthflow_call_events
+        description: Synthflow call journey, intent, branch, offer, abandonment, and transfer events. Journey source only; cannot confirm subscription outcomes.
+        loaded_at_field: occurred_at
+        columns:
+          - name: event_id
+            tests: [not_null, unique]
+          - name: call_id
+            tests: [not_null]
+          - name: occurred_at
+            tests: [not_null]
+      - name: stayai_subscription_events
+        description: Stay.ai subscription action and outcome events. Primary source of truth for subscription state, saves, cancellations, and action completion.
+        loaded_at_field: occurred_at
+        columns:
+          - name: event_id
+            tests: [not_null, unique]
+          - name: subscription_id
+            tests: [not_null]
+          - name: occurred_at
+            tests: [not_null]
+      - name: shopify_order_context
+        description: Shopify order, product, fulfillment, customer, and order-status context. Cannot override subscription state.
+        loaded_at_field: created_at
+        columns:
+          - name: order_id
+            tests: [not_null, unique]
+      - name: portal_completion_events
+        description: Portal, email, SMS, or self-service handoff events. Link sent is not completion; portal success requires confirmed completion.
+        loaded_at_field: occurred_at
+        columns:
+          - name: event_id
+            tests: [not_null, unique]
+          - name: portal_session_id
+            tests: [not_null]
+      - name: live_agent_escalation_events
+        description: RingCX/live-agent transfer, queue, and resolution events where integrated.
+        loaded_at_field: occurred_at
+        columns:
+          - name: event_id
+            tests: [not_null, unique]
+          - name: call_id
+            tests: [not_null]
+
+
+- name: warehouse
+  schema: analytics
+  tables:
+    - name: export_audit_metadata
+    - name: audit_log
+    - name: trust_label_audit
+    - name: permission_policy

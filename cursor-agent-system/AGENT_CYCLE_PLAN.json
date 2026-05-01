@@ -1,0 +1,23 @@
+{
+  "cycle_name": "Wave 9 QA/Test/CI/CD kickoff",
+  "cycle_status": "ready_for_next_wave",
+  "locked_base": "Wave 8",
+  "branch_pattern": "wave-09/<agent>/<short-task-name>",
+  "merge_gates": [
+    "AI PM review packet attached",
+    "Agent C no-drift review passed",
+    "validate-structure passed",
+    "validate-no-drift passed",
+    "relevant tests documented or executed",
+    "scope maps to active wave or approved change request"
+  ],
+  "forbidden": [
+    "direct-to-main commits",
+    "self-merges",
+    "silent no-drift changes",
+    "scope changes without Kevin approval"
+  ],
+  "current_wave": 9,
+  "next_wave": 10,
+  "status": "wave9_complete_locked"
+}

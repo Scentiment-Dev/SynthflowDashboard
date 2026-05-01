@@ -1,0 +1,99 @@
+{
+  "project": "scentiment-analytics-dashboard",
+  "version": "wave9",
+  "locked_waves": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "next_wave": 10,
+  "no_drift_anchors": [
+    "Stay.ai is source of truth for subscription state, cancellation, save, and retention outcomes.",
+    "Shopify is source of truth for order, product, customer, fulfillment, tracking, and order-status context.",
+    "Portal success requires confirmed portal completion, not link sent.",
+    "Abandoned, unresolved, and transferred calls are excluded from successful containment.",
+    "Trust labels are system-calculated and cannot be manually elevated.",
+    "Permissions are server-side explicit deny.",
+    "Exports require filters, definitions, trust labels, freshness, formula versions, owner, timestamp, fingerprint, and audit reference."
+  ],
+  "agents": [
+    {
+      "id": "agent_a",
+      "name": "Cursor Agent A",
+      "role": "Backend, data, ingestion, schemas, APIs, dbt, database",
+      "primary_paths": [
+        "services/analytics-api",
+        "services/ingestion-worker",
+        "data/dbt",
+        "data/warehouse",
+        "packages/shared-contracts"
+      ],
+      "may_open_pr": true,
+      "may_merge_pr": false,
+      "required_checks": [
+        "make validate-structure",
+        "make validate-no-drift",
+        "make validate-wave8"
+      ]
+    },
+    {
+      "id": "agent_b",
+      "name": "Cursor Agent B",
+      "role": "Frontend dashboard, UI/UX, visualizations, filters, tables",
+      "primary_paths": [
+        "apps/dashboard-web",
+        "docs/07_dashboard_ui_ux"
+      ],
+      "may_open_pr": true,
+      "may_merge_pr": false,
+      "required_checks": [
+        "make validate-structure",
+        "make validate-no-drift"
+      ]
+    },
+    {
+      "id": "agent_c",
+      "name": "Cursor Agent C",
+      "role": "QA, tests, governance, RBAC, docs consistency, no-drift review",
+      "primary_paths": [
+        "tests",
+        ".github",
+        "docs/10_qa_acceptance",
+        "docs/11_security_governance_rbac",
+        "cursor-agent-system",
+        "project-management"
+      ],
+      "may_open_pr": true,
+      "may_merge_pr": false,
+      "required_checks": [
+        "make validate-structure",
+        "make validate-no-drift",
+        "make validate-wave8"
+      ]
+    },
+    {
+      "id": "ai_pm",
+      "name": "AI PM",
+      "role": "Wave orchestration, task assignment, review, acceptance, handoff packaging",
+      "primary_paths": [
+        "project-management",
+        "cursor-agent-system",
+        "docs/01_project_control"
+      ],
+      "may_open_pr": false,
+      "may_merge_pr": false,
+      "required_checks": [
+        "make validate-structure",
+        "make validate-no-drift",
+        "make validate-wave8",
+        "make manifest"
+      ]
+    }
+  ]
+}

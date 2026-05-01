@@ -1,0 +1,14 @@
+[
+  {
+    "cursor": "001",
+    "event_type": "agent_transfer",
+    "external_id": "ringcx-5001-transfer",
+    "occurred_at": "2026-04-29T15:15:00Z",
+    "payload": {
+      "call_id": "sf-call-1002",
+      "customer_id": "cust-1002",
+      "queue": "subscription_support"
+    },
+    "source": "live_agent"
+  }
+]

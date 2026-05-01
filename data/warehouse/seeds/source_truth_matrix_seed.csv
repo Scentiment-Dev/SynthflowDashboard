@@ -1,0 +1,8 @@
+domain,source_of_truth,allowed_to_confirm,forbidden_override,rule,trust_label_when_missing
+Subscription state/action/cancel/save,Stay.ai,save/cancel/action completion,Synthflow/Shopify/manual,"Official subscription outcomes require Stay.ai confirmation.",Missing
+Order/product/customer/order status,Shopify,order/product/customer/fulfillment context,Stay.ai/Synthflow/manual,"Official order context requires Shopify.",Missing
+Call journey/intent/branch,Synthflow,intent/branch/offer/handoff journey,Stay.ai/Shopify,"Journey source only, not official subscription or order outcome.",Partial Evidence
+Portal success,Portal/Stay.ai,completed portal workflow,Synthflow link sent/manual,"Completion required; link sent is not success.",Partial Evidence
+Escalation outcome,RingCX/live-agent,transfer/resolution where integrated,Synthflow only/manual,"Escalation success requires connected transfer or downstream resolution source.",Partial Evidence
+Trust labels,Warehouse/API,calculated trust label,manual override,"Trust labels are system-calculated and cannot be manually elevated.",Missing
+Exports,Analytics API,export fingerprint and audit reference,client-only export,"Exports require definitions, filters, formula versions, trust labels, owner, timestamp, and audit reference.",Missing

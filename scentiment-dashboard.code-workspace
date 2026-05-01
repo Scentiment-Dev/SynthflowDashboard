@@ -1,0 +1,13 @@
+{
+  "folders": [
+    { "path": ".", "name": "root" },
+    { "path": "apps/dashboard-web", "name": "dashboard-web" },
+    { "path": "services/analytics-api", "name": "analytics-api" },
+    { "path": "services/ingestion-worker", "name": "ingestion-worker" },
+    { "path": "data/dbt", "name": "dbt" }
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "typescript.tsdk": "apps/dashboard-web/node_modules/typescript/lib"
+  }
+}

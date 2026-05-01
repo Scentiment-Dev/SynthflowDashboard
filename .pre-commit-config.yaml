@@ -1,0 +1,18 @@
+repos:
+  - repo: local
+    hooks:
+      - id: validate-structure
+        name: Validate required repo structure
+        entry: python -S scripts/validate_repo_structure.py
+        language: system
+        pass_filenames: false
+      - id: validate-no-drift
+        name: Validate no-drift anchors
+        entry: python -S scripts/validate_no_drift_rules.py
+        language: system
+        pass_filenames: false
+      - id: validate-wave9-qa-ci
+        name: Validate Wave 9 QA/CI files
+        entry: python -S scripts/validate_wave9_qa_ci.py
+        language: system
+        pass_filenames: false

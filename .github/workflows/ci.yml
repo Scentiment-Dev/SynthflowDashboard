@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  repo-validation:
+    name: Repo validation and no-drift gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate required structure
+        run: python -S scripts/validate_repo_structure.py
+      - name: Validate no-drift anchors
+        run: python -S scripts/validate_no_drift_rules.py
+      - name: Validate Wave 8 agent system
+        run: python -S scripts/validate_wave8_agent_system.py
+      - name: Validate Wave 9 QA/CI layer
+        run: python -S scripts/validate_wave9_qa_ci.py
+      - name: Generate repo manifest
+        run: python -S scripts/generate_repo_manifest.py
+
+  backend-tests:
+    uses: ./.github/workflows/backend-tests.yml
+
+  ingestion-tests:
+    uses: ./.github/workflows/ingestion-tests.yml
+
+  frontend-tests:
+    uses: ./.github/workflows/frontend-tests.yml
+
+  dbt-tests:
+    uses: ./.github/workflows/dbt-tests.yml
+
+  contract-tests:
+    uses: ./.github/workflows/contract-tests.yml
+
+  smoke-tests:
+    uses: ./.github/workflows/smoke-tests.yml

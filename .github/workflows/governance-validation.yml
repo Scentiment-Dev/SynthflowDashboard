@@ -1,0 +1,28 @@
+name: Governance Validation
+
+on:
+  pull_request:
+    paths:
+      - 'services/analytics-api/app/core/security.py'
+      - 'services/analytics-api/app/services/*governance*.py'
+      - 'services/analytics-api/app/services/*audit*.py'
+      - 'data/dbt/tests/assert_*'
+      - 'docs/00_read_me_first/NO_DRIFT_RULES.md'
+      - 'docs/11_security_governance_rbac/**'
+      - 'scripts/validate_no_drift_rules.py'
+      - 'scripts/validate_wave9_qa_ci.py'
+
+permissions:
+  contents: read
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate no-drift anchors
+        run: python -S scripts/validate_no_drift_rules.py
+      - name: Validate Wave 9 governance QA surface
+        run: python -S scripts/validate_wave9_qa_ci.py
+      - name: Collect QA evidence
+        run: python -S scripts/qa_collect_evidence.py

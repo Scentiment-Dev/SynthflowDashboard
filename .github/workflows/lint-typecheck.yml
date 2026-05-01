@@ -1,0 +1,51 @@
+name: Lint and Typecheck
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint-typecheck:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [backend, ingestion, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        if: matrix.target != 'frontend'
+        with:
+          python-version: '3.11'
+          cache: pip
+      - uses: actions/setup-node@v4
+        if: matrix.target == 'frontend'
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: apps/dashboard-web/package.json
+      - name: Backend lint/typecheck
+        if: matrix.target == 'backend'
+        run: |
+          cd services/analytics-api
+          python -m pip install -e '.[dev]'
+          ruff check app tests
+          mypy app
+      - name: Ingestion lint/typecheck
+        if: matrix.target == 'ingestion'
+        run: |
+          cd services/ingestion-worker
+          python -m pip install -e '.[dev]'
+          ruff check app tests
+          mypy app
+      - name: Frontend lint/typecheck
+        if: matrix.target == 'frontend'
+        run: |
+          cd apps/dashboard-web
+          npm install
+          npm run lint
+          npm run typecheck

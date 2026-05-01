@@ -1,0 +1,47 @@
+{
+  "subscription_id": "sub-2002",
+  "final_subscription_state": "cancelled",
+  "source_of_truth_system": "stayai",
+  "source_confirmation_status": "confirmed",
+  "action_attempts": [
+    {
+      "action": "frequency_change_offer",
+      "attempted_at": "2026-04-29T15:11:00Z",
+      "source_system": "synthflow",
+      "confirmed": true
+    },
+    {
+      "action": "discount_25_offer",
+      "attempted_at": "2026-04-29T15:12:00Z",
+      "source_system": "synthflow",
+      "confirmed": true
+    },
+    {
+      "action": "cancel",
+      "attempted_at": "2026-04-29T15:13:00Z",
+      "source_system": "stayai",
+      "confirmed": true
+    }
+  ],
+  "portal_journey": {
+    "link_sent": true,
+    "completion_confirmed": false
+  },
+  "shopify_context": {
+    "order_id": "gid://shopify/Order/123",
+    "is_secondary_context_only": true,
+    "fulfillment_status": "unfulfilled",
+    "tracking_number": null
+  },
+  "metric_metadata": {
+    "metric_id": "subscription_action_completion_rate",
+    "formula_version": "v0.3.0",
+    "freshness": "fresh",
+    "trust_label": "high",
+    "owner": "analytics",
+    "timestamp": "2026-04-30T00:00:00Z",
+    "audit_reference": "audit-sub-2002-20260430",
+    "source_system": "stayai",
+    "source_confirmation_status": "confirmed"
+  }
+}

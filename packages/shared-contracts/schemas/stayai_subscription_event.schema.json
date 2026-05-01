@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "title": "Stay.ai Subscription Event",
+  "required": [
+    "event_id",
+    "subscription_id",
+    "event_type",
+    "occurred_at",
+    "confirmed_state"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string"
+    },
+    "subscription_id": {
+      "type": "string"
+    },
+    "event_type": {
+      "type": "string"
+    },
+    "confirmed_state": {
+      "type": "string"
+    },
+    "cancellation_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+# Cursor agent ownership map for Scentiment Analytics Dashboard
+/services/analytics-api/     @cursor-agent-a
+/services/ingestion-worker/  @cursor-agent-a
+/data/                       @cursor-agent-a
+/apps/dashboard-web/         @cursor-agent-b
+/docs/                       @cursor-agent-c
+/project-management/         @cursor-agent-c
+/cursor-agent-system/        @cursor-agent-c
+/.github/                    @cursor-agent-c
+/packages/shared-contracts/  @cursor-agent-a @cursor-agent-c

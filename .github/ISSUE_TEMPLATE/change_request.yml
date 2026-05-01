@@ -1,0 +1,30 @@
+name: Change Request
+about: Request a formal scope or locked-wave change
+labels: [change-request]
+body:
+  - type: textarea
+    id: requested_change
+    attributes:
+      label: Requested change
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason and business impact
+    validations:
+      required: true
+  - type: textarea
+    id: drift_risk
+    attributes:
+      label: No-drift risk assessment
+      description: Explain impact on Stay.ai, Shopify, portal completion, containment, trust labels, export audit, and explicit deny.
+    validations:
+      required: true
+  - type: input
+    id: approver
+    attributes:
+      label: Kevin approval reference
+      placeholder: Link or date of approval
+    validations:
+      required: true

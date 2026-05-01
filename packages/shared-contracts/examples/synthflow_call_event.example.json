@@ -1,0 +1,10 @@
+{
+  "event_id": "evt-call-001",
+  "call_id": "call-001",
+  "event_type": "intent_captured",
+  "intent": "subscription_cancel",
+  "branch": "cost_too_high",
+  "abandoned": false,
+  "unresolved": false,
+  "occurred_at": "2026-04-29T12:00:00Z"
+}

@@ -1,0 +1,9 @@
+{
+  "order_id": "gid://shopify/Order/1",
+  "created_at": "2026-04-29T10:00:00Z",
+  "tags": [
+    "pre-order"
+  ],
+  "shipping_method": "Standard",
+  "fulfillment_status": "unfulfilled"
+}

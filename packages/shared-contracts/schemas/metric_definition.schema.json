@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "title": "Metric Definition",
+  "required": [
+    "metric_key",
+    "display_name",
+    "module",
+    "formula",
+    "source_of_truth",
+    "trust_rule",
+    "formula_version"
+  ],
+  "properties": {
+    "metric_key": {
+      "type": "string"
+    },
+    "display_name": {
+      "type": "string"
+    },
+    "module": {
+      "type": "string"
+    },
+    "formula": {
+      "type": "string"
+    },
+    "source_of_truth": {
+      "type": "string"
+    },
+    "trust_rule": {
+      "type": "string"
+    },
+    "formula_version": {
+      "type": "string"
+    }
+  }
+}

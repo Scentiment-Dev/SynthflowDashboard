@@ -1,0 +1,7 @@
+{
+  "event_id": "evt-portal-002",
+  "portal_session_id": "portal-002",
+  "event_type": "portal_link_sent",
+  "completed": false,
+  "occurred_at": "2026-04-30T10:15:00Z"
+}

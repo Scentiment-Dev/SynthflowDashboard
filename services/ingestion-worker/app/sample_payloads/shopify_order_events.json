@@ -1,0 +1,27 @@
+[
+  {
+    "cursor": "001",
+    "event_type": "order_created",
+    "external_id": "shop-order-3001",
+    "occurred_at": "2026-04-29T14:55:00Z",
+    "payload": {
+      "customer_id": "cust-1001",
+      "financial_status": "paid",
+      "order_id": "order-3001",
+      "total_price": "59.99"
+    },
+    "source": "shopify"
+  },
+  {
+    "cursor": "002",
+    "event_type": "tracking_updated",
+    "external_id": "shop-order-3002-track",
+    "occurred_at": "2026-04-29T15:20:00Z",
+    "payload": {
+      "customer_id": "cust-1003",
+      "order_id": "order-3002",
+      "tracking_status": "in_transit"
+    },
+    "source": "shopify"
+  }
+]

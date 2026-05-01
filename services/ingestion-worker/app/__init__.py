@@ -1,0 +1,1 @@
+"""Scentiment ingestion worker package."""

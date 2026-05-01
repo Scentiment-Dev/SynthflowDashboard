@@ -1,0 +1,2 @@
+create schema if not exists analytics;
+create table if not exists analytics.normalized_events (event_id text primary key, source text not null, event_type text not null, occurred_at timestamptz not null, customer_id text, call_id text, subscription_id text, order_id text, is_official_outcome boolean not null default false, payload jsonb not null default '{}'::jsonb, loaded_at timestamptz not null default now());

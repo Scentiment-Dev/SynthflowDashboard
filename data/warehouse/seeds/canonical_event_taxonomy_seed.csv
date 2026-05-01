@@ -1,0 +1,13 @@
+event_family,event_type,source,official_outcome_allowed,notes
+journey,synthflow_call_started,Synthflow,false,Call started is diagnostic only.
+journey,handoff_link_sent,Synthflow,false,Link sent is not completion.
+journey,retention_funnel_started,Synthflow,false,Retention journey source only.
+retention,frequency_offer_presented,Synthflow,false,Offer presentation is not save.
+retention,frequency_offer_accepted,Synthflow,false,Offer acceptance is not save without Stay.ai retained state.
+retention,discount_offer_presented,Synthflow,false,25% discount offer step.
+retention,discount_offer_accepted,Synthflow,false,Offer acceptance is not save without Stay.ai retained state.
+outcome,subscription_retained,Stay.ai,true,Official retained/save outcome.
+outcome,subscription_cancelled,Stay.ai,true,Official cancellation outcome.
+portal,portal_completed,Portal/Stay.ai,true,Confirmed portal completion.
+escalation,transfer_connected,RingCX/live-agent,true,Escalation connected where integrated.
+order,order_context_loaded,Shopify,true,Official order context only.

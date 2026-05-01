@@ -1,0 +1,26 @@
+[
+  {
+    "cursor": "001",
+    "event_type": "portal_link_sent",
+    "external_id": "portal-4001-link",
+    "occurred_at": "2026-04-29T15:04:00Z",
+    "payload": {
+      "call_id": "sf-call-1001",
+      "customer_id": "cust-1001",
+      "portal_url": "https://orders.protectplus.io"
+    },
+    "source": "portal"
+  },
+  {
+    "cursor": "002",
+    "event_type": "portal_completed",
+    "external_id": "portal-4001-complete",
+    "occurred_at": "2026-04-29T15:07:00Z",
+    "payload": {
+      "call_id": "sf-call-1001",
+      "completion_type": "troubleshooting_warranty",
+      "customer_id": "cust-1001"
+    },
+    "source": "portal"
+  }
+]

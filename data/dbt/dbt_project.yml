@@ -1,0 +1,38 @@
+name: scentiment_analytics
+version: '0.2.0'
+config-version: 2
+profile: scentiment_analytics
+
+model-paths: ["models"]
+test-paths: ["tests"]
+seed-paths: ["../warehouse/seeds"]
+macro-paths: ["macros"]
+analysis-paths: ["analyses"]
+
+vars:
+  formula_version: "sub_formula_v0.2_wave05_data_lock"
+  freshness_sla_hours:
+    synthflow: 6
+    stayai: 6
+    shopify: 12
+    portal: 6
+    live_agent: 12
+
+models:
+  scentiment_analytics:
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+    marts:
+      +materialized: table
+      +schema: marts
+    metrics:
+      +materialized: view
+      +schema: metrics
+
+seeds:
+  scentiment_analytics:
+    +schema: seeds

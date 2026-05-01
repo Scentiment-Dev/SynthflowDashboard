@@ -1,0 +1,8 @@
+trust_label,rank,meaning,can_be_manual,display_policy
+Confirmed,1,Official source-of-truth confirmation exists,false,green
+Pending Confirmation,2,Journey evidence exists but official confirmation has not arrived,false,amber
+Partial Evidence,3,Diagnostic evidence exists but is insufficient for official outcome,false,amber
+Stale,4,Source data is older than SLA,false,orange
+Missing,5,Required source evidence is missing,false,red
+Conflicting,6,Two official/evidence sources disagree,false,red
+Unverified,7,Model cannot verify source evidence,false,gray
