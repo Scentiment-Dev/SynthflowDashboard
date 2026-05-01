@@ -1,6 +1,10 @@
 from app.schemas.cancellation import CancellationSummary, CostTooHighValidationResponse
 from app.schemas.metric import MetricCard, TrustLabel
-from app.schemas.source_truth import CancellationValidationRequest, CostTooHighSequenceRequest
+from app.schemas.source_truth import (
+    CancellationValidationRequest,
+    CostTooHighSequenceRequest,
+    SourceTruthDecision,
+)
 from app.services.source_truth_service import SourceTruthService
 
 
@@ -27,7 +31,7 @@ def get_cancellation_summary() -> CancellationSummary:
     )
 
 
-def confirm_cancellation(request: CancellationValidationRequest):
+def confirm_cancellation(request: CancellationValidationRequest) -> SourceTruthDecision:
     return SourceTruthService().cancellation_confirmed(request)
 
 

@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import tsParser from '@typescript-eslint/parser';
 
 export default [
   js.configs.recommended,
@@ -10,6 +11,7 @@ export default [
       globals: {
         document: 'readonly',
         window: 'readonly',
+        HTMLElement: 'readonly',
         fetch: 'readonly',
         vi: 'readonly',
         describe: 'readonly',
@@ -18,6 +20,7 @@ export default [
         beforeEach: 'readonly',
         afterEach: 'readonly',
       },
+      parser: tsParser,
       parserOptions: {
         ecmaFeatures: { jsx: true },
       },

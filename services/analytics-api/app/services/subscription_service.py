@@ -1,6 +1,9 @@
-from app.schemas.common import Platform
 from app.schemas.metric import MetricCard, TrustLabel
-from app.schemas.source_truth import PortalSuccessValidationRequest, SubscriptionOutcomeValidationRequest
+from app.schemas.source_truth import (
+    PortalSuccessValidationRequest,
+    SourceTruthDecision,
+    SubscriptionOutcomeValidationRequest,
+)
 from app.schemas.subscription import (
     SubscriptionActionConfirmationRequest,
     SubscriptionActionConfirmationResponse,
@@ -41,5 +44,5 @@ def confirm_subscription_action(
     return SubscriptionActionConfirmationResponse(action=request.action, decision=decision)
 
 
-def validate_portal_success(request: PortalSuccessValidationRequest):
+def validate_portal_success(request: PortalSuccessValidationRequest) -> SourceTruthDecision:
     return SourceTruthService().portal_success(request)

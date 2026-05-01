@@ -1,0 +1,13 @@
+scentiment_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_POSTGRES_HOST', 'localhost') }}"
+      user: "{{ env_var('DBT_POSTGRES_USER', 'scentiment') }}"
+      password: "{{ env_var('DBT_POSTGRES_PASSWORD', 'scentiment') }}"
+      port: "{{ env_var('DBT_POSTGRES_PORT', 5432) | int }}"
+      dbname: "{{ env_var('DBT_POSTGRES_DB', 'scentiment_analytics') }}"
+      schema: analytics
+      threads: 4
+      keepalives_idle: 0

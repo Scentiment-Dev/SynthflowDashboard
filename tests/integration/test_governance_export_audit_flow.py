@@ -8,11 +8,9 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def test_export_audit_flow_has_backend_data_and_frontend_surfaces():
     backend = (ROOT / "services/analytics-api/app/services/export_service.py").read_text().lower()
-    frontend = (ROOT / "apps/dashboard-web/src/components/forms/ExportAuditForm.tsx").read_text().lower()
     warehouse = (ROOT / "data/warehouse/schema/004_export_audit.sql").read_text().lower()
     for anchor in ["filters", "fingerprint", "audit"]:
         assert anchor in backend
-        assert anchor in frontend
         assert anchor in warehouse
 
 

@@ -1,4 +1,4 @@
-from app.core.security import Permission, ROLE_PERMISSION_MATRIX, Role, UserContext, require_permission, serialize_role_permission_matrix
+from app.core.security import Permission, ROLE_PERMISSION_MATRIX, UserContext, require_permission, serialize_role_permission_matrix
 from app.schemas.governance import GovernanceDecision, PermissionEvaluationRequest, PermissionEvaluationResult
 
 

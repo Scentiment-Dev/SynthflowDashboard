@@ -49,12 +49,10 @@ sources:
             tests: [not_null, unique]
           - name: call_id
             tests: [not_null]
-
-
-- name: warehouse
-  schema: analytics
-  tables:
-    - name: export_audit_metadata
-    - name: audit_log
-    - name: trust_label_audit
-    - name: permission_policy
+  - name: warehouse
+    schema: analytics
+    tables:
+      - name: export_audit_metadata
+      - name: audit_log
+      - name: trust_label_audit
+      - name: permission_policy
