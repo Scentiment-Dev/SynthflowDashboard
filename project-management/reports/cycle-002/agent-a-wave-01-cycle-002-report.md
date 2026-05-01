@@ -6,7 +6,7 @@
 - Wave number: 01
 - Cycle number: 002
 - Branch name: `agent-a/wave-01/cycle-002-subscription-api-contract-wiring`
-- PR URL: Pending branch push and PR creation
+- PR URL: [PR #11](https://github.com/Scentiment-Dev/SynthflowDashboard/pull/11)
 
 ## Assigned Work Summary
 
@@ -69,13 +69,17 @@
 - Cycle 001 verification evidence confirmed on merged PR #4:
   - `Coverage and Codecov Upload`: pass
   - `codecov/project` + `codecov/patch` were governed as required checks during Cycle 001 quality-gate work.
-- Cycle 002 branch/PR Codecov status: Pending PR creation and CI run.
+- Cycle 002 PR #11:
+  - `Coverage and Codecov Upload`: pass
+  - `codecov/patch`: pass
+  - `codecov/project`: not emitted on PR #11 (external/platform context behavior consistent with prior governance notes).
 
 ## Bugbot Status
 
 - Cycle 001 verification evidence confirmed on merged PR #4:
   - `Cursor Bugbot`: pass
-- Cycle 002 branch/PR Bugbot status: Pending PR creation and check execution.
+- Cycle 002 PR #11:
+  - `Cursor Bugbot`: `skipping` / neutral (not a success conclusion), so hard-gate merge-readiness remains blocked pending an explicit passing Bugbot status.
 
 ## Validation Commands
 
@@ -92,16 +96,21 @@
 
 ## PR / Check Status
 
-- PR: Pending creation.
-- Cycle 002 checks: Pending.
+- PR: [PR #11](https://github.com/Scentiment-Dev/SynthflowDashboard/pull/11), state `OPEN`, merge state `BLOCKED`.
+- Passing checks on PR #11 include backend/frontend/ingestion/dbt/contracts/smoke, `Coverage and Codecov Upload`, and `codecov/patch`.
+- `Cursor Bugbot` is neutral/skipped (not pass).
+- `codecov/project` is absent/non-emitting on this PR.
 
 ## Open Issues
 
 - The exact unconfigured combined coverage command currently includes ingestion app files outside the analytics coverage config and falls below 95% in this local run.
+- `codecov/project` did not emit on PR #11.
+- `Cursor Bugbot` did not conclude as pass on PR #11 (neutral/skipped).
 
 ## Blockers
 
-- None blocking local implementation and configured coverage gate pass.
+- Merge-readiness blocker: missing `codecov/project` status on PR #11.
+- Merge-readiness blocker: `Cursor Bugbot` is not passing on PR #11 (neutral/skipped).
 
 ## Risks
 
@@ -125,6 +134,6 @@
 
 ## Recommended Next Steps
 
-1. Push branch and open the Cycle 002 PR.
-2. Verify `Coverage and Codecov Upload`, `codecov/project`, `codecov/patch`, and `Cursor Bugbot` on the new PR.
-3. Share the updated API response contract with Agent B integration work.
+1. Resolve external check-gate status drift for PR #11 (`codecov/project` non-emitting; Bugbot neutral/skipped) before merge.
+2. Keep Path A required checks green (`backend CI`, `frontend CI`, `Coverage and Codecov Upload`, `codecov/patch`) while documenting the non-emitting project status.
+3. Share the updated API response contract with Agent B integration work after gate remediation.
