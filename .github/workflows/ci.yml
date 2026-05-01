@@ -88,6 +88,9 @@ jobs:
           flags: backend
           use_oidc: true
           fail_ci_if_error: true
+          override_commit: ${{ github.sha }}
+          override_branch: ${{ github.head_ref || github.ref_name }}
+          override_pr: ${{ github.event.pull_request.number }}
       - name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
@@ -95,9 +98,15 @@ jobs:
           flags: frontend
           use_oidc: true
           fail_ci_if_error: true
+          override_commit: ${{ github.sha }}
+          override_branch: ${{ github.head_ref || github.ref_name }}
+          override_pr: ${{ github.event.pull_request.number }}
       - name: Upload combined coverage to Codecov project status
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage.xml,./coverage-ingestion.xml,./apps/dashboard-web/coverage/lcov.info
           use_oidc: true
           fail_ci_if_error: true
+          override_commit: ${{ github.sha }}
+          override_branch: ${{ github.head_ref || github.ref_name }}
+          override_pr: ${{ github.event.pull_request.number }}
