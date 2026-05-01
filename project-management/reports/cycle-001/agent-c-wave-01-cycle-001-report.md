@@ -223,28 +223,30 @@ Executed from `C:\Synthflow_Dashboard`:
 
 ## Bugbot status
 
-- No Bugbot execution evidence captured for PR #1 or PR #2 in this cycle.
-- Status: pending evidence.
+- Implementation status: not implemented in current repo CI/config surface (no Bugbot workflow/config references found in `.github/workflows` or repository scan).
+- Execution status: not run for PR #1, PR #2, or PR #3 because no Bugbot integration is configured.
+- Status: blocked by missing implementation (not just missing run evidence).
 
 ## Codecov status
 
-- No Codecov status evidence captured for PR #1 or PR #2 in this cycle.
-- Status: pending evidence.
+- Implementation status: not implemented in current repo CI/config surface (no Codecov workflow step/action, no `codecov.yml`, and no repo references found).
+- Execution status: not run for PR #1, PR #2, or PR #3 because no Codecov integration is configured.
+- Status: blocked by missing implementation (not just missing run evidence).
 
 ## Open issues
 
 - Invalid global `GH_TOKEN` remains a recurring auth risk unless corrected at environment level.
-- Bugbot and Codecov evidence is missing for completed PR governance closure.
+- Bugbot and Codecov are not currently implemented in this repository, so evidence cannot be produced without adding integrations.
 
 ## Blockers
 
 - No hard GitHub setup blocker remains.
-- Governance completion for merge-readiness remains blocked by missing Bugbot/Codecov evidence.
+- Governance completion for merge-readiness remains blocked by missing Bugbot/Codecov implementation and resulting evidence gap.
 
 ## Risks
 
 - Token override can intermittently break gh/git operations and produce misleading auth failures.
-- Merged PRs without captured Bugbot/Codecov evidence reduce audit confidence.
+- Merged PRs without Bugbot/Codecov implementation and evidence reduce audit confidence.
 
 ## Drift concerns
 
@@ -254,13 +256,14 @@ Executed from `C:\Synthflow_Dashboard`:
 ## Handoffs required
 
 - Kevin/PM: remove or correct global `GH_TOKEN` to prevent auth drift.
-- QA/PM: run Bugbot and collect Codecov evidence for PR #1 and PR #2 (or document explicit waiver policy).
+- DevOps/PM: implement Bugbot and Codecov integrations in GitHub workflows/repository settings (or approve and document a formal waiver).
+- QA/PM: after implementation, run Bugbot and collect Codecov evidence for PR #1, PR #2, and PR #3.
 - Governance owner: re-run final readiness gate once Bugbot/Codecov evidence is available.
 
 ## Merge-readiness recommendation
 
 - **Not Ready**
-- Rationale: CI and branch/PR evidence are healthy, but Bugbot and Codecov evidence is missing for PR-ready governance closure.
+- Rationale: CI and branch/PR evidence are healthy, but Bugbot and Codecov are not implemented in the current repository, so required governance evidence cannot be generated.
 
 ## Confidence percentage
 
@@ -273,6 +276,7 @@ Executed from `C:\Synthflow_Dashboard`:
 ## Recommended next steps
 
 1. Fix global `GH_TOKEN` at shell/profile level to eliminate recurring auth failures.
-2. Run Bugbot for PR #1 and PR #2 and attach findings in `project-management/reports/cycle-001/qa-evidence/`.
-3. Capture Codecov status (or documented equivalent coverage gate evidence) for PR #1 and PR #2.
-4. Re-evaluate merge-readiness after evidence is attached and checklist items are updated.
+2. Implement Bugbot workflow/integration for repository PRs.
+3. Implement Codecov workflow/integration (`codecov-action` or approved equivalent) and configure coverage reporting.
+4. Run Bugbot and capture Codecov evidence for PR #1, PR #2, and PR #3 under `project-management/reports/cycle-001/qa-evidence/`.
+5. Re-evaluate merge-readiness after implementation and evidence attachment.

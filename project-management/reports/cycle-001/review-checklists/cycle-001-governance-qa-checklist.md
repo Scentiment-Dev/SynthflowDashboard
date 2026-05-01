@@ -62,9 +62,9 @@
 ## Bugbot and Codecov governance
 
 - [ ] Bugbot status evidence recorded for Agent A/B PRs.
-      Status: pending (no Bugbot check/comment evidence found).
+      Status: blocked (Bugbot integration not implemented in repository CI/config; no Bugbot checks/comments exist).
 - [ ] Codecov status evidence recorded for Agent A/B PRs.
-      Status: pending (no Codecov check/status evidence found).
+      Status: blocked (Codecov integration not implemented in repository CI/config; no Codecov checks/statuses exist).
 
 ## No-drift validation
 
@@ -82,4 +82,4 @@
 ## Merge-readiness recommendation
 
 - Recommendation: **Not Ready**
-- Reason: GitHub setup and CI evidence are healthy, but Bugbot and Codecov evidence is still missing for PR-ready governance closure.
+- Reason: GitHub setup and CI evidence are healthy, but Bugbot and Codecov are not implemented in current repository automation, so required governance evidence cannot be produced.
