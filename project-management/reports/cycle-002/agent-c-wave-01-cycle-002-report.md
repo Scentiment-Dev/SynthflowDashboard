@@ -115,6 +115,10 @@
 
 - Agent A PR #11 status: merged at `2026-05-01T18:13:38Z`.
 - Agent B PR #13 status: merged at `2026-05-01T20:05:14Z`.
+- Agent C PR #14 status: open, `mergeStateStatus: BLOCKED` while checks run.
+- PR #14 current checks observed:
+  - Passing: `Coverage and Codecov Upload`, `codecov/patch`, backend/frontend/ingestion/contract/dbt/smoke, lint-typecheck, release-readiness, no-drift gates.
+  - Pending: `Cursor Bugbot`.
 - Required Path A checks verified as green for both PRs.
 - `codecov/project` remains non-emitting; treated as platform/context issue, not local configuration drift.
 
