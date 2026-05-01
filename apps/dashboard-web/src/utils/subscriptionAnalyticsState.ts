@@ -260,10 +260,6 @@ export function deriveSubscriptionStateAlerts(
   return alerts;
 }
 
-export function formatCount(value: number): string {
-  return value.toLocaleString();
-}
-
 const RATIO_INTEGER_TOLERANCE = 1e-9;
 
 export function formatRatio(numerator: number, denominator: number): string {

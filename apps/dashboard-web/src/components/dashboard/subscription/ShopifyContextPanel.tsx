@@ -1,6 +1,6 @@
 import { Boxes, ShieldOff } from 'lucide-react';
 import type { ShopifyContextMetrics } from '../../../types/subscriptionAnalytics';
-import { formatCount } from '../../../utils/subscriptionAnalyticsState';
+import { formatMetricValue } from '../../../utils/formatters';
 
 export default function ShopifyContextPanel({
   shopify,
@@ -25,7 +25,7 @@ export default function ShopifyContextPanel({
             <Boxes className="h-4 w-4" /> Context records available
           </div>
           <p className="mt-2 text-3xl font-semibold tracking-tight">
-            {formatCount(shopify.context_records_available_count)}
+            {formatMetricValue(shopify.context_records_available_count)}
           </p>
           <p className="mt-2 text-sm leading-6">
             Shopify rows joined for context display in this analytics window.

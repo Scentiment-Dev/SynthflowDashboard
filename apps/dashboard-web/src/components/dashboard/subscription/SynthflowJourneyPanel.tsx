@@ -1,5 +1,6 @@
 import type { SynthflowJourneyMetrics } from '../../../types/subscriptionAnalytics';
-import { formatCount, formatRatio } from '../../../utils/subscriptionAnalyticsState';
+import { formatRatio } from '../../../utils/subscriptionAnalyticsState';
+import { formatMetricValue } from '../../../utils/formatters';
 
 const STATUS_COPY: Record<string, { label: string; tone: string; helper: string }> = {
   completed: {
@@ -60,7 +61,7 @@ export default function SynthflowJourneyPanel({
           </p>
         </div>
         <div className="rounded-xl bg-slate-50 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-          {formatCount(total)} events
+          {formatMetricValue(total)} events
         </div>
       </header>
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -78,7 +79,7 @@ export default function SynthflowJourneyPanel({
               className={`rounded-2xl border p-4 ${copy.tone}`}
             >
               <p className="text-xs font-semibold uppercase tracking-wide">{copy.label}</p>
-              <p className="mt-2 text-2xl font-semibold tracking-tight">{formatCount(count)}</p>
+              <p className="mt-2 text-2xl font-semibold tracking-tight">{formatMetricValue(count)}</p>
               <p className="mt-1 text-xs uppercase tracking-wide opacity-80">
                 {formatRatio(count, total)} of journey events
               </p>

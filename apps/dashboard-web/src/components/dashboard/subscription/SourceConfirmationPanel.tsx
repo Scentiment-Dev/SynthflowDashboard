@@ -1,10 +1,10 @@
 import type { SourceConfirmationMetrics } from '../../../types/subscriptionAnalytics';
 import {
-  formatCount,
   formatRatio,
   sourceConfirmationTone,
   statusBadgeClasses,
 } from '../../../utils/subscriptionAnalyticsState';
+import { formatMetricValue } from '../../../utils/formatters';
 
 export default function SourceConfirmationPanel({
   sourceConfirmation,
@@ -68,7 +68,7 @@ export default function SourceConfirmationPanel({
             className={`rounded-2xl border p-4 ${row.tone}`}
           >
             <p className="text-xs font-semibold uppercase tracking-wide">{row.label}</p>
-            <p className="mt-2 text-2xl font-semibold tracking-tight">{formatCount(row.count)}</p>
+            <p className="mt-2 text-2xl font-semibold tracking-tight">{formatMetricValue(row.count)}</p>
             <p className="mt-1 text-xs uppercase tracking-wide opacity-80">
               {formatRatio(row.count, total)} of records
             </p>

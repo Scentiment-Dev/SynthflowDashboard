@@ -21,7 +21,6 @@ import {
   deriveSubscriptionStateAlerts,
   finalStateLabel,
   finalStateTone,
-  formatCount,
   formatRatio,
   sourceConfirmationTone,
   statusBadgeClasses,
@@ -375,11 +374,6 @@ describe('deriveSubscriptionStateAlerts', () => {
 });
 
 describe('subscription analytics state helpers', () => {
-  it('formats counts with locale-aware separators', () => {
-    expect(formatCount(0)).toBe('0');
-    expect(formatCount(12345)).toBe(new Intl.NumberFormat().format(12345));
-  });
-
   it('formats ratios for normal, integer and zero denominators', () => {
     expect(formatRatio(0, 0)).toBe('n/a');
     expect(formatRatio(50, 100)).toBe('50%');

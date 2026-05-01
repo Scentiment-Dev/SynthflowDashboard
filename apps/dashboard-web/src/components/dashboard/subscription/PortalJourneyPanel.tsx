@@ -1,6 +1,7 @@
 import { Link2, MailCheck } from 'lucide-react';
 import type { PortalJourneyMetrics } from '../../../types/subscriptionAnalytics';
-import { formatCount, formatRatio } from '../../../utils/subscriptionAnalyticsState';
+import { formatRatio } from '../../../utils/subscriptionAnalyticsState';
+import { formatMetricValue } from '../../../utils/formatters';
 
 export default function PortalJourneyPanel({ portal }: { portal: PortalJourneyMetrics }) {
   const sent = portal.portal_link_sent_count;
@@ -25,7 +26,7 @@ export default function PortalJourneyPanel({ portal }: { portal: PortalJourneyMe
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide">
             <Link2 className="h-4 w-4" /> Portal link sent
           </div>
-          <p className="mt-2 text-3xl font-semibold tracking-tight">{formatCount(sent)}</p>
+          <p className="mt-2 text-3xl font-semibold tracking-tight">{formatMetricValue(sent)}</p>
           <p className="mt-2 text-sm leading-6">
             Link delivery only. Cannot be counted as portal completion.
           </p>
@@ -34,7 +35,7 @@ export default function PortalJourneyPanel({ portal }: { portal: PortalJourneyMe
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide">
             <MailCheck className="h-4 w-4" /> Confirmed portal completion
           </div>
-          <p className="mt-2 text-3xl font-semibold tracking-tight">{formatCount(completed)}</p>
+          <p className="mt-2 text-3xl font-semibold tracking-tight">{formatMetricValue(completed)}</p>
           <p className="mt-2 text-sm leading-6">
             Stay.ai/portal-confirmed completion. Counted toward portal completion rate.
           </p>
@@ -54,7 +55,7 @@ export default function PortalJourneyPanel({ portal }: { portal: PortalJourneyMe
           <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             Links sent without confirmed completion
           </dt>
-          <dd className="mt-1 text-lg font-semibold text-slate-950">{formatCount(linkOnly)}</dd>
+          <dd className="mt-1 text-lg font-semibold text-slate-950">{formatMetricValue(linkOnly)}</dd>
         </div>
         <div>
           <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Locked rule</dt>

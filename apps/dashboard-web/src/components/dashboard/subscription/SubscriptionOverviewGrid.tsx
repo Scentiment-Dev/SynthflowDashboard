@@ -1,5 +1,5 @@
 import type { SubscriptionOverviewMetrics } from '../../../types/subscriptionAnalytics';
-import { formatCount } from '../../../utils/subscriptionAnalyticsState';
+import { formatMetricValue } from '../../../utils/formatters';
 
 type OverviewTile = {
   key: keyof SubscriptionOverviewMetrics;
@@ -86,7 +86,7 @@ export default function SubscriptionOverviewGrid({
             className={`rounded-2xl border p-4 shadow-sm ${emphasisClasses[tile.emphasis]}`}
           >
             <p className="text-xs font-semibold uppercase tracking-wide opacity-80">{tile.label}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight">{formatCount(overview[tile.key])}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight">{formatMetricValue(overview[tile.key])}</p>
             <p className="mt-3 text-xs uppercase tracking-wide opacity-80">Source: {tile.source}</p>
             <p className="mt-2 text-sm leading-6 opacity-90">{tile.description}</p>
           </article>
