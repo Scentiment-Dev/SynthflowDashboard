@@ -54,9 +54,10 @@
 
 - [x] Agent A PR evidence exists: `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/1` (state: merged).
 - [x] Agent B PR evidence exists: `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/2` (state: merged).
+- [x] Agent C PR evidence exists: `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/3` (state: open, merge state CLEAN).
 - [x] PR titles follow expected `[Wave 01][Cycle 001][Agent X] ...` format.
 - [x] PR bodies include summary and test plan sections.
-- [x] CI checks pass on both PRs.
+- [x] CI checks pass on Agent A/B merged PRs and Agent C active PR.
 
 ## Bugbot and Codecov governance
 
