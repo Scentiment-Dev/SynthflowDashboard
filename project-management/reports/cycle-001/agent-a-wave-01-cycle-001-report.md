@@ -101,9 +101,9 @@
 
 ## PR / Check Status
 
-- PR/check status: branch ready for push/PR creation after this report update commit.
-- Bugbot status: not run (no PR check evidence yet).
-- Codecov status: not run (no PR check evidence yet).
+- PR/check status: PR opened at `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/1`.
+- Bugbot status: not run yet (no completed Bugbot result recorded).
+- Codecov status: not run yet (no completed Codecov result recorded).
 
 ## Open Issues
 
@@ -136,6 +136,6 @@
 
 ## Recommended Next Steps
 
-1. Commit and push this branch to origin.
-2. Open PR titled `[Wave 01][Cycle 001][Agent A] Subscription backend foundation`.
-3. Run/collect Bugbot and Codecov results on the PR before merge-ready claim.
+1. Run Bugbot on PR #1 and capture pass/fail evidence.
+2. Collect Codecov status for PR #1 and confirm coverage gate expectations.
+3. Resolve any PR review or CI findings, then re-run required test evidence if logic changes.
