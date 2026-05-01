@@ -101,7 +101,7 @@
 ## Final reconciliation update (Path A)
 
 - Date/time: 2026-05-01T11:12:00-05:00
-- [x] PR #8 merged under emitted strict gate set after resolving external `codecov/project` non-emission.
+- [x] PR #8 merged under emitted strict gate set while external `codecov/project` non-emission remained open.
 - [x] PR #9 fresh verification executed and merged under emitted strict gate set.
 - [x] `codecov/patch` is emitted and passing.
 - [ ] `codecov/project` is emitted and passing.
