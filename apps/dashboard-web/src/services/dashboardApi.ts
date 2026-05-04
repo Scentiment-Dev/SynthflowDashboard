@@ -5,6 +5,10 @@ import type {
   SubscriptionAnalyticsScenario,
 } from '../types/subscriptionAnalytics';
 import type {
+  SubscriptionOutcomesResponse,
+  SubscriptionOutcomesScenario,
+} from '../types/subscriptionOutcomes';
+import type {
   SourceHealthScenario,
   SourceHealthSystem,
   SubscriptionSourceHealthResponse,
@@ -48,6 +52,14 @@ export const getNoDriftRules = () => apiGet<{ rules: string[] }>('/governance/no
 export const createExportAudit = (request: ExportAuditRequest) => apiPost<ExportAuditRecord, ExportAuditRequest>('/exports/audit', request);
 export const getSubscriptionAnalytics = (scenario: SubscriptionAnalyticsScenario = 'baseline') =>
   apiGet<SubscriptionAnalyticsResponse>(buildSubscriptionAnalyticsUrl(scenario));
+
+export const buildSubscriptionOutcomesUrl = (
+  scenario: SubscriptionOutcomesScenario = 'baseline',
+) => `/subscriptions/outcomes?scenario=${encodeURIComponent(scenario)}`;
+
+export const getSubscriptionOutcomes = (
+  scenario: SubscriptionOutcomesScenario = 'baseline',
+) => apiGet<SubscriptionOutcomesResponse>(buildSubscriptionOutcomesUrl(scenario));
 
 export const buildSubscriptionSourceHealthUrl = (
   scenario: SourceHealthScenario = 'baseline',

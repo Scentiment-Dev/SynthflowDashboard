@@ -30,3 +30,34 @@
 - `shopify_context.context_role` is `context_only` and `finalization_allowed` is always `false`.
 - `metric_metadata` includes filters, metric definitions, trust label, freshness, formula version, owner, timestamp, fingerprint, and audit reference.
 - `outcomes.metadata` includes source confirmation status and the same audit/fingerprint/freshness/formula governance fields.
+
+## Cycle 005 subscription outcome UI behavior
+
+The Cycle 005 outcome UI (`SubscriptionOutcomesView`) renders the
+`/subscriptions/outcomes` contract as the top section of `SubscriptionAnalyticsPage` and is
+visually prioritized above the Cycle 004 source-health view, the Cycle 002 contract-wired
+view, and the Cycle 001 module shell.
+
+- Renders KPI cards for every required outcome count: subscription contacts,
+  subscription action requests, cancellation requests, confirmed cancellations,
+  save/retention attempts, confirmed retained, non-cancellation actions, pending Stay.ai
+  confirmation, missing Stay.ai final state, portal link sent, portal completion confirmed,
+  Shopify context available, Synthflow subscription journeys, and subscription outcome
+  unknown.
+- Renders rate cards for retention rate, cancellation confirmation rate, and portal
+  completion rate. Each rate card displays the live formula (`numerator / denominator`) and
+  shows `n/a` when the denominator is zero.
+- Renders an eight-stage outcome funnel: subscription contact / journey, requested action,
+  cancellation path, save/retention path, non-cancellation action path, Stay.ai final
+  confirmation, portal completion (where applicable), and unknown / pending states.
+- Each KPI, rate, and funnel stage exposes its source authority. Stay.ai final-authority
+  metrics are tagged with a shield icon and a "Stay.ai final" chip. Shopify context and
+  Synthflow journey are tagged "Context / request" and never imply finalization.
+- Required UI states are derived from the contract response: loading, empty,
+  error, permission denied, low trust, stale source, pending Stay.ai confirmation,
+  missing Stay.ai final state, portal link sent without confirmed completion,
+  Shopify context available without Stay.ai final, Synthflow journey incomplete,
+  export/audit metadata unavailable, and contract preview from fixture.
+- Metric definition, formula version, owner, timestamp, scenario, fingerprint,
+  audit reference, metric definitions, and filters are rendered through the metadata
+  panel. Trust, freshness, and source confirmation chips use color-coded tones.
