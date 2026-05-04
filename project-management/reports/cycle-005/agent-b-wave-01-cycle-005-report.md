@@ -123,8 +123,8 @@
   warnings are pre-existing `no-unused-vars` matches, including the same `_reason`
   pattern already used by Cycle 002 and Cycle 004 tests).
 - `npm --prefix apps/dashboard-web run test:run` -> `12 test files passed,
-  202 tests passed`. New file `SubscriptionOutcomeAnalytics.test.tsx`
-  contributes 58 tests covering: URL builder, hook contract validation
+  203 tests passed`. New file `SubscriptionOutcomeAnalytics.test.tsx`
+  contributes 59 tests covering: URL builder, hook contract validation
   (valid response, generic error, 403 permission denied, shape mismatch with
   missing keys / null nested object / non-boolean fixture flag / array nested
   object, non-number metric / NaN metric / non-string metadata / non-array
@@ -149,10 +149,10 @@
   on lines, statements, branches, and functions).
 - Artifact: `apps/dashboard-web/coverage/` directory (lcov + text + text-summary +
   html reporters per `vite.config.ts`).
-- Coverage result (final run with all Cycle 005 code + Bugbot fix-pass code
-  present):
+- Coverage result (final run with all Cycle 005 code + Bugbot fix-pass 1/2/3
+  code present):
   - Statements: 99.28% (831 / 837)
-  - Branches: 96.58% (566 / 586)
+  - Branches: 96.59% (568 / 588)
   - Functions: 99.59% (247 / 248)
   - Lines: 99.86% (726 / 727)
 - Coverage >= 95%: yes — every threshold is comfortably above 95% on every metric.
@@ -178,7 +178,7 @@
 
 - Bugbot is configured at the repo level (Agent A Cycle 005 PR `#20` shows `Cursor
   Bugbot` as a required check). PR `#21` triggered Bugbot on every push. Across
-  three Bugbot passes the bot surfaced six findings, all addressed in this
+  four Bugbot passes the bot surfaced seven findings, all addressed in this
   branch. The first two passes surfaced one Cursor Bugbot Low (`safeRatio`
   exported but unused in production), one Cursor Bugbot Low (duplicated
   `FilterChips` in two metadata panels), and two Codex
@@ -187,8 +187,12 @@
   payloads). The third pass surfaced two Cursor Bugbot Low nits
   (`formatRatePercent` rendering "100.0%" at the 99.95 boundary;
   `SUBSCRIPTION_OUTCOME_KPI_CARDS` and `SUBSCRIPTION_OUTCOME_RATE_CARDS`
-  exported but only consumed inside their own file). All six findings have
-  been resolved in this branch:
+  exported but only consumed inside their own file). The fourth pass surfaced
+  one Cursor Bugbot Low (status-bar text saying "analytics-api unreachable"
+  even when the API was reachable but returned a malformed contract). After
+  the fix-pass 3 push (`284a8e4`) Bugbot completed with conclusion `SUCCESS`
+  and the summary text `Bugbot completed review - no issues found! ✅`. All
+  seven findings have been resolved in this branch:
   - `safeRatio` is now used by `SubscriptionOutcomeKpiGrid` so the rate cards
     delegate to the same n/a fallback as the rest of the module (no dead code).
   - `FilterChips` was extracted to `apps/dashboard-web/src/components/dashboard/MetadataFilterChips.tsx`
@@ -221,8 +225,20 @@
     `buildSubscriptionOutcomeRateCards`. This narrows the public surface area of
     `subscriptionOutcomesState.ts` to just the helpers and types actually
     imported by other modules and tests.
-- Final Bugbot status will be confirmed after the fix-pass push triggers a
-  re-run on PR `#21`.
+  - The fixture-fallback branch of the status bar in `SubscriptionOutcomesView`
+    now branches on the error message: when the error contains "shape mismatch"
+    (the API was reachable but returned a malformed contract that failed
+    `isSubscriptionOutcomesShape`), the status bar renders "analytics-api
+    returned a malformed contract: <error>" instead of always falling back to
+    "analytics-api unreachable". A regression test
+    (`differentiates a malformed contract from an unreachable API in the
+    status bar`) mocks a malformed-but-reachable API response and asserts the
+    new wording is shown and the old wording is not.
+- Final Bugbot status: `Cursor Bugbot: COMPLETED SUCCESS` on commit
+  `284a8e4` (summary `Bugbot completed review - no issues found! ✅`), every
+  required CI check `pass`, every Codecov check `pass`, every Bugbot/Codex
+  review thread resolved, PR `mergeStateStatus = CLEAN`, PR `mergeable =
+  MERGEABLE`. This task is merge-ready.
 
 ## Visual Evidence Status
 
@@ -280,21 +296,21 @@
 ## PR / Check Status
 
 - PR URL: https://github.com/Scentiment-Dev/SynthflowDashboard/pull/21
-- Local check status snapshot (after Bugbot fix-pass 2):
+- Local check status snapshot (after Bugbot fix-pass 3):
   - Typecheck: pass
   - Lint: pass (0 errors; pre-existing warnings only)
-  - Vitest: 202 / 202 tests pass across 12 files
-  - Coverage: 99.28% / 96.58% / 99.59% / 99.86% (>= 95% on every metric)
+  - Vitest: 203 / 203 tests pass across 12 files
+  - Coverage: 99.28% / 96.59% / 99.59% / 99.86% (>= 95% on every metric)
   - Build: pass (vite production build completes)
-- Remote PR check status (final, on `cf14cdd`):
+- Remote PR check status (final, on `284a8e4`):
   - Repo validation, contract-tests, ingestion-tests, backend-tests, dbt-tests,
     frontend, frontend-tests, lint-typecheck (backend / ingestion / frontend),
     release-readiness, smoke, smoke-tests: pass.
   - `Coverage and Codecov Upload`: pass.
   - `codecov/patch`: pass.
-  - `Cursor Bugbot`: completed (status `COMPLETED`, conclusion `NEUTRAL`,
-    summary text `Bugbot completed review - no issues found`). All review
-    threads from prior Bugbot/Codex passes are now resolved (each one was
+  - `Cursor Bugbot`: completed (status `COMPLETED`, conclusion `SUCCESS`,
+    summary text `Bugbot completed review - no issues found! ✅`). All review
+    threads from prior Bugbot/Codex passes are resolved (each one was
     replied to with a fix-evidence summary linking the addressing commit and
     its regression test, then resolved through the GitHub Reviews API).
   - PR `mergeStateStatus`: `CLEAN`. PR `mergeable`: `MERGEABLE`. No
@@ -342,23 +358,25 @@
 
 ## Confidence Percentage
 
-- 99%
+- 99% (Bugbot SUCCESS, Codecov pass, every CI required-check pass, PR
+  mergeStateStatus = CLEAN, every review thread resolved).
 
 ## Completion Statement
 
 - Local implementation and validation for Cycle 005 subscription outcome analytics
   UI are complete: every required KPI, rate, funnel stage, source-authority chip,
   trust/freshness/source-confirmation chip, and UI state is implemented and
-  tested. Coverage is comfortably above the 95% gate (99.28% / 96.58% / 99.59% /
-  99.86%). Lint, typecheck, full test suite (202 / 202), and production build
+  tested. Coverage is comfortably above the 95% gate (99.28% / 96.59% / 99.59% /
+  99.86%). Lint, typecheck, full test suite (203 / 203), and production build
   all pass.
-- All Bugbot/Codex review findings (2 P1 + 4 Low across three Bugbot passes) are
+- All Bugbot/Codex review findings (2 P1 + 5 Low across four Bugbot passes) are
   resolved in code with regression tests, replied to with fix evidence on the
   PR, and the underlying review threads are marked resolved via the GitHub
   Reviews API.
-- Merge-readiness is confirmed: Bugbot status `COMPLETED` with no issues found,
-  Codecov status `pass`, every CI required-check is `SUCCESS`, PR
-  `mergeStateStatus = CLEAN`, PR `mergeable = MERGEABLE`.
+- Merge-readiness is confirmed: `Cursor Bugbot: COMPLETED SUCCESS` with no
+  issues found, `Coverage and Codecov Upload: pass`, `codecov/patch: pass`,
+  every CI required-check is `SUCCESS`, PR `mergeStateStatus = CLEAN`, PR
+  `mergeable = MERGEABLE`.
 
 ## Recommended Next Steps
 
