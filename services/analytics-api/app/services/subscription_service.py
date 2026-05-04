@@ -857,6 +857,30 @@ SUBSCRIPTION_OUTCOME_FIXTURES: dict[str, SubscriptionOutcomeScenarioFixture] = {
         "owner": "analytics",
         "audit_reference": "audit-subscription-outcomes-save-not-requested-20260504",
     },
+    "cancellation_not_requested_official_path": {
+        "records": [
+            {
+                "contact_id": "sub-cancel-not-requested-001",
+                "action_requested": False,
+                "action_type": SubscriptionOutcomeActionType.CANCEL,
+                "stayai_final_state": SubscriptionTruthState.CANCELLED,
+                "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "approved_official_completion_path": True,
+                "portal_link_sent": False,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": False,
+            }
+        ],
+        "freshness_status": FreshnessStatus.FRESH,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "cancellation_not_requested_official_path"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-cancel-not-requested-20260504",
+    },
 }
 
 
@@ -881,11 +905,15 @@ def _safe_rate(numerator: int, denominator: int) -> float:
 
 
 def _is_confirmed_cancellation(record: SubscriptionOutcomeRecordFixture) -> bool:
+    if (
+        not record["action_requested"]
+        or record["action_type"] != SubscriptionOutcomeActionType.CANCEL
+    ):
+        return False
     if record["approved_official_completion_path"]:
         return True
     return bool(
-        record["action_type"] == SubscriptionOutcomeActionType.CANCEL
-        and record["stayai_confirmation_status"] == SourceConfirmationStatus.CONFIRMED
+        record["stayai_confirmation_status"] == SourceConfirmationStatus.CONFIRMED
         and record["stayai_final_state"] == SubscriptionTruthState.CANCELLED
     )
 

@@ -198,6 +198,18 @@ def test_subscription_outcomes_save_requires_action_requested(client: TestClient
     assert metrics["retention_rate"] == 0.0
 
 
+def test_subscription_outcomes_cancellation_requires_action_requested(client: TestClient) -> None:
+    response = client.get(
+        "/subscriptions/outcomes",
+        params={"scenario": "cancellation_not_requested_official_path"},
+    )
+    assert response.status_code == 200
+    metrics = response.json()["metrics"]
+    assert metrics["cancellation_requests_total"] == 0
+    assert metrics["confirmed_cancellations_total"] == 0
+    assert metrics["cancellation_confirmation_rate"] == 0.0
+
+
 def test_subscription_outcomes_requires_subscription_permission(client: TestClient) -> None:
     response = client.get(
         "/subscriptions/outcomes",
