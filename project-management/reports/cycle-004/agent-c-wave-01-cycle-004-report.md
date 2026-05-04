@@ -6,7 +6,7 @@
 - Wave number: 01
 - Cycle number: 004
 - Branch name: `agent-c/wave-01/cycle-004-source-reconciliation-quality-review`
-- PR URL: pending creation for this governance/report branch
+- PR URL: https://github.com/Scentiment-Dev/SynthflowDashboard/pull/19
 
 ## Cycle 003 Evidence Verification Status
 
