@@ -63,17 +63,18 @@
 
 ## Bugbot Status
 
-- `Cursor Bugbot`: skipping / neutral (not pass)
+- Earlier run on PR #15: `Cursor Bugbot` completed as `skipping` / neutral.
+- Latest run after report push: `Cursor Bugbot` is still pending.
 - This does not satisfy a strict "Bugbot pass" merge-readiness claim.
 
 ## PR / Checks Status
 
-- PR: open, merge state currently reported as blocked by platform branch protection metadata.
+- PR: open, merge state reported as blocked/pending due required checks still running.
 - Checks observed via `gh pr checks 15` / `gh pr view 15 --json statusCheckRollup`:
   - CI and quality checks: pass
   - Coverage and Codecov Upload: pass
   - codecov/patch: pass
-  - Cursor Bugbot: skipping (neutral)
+  - Cursor Bugbot: pending (latest run), previously neutral/skipping
 
 ## Open Issues / Blockers / Risks / Drift Concerns
 
