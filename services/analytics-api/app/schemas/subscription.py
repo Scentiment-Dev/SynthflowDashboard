@@ -140,6 +140,61 @@ class SubscriptionAnalyticsResponse(BaseModel):
     metric_metadata: SubscriptionAnalyticsMetricMetadata
 
 
+class SubscriptionOutcomeActionType(StrEnum):
+    CANCEL = "cancel"
+    SAVE = "save"
+    PAUSE = "pause"
+    SKIP = "skip"
+    FREQUENCY_CHANGE = "frequency_change"
+    ADDRESS_CHANGE = "address_change"
+    PAYMENT_UPDATE = "payment_update"
+    OTHER = "other"
+
+
+class SubscriptionOutcomeMetricMetadata(BaseModel):
+    metric_id: str
+    filters: dict[str, object]
+    metric_definitions: list[str]
+    trust_label: TrustLabel
+    freshness_status: FreshnessStatus
+    formula_version: str
+    owner: str
+    timestamp: str
+    fingerprint: str
+    audit_reference: str
+    source_confirmation_status: SourceConfirmationStatus
+
+
+class SubscriptionOutcomeMetrics(BaseModel):
+    subscription_contacts_total: int
+    subscription_action_requests_total: int
+    cancellation_requests_total: int
+    confirmed_cancellations_total: int
+    save_or_retention_attempts_total: int
+    confirmed_retained_total: int
+    non_cancellation_actions_total: int
+    pending_stayai_confirmation_total: int
+    missing_stayai_final_state_total: int
+    portal_link_sent_total: int
+    portal_completion_confirmed_total: int
+    shopify_context_available_total: int
+    synthflow_subscription_journeys_total: int
+    subscription_outcome_unknown_total: int
+    retention_rate: float
+    cancellation_confirmation_rate: float
+    portal_completion_rate: float
+
+
+class SubscriptionOutcomesResponse(BaseModel):
+    module: str = "subscriptions"
+    generated_from_fixture: bool = True
+    source_of_truth_system: str = "stayai"
+    source_confirmation_status: SourceConfirmationStatus
+    scenario: str
+    metrics: SubscriptionOutcomeMetrics
+    metadata: SubscriptionOutcomeMetricMetadata
+
+
 class SubscriptionSourceHealthSource(BaseModel):
     source_system: SourceSystem
     source_authority_level: SourceAuthorityLevel

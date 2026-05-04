@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Subscription Outcomes Response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "module",
+    "generated_from_fixture",
+    "source_of_truth_system",
+    "source_confirmation_status",
+    "scenario",
+    "metrics",
+    "metadata"
+  ],
+  "properties": {
+    "module": {
+      "type": "string",
+      "const": "subscriptions"
+    },
+    "generated_from_fixture": {
+      "type": "boolean",
+      "const": true
+    },
+    "source_of_truth_system": {
+      "type": "string",
+      "enum": ["stayai"]
+    },
+    "source_confirmation_status": {
+      "type": "string",
+      "enum": ["confirmed", "pending", "missing"]
+    },
+    "scenario": {
+      "type": "string"
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subscription_contacts_total",
+        "subscription_action_requests_total",
+        "cancellation_requests_total",
+        "confirmed_cancellations_total",
+        "save_or_retention_attempts_total",
+        "confirmed_retained_total",
+        "non_cancellation_actions_total",
+        "pending_stayai_confirmation_total",
+        "missing_stayai_final_state_total",
+        "portal_link_sent_total",
+        "portal_completion_confirmed_total",
+        "shopify_context_available_total",
+        "synthflow_subscription_journeys_total",
+        "subscription_outcome_unknown_total",
+        "retention_rate",
+        "cancellation_confirmation_rate",
+        "portal_completion_rate"
+      ],
+      "properties": {
+        "subscription_contacts_total": { "type": "integer", "minimum": 0 },
+        "subscription_action_requests_total": { "type": "integer", "minimum": 0 },
+        "cancellation_requests_total": { "type": "integer", "minimum": 0 },
+        "confirmed_cancellations_total": { "type": "integer", "minimum": 0 },
+        "save_or_retention_attempts_total": { "type": "integer", "minimum": 0 },
+        "confirmed_retained_total": { "type": "integer", "minimum": 0 },
+        "non_cancellation_actions_total": { "type": "integer", "minimum": 0 },
+        "pending_stayai_confirmation_total": { "type": "integer", "minimum": 0 },
+        "missing_stayai_final_state_total": { "type": "integer", "minimum": 0 },
+        "portal_link_sent_total": { "type": "integer", "minimum": 0 },
+        "portal_completion_confirmed_total": { "type": "integer", "minimum": 0 },
+        "shopify_context_available_total": { "type": "integer", "minimum": 0 },
+        "synthflow_subscription_journeys_total": { "type": "integer", "minimum": 0 },
+        "subscription_outcome_unknown_total": { "type": "integer", "minimum": 0 },
+        "retention_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "cancellation_confirmation_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "portal_completion_rate": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "metric_id",
+        "filters",
+        "metric_definitions",
+        "trust_label",
+        "freshness_status",
+        "formula_version",
+        "owner",
+        "timestamp",
+        "fingerprint",
+        "audit_reference",
+        "source_confirmation_status"
+      ],
+      "properties": {
+        "metric_id": { "type": "string" },
+        "filters": { "type": "object" },
+        "metric_definitions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "trust_label": {
+          "type": "string",
+          "enum": ["high", "medium", "low", "untrusted"]
+        },
+        "freshness_status": {
+          "type": "string",
+          "enum": ["fresh", "stale", "unknown"]
+        },
+        "formula_version": { "type": "string" },
+        "owner": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "fingerprint": { "type": "string" },
+        "audit_reference": { "type": "string" },
+        "source_confirmation_status": {
+          "type": "string",
+          "enum": ["confirmed", "pending", "missing"]
+        }
+      }
+    }
+  }
+}

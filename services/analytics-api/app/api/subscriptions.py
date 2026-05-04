@@ -8,12 +8,14 @@ from app.schemas.subscription import (
     SubscriptionActionConfirmationRequest,
     SubscriptionActionConfirmationResponse,
     SubscriptionAnalyticsResponse,
+    SubscriptionOutcomesResponse,
     SubscriptionSourceHealthResponse,
     SubscriptionSummary,
 )
 from app.services.subscription_service import (
     confirm_subscription_action,
     get_subscription_analytics,
+    get_subscription_outcomes,
     get_subscription_source_health,
     get_subscription_summary,
     validate_portal_success,
@@ -35,6 +37,14 @@ def analytics(
     _: UserContext = Depends(require_api_permission(Permission.READ_SUBSCRIPTIONS)),
 ) -> SubscriptionAnalyticsResponse:
     return get_subscription_analytics(scenario)
+
+
+@router.get("/outcomes", response_model=SubscriptionOutcomesResponse)
+def outcomes(
+    scenario: str = "baseline",
+    _: UserContext = Depends(require_api_permission(Permission.READ_SUBSCRIPTIONS)),
+) -> SubscriptionOutcomesResponse:
+    return get_subscription_outcomes(scenario)
 
 
 @router.get("/source-health", response_model=SubscriptionSourceHealthResponse)

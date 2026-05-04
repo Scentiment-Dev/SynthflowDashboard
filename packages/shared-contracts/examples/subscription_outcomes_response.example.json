@@ -1,0 +1,46 @@
+{
+  "module": "subscriptions",
+  "generated_from_fixture": true,
+  "source_of_truth_system": "stayai",
+  "source_confirmation_status": "missing",
+  "scenario": "baseline",
+  "metrics": {
+    "subscription_contacts_total": 4,
+    "subscription_action_requests_total": 4,
+    "cancellation_requests_total": 2,
+    "confirmed_cancellations_total": 1,
+    "save_or_retention_attempts_total": 1,
+    "confirmed_retained_total": 1,
+    "non_cancellation_actions_total": 1,
+    "pending_stayai_confirmation_total": 1,
+    "missing_stayai_final_state_total": 1,
+    "portal_link_sent_total": 2,
+    "portal_completion_confirmed_total": 1,
+    "shopify_context_available_total": 4,
+    "synthflow_subscription_journeys_total": 4,
+    "subscription_outcome_unknown_total": 1,
+    "retention_rate": 1.0,
+    "cancellation_confirmation_rate": 0.5,
+    "portal_completion_rate": 0.5
+  },
+  "metadata": {
+    "metric_id": "subscription_outcome_metrics",
+    "filters": {
+      "date_range": "last_7_days",
+      "module": "subscriptions"
+    },
+    "metric_definitions": [
+      "retention_rate = confirmed_retained_total / save_or_retention_attempts_total",
+      "cancellation_confirmation_rate = confirmed_cancellations_total / cancellation_requests_total",
+      "portal_completion_rate = portal_completion_confirmed_total / portal_link_sent_total"
+    ],
+    "trust_label": "low",
+    "freshness_status": "fresh",
+    "formula_version": "v0.5.0",
+    "owner": "analytics",
+    "timestamp": "2026-05-04T00:00:00Z",
+    "fingerprint": "658631e58f0afe3e62115d5d8d9d40dce12ec1d06ddb9d14e6632f25f323f060",
+    "audit_reference": "audit-subscription-outcomes-baseline-20260504",
+    "source_confirmation_status": "missing"
+  }
+}

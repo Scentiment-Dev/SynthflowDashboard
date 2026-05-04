@@ -21,9 +21,12 @@
 ## Cycle 002 backend API contract surface
 
 - Backend route: `GET /subscriptions/analytics` (fixture-backed deterministic response).
+- Backend route: `GET /subscriptions/outcomes` (fixture-backed deterministic subscription outcome metrics).
 - Scenario switch for known-answer tests: `GET /subscriptions/analytics?scenario=missing_stayai_confirmation`.
+- Scenario switch for outcome tests: `GET /subscriptions/outcomes?scenario=<known_answer_case>`.
 - `subscription_overview.confirmed_cancellations_count` is Stay.ai-confirmed only.
 - `subscription_overview.confirmed_retained_subscriptions_count` requires confirmed retained/saved/active Stay.ai state.
 - `portal_journey.portal_link_sent_count` is tracked separately from `portal_journey.confirmed_portal_completion_count`.
 - `shopify_context.context_role` is `context_only` and `finalization_allowed` is always `false`.
 - `metric_metadata` includes filters, metric definitions, trust label, freshness, formula version, owner, timestamp, fingerprint, and audit reference.
+- `outcomes.metadata` includes source confirmation status and the same audit/fingerprint/freshness/formula governance fields.

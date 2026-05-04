@@ -21,6 +21,7 @@ EXAMPLE_BY_SCHEMA = {
     "shopify_order_context.schema.json": "shopify_order_context.example.json",
     "portal_completion_event.schema.json": "portal_completion_event.example.json",
     "subscription_analytics_response.schema.json": "subscription_analytics_response.example.json",
+    "subscription_outcomes_response.schema.json": "subscription_outcomes_response.example.json",
     "subscription_source_health.schema.json": "subscription_source_health.example.json",
 }
 
