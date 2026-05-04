@@ -132,7 +132,7 @@ export function freshnessTone(value: FreshnessStatus): StatusTone {
     case 'fresh':
       return 'success';
     case 'stale':
-      return 'danger';
+      return 'warning';
     default:
       return 'warning';
   }
@@ -516,10 +516,7 @@ export function activeVisualStates(
   );
 }
 
-export function formatLastSeenRelative(
-  freshnessMinutes: number,
-  now: () => Date = () => new Date(),
-): string {
+export function formatLastSeenRelative(freshnessMinutes: number): string {
   if (!Number.isFinite(freshnessMinutes) || freshnessMinutes < 0) return 'unknown';
   if (freshnessMinutes < 1) return 'less than a minute ago';
   if (freshnessMinutes < 60) {
@@ -532,7 +529,5 @@ export function formatLastSeenRelative(
   }
   const days = hours / 24;
   const roundedDays = Math.round(days * 10) / 10;
-  // touch the now() callback so future variants can use timestamp-relative math without breaking the contract.
-  void now;
   return `${roundedDays}d ago`;
 }

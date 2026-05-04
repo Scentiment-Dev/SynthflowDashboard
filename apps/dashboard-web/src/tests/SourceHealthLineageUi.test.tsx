@@ -147,6 +147,16 @@ describe('useSubscriptionSourceHealth', () => {
     });
   });
 
+  it('treats ApiClientError with non-permission status and empty message as not denied', async () => {
+    vi.spyOn(dashboardApi, 'getSubscriptionSourceHealth').mockRejectedValueOnce(
+      new ApiClientError('', 504),
+    );
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-permission-denied')).toHaveTextContent('allowed');
+    });
+  });
+
   it('falls back to fixture when API returns the wrong shape', async () => {
     vi.spyOn(dashboardApi, 'getSubscriptionSourceHealth').mockResolvedValueOnce(
       { module: 'subscriptions' } as unknown as SubscriptionSourceHealthResponse,
@@ -237,6 +247,108 @@ describe('useSubscriptionSourceHealth', () => {
     await Promise.resolve();
     expect(true).toBe(true);
   });
+
+  it('falls back to fixture when a source entry has an unknown source_system', async () => {
+    const broken = clone(baseline);
+    broken.sources = broken.sources.map((source) =>
+      source.source_system === 'shopify'
+        ? ({ ...source, source_system: 'salesforce' } as unknown as typeof source)
+        : source,
+    );
+    vi.spyOn(dashboardApi, 'getSubscriptionSourceHealth').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(/shape mismatch/i);
+    });
+  });
+
+  it('falls back to fixture when a source entry omits a required key', async () => {
+    const broken = clone(baseline);
+    broken.sources = broken.sources.map((source) => {
+      if (source.source_system !== 'portal') return source;
+      const partial = { ...source } as Record<string, unknown>;
+      delete partial.lineage_reference;
+      return partial as unknown as typeof source;
+    });
+    vi.spyOn(dashboardApi, 'getSubscriptionSourceHealth').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(/shape mismatch/i);
+    });
+  });
+
+  it('falls back to fixture when a numeric field is not a number on a source entry', async () => {
+    const broken = clone(baseline);
+    broken.sources = broken.sources.map((source) =>
+      source.source_system === 'synthflow'
+        ? ({ ...source, freshness_minutes: 'soon' } as unknown as typeof source)
+        : source,
+    );
+    vi.spyOn(dashboardApi, 'getSubscriptionSourceHealth').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(/shape mismatch/i);
+    });
+  });
+
+  it('falls back to fixture when missing_required_fields is not an array on a source entry', async () => {
+    const broken = clone(baseline);
+    broken.sources = broken.sources.map((source) =>
+      source.source_system === 'stay_ai'
+        ? ({ ...source, missing_required_fields: 'none' } as unknown as typeof source)
+        : source,
+    );
+    vi.spyOn(dashboardApi, 'getSubscriptionSourceHealth').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(/shape mismatch/i);
+    });
+  });
+
+  it('falls back to fixture when missing_required_fields contains a non-string entry', async () => {
+    const broken = clone(baseline);
+    broken.sources = broken.sources.map((source) =>
+      source.source_system === 'shopify'
+        ? ({ ...source, missing_required_fields: [42] } as unknown as typeof source)
+        : source,
+    );
+    vi.spyOn(dashboardApi, 'getSubscriptionSourceHealth').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(/shape mismatch/i);
+    });
+  });
+
+  it('falls back to fixture when a source entry is not a plain object', async () => {
+    const broken = clone(baseline);
+    (broken as unknown as Record<string, unknown>).sources = [null];
+    vi.spyOn(dashboardApi, 'getSubscriptionSourceHealth').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(/shape mismatch/i);
+    });
+  });
+
+  it('falls back to fixture when source_system is not a string on a source entry', async () => {
+    const broken = clone(baseline);
+    broken.sources = broken.sources.map((source, index) =>
+      index === 0
+        ? ({ ...source, source_system: 7 } as unknown as typeof source)
+        : source,
+    );
+    vi.spyOn(dashboardApi, 'getSubscriptionSourceHealth').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(/shape mismatch/i);
+    });
+  });
 });
 
 describe('source-health derivation helpers', () => {
@@ -247,7 +359,7 @@ describe('source-health derivation helpers', () => {
     expect(overallHealthTone('unknown')).toBe('neutral');
 
     expect(freshnessTone('fresh')).toBe('success');
-    expect(freshnessTone('stale')).toBe('danger');
+    expect(freshnessTone('stale')).toBe('warning');
     expect(freshnessTone('unknown')).toBe('warning');
 
     expect(dataQualityTone('passing')).toBe('success');
@@ -616,6 +728,20 @@ describe('FreshnessStateLegend', () => {
       expect(node).toHaveAttribute('data-active', expected);
     });
     expect(screen.getByTestId('freshness-state-legend-active-count')).toHaveTextContent('2 active');
+  });
+
+  it('keeps legend tones consistent with the card-level freshness/quality tone helpers', () => {
+    // Regression guard for Bugbot Medium (PR #18 r3183212901): the legend tone for
+    // 'stale' and 'unknown_freshness' must match the card-level freshnessTone helper so
+    // operators can correlate card colors with legend entries.
+    const staleMeta = SOURCE_VISUAL_STATE_LIBRARY.find((meta) => meta.id === 'stale');
+    const unknownMeta = SOURCE_VISUAL_STATE_LIBRARY.find(
+      (meta) => meta.id === 'unknown_freshness',
+    );
+    const freshMeta = SOURCE_VISUAL_STATE_LIBRARY.find((meta) => meta.id === 'fresh');
+    expect(staleMeta?.tone).toBe(freshnessTone('stale'));
+    expect(unknownMeta?.tone).toBe(freshnessTone('unknown'));
+    expect(freshMeta?.tone).toBe(freshnessTone('fresh'));
   });
 });
 

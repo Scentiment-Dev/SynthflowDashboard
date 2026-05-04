@@ -1,14 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ApiClientError } from '../services/apiClient';
 import { getSubscriptionAnalytics } from '../services/dashboardApi';
 import { SUBSCRIPTION_ANALYTICS_FIXTURES } from '../data/subscriptionAnalyticsFixtures';
+import { errorMessage, isPermissionDenied, isPlainObject } from '../utils/apiState';
 import type {
   SubscriptionAnalyticsApiState,
   SubscriptionAnalyticsResponse,
   SubscriptionAnalyticsScenario,
 } from '../types/subscriptionAnalytics';
-
-const PERMISSION_DENIED_PATTERN = /403|forbidden|permission denied|unauthor(?:i[sz]ed)/i;
 
 const REQUIRED_TOP_LEVEL_KEYS: Array<keyof SubscriptionAnalyticsResponse> = [
   'module',
@@ -33,33 +31,12 @@ const REQUIRED_NESTED_OBJECT_KEYS: Array<keyof SubscriptionAnalyticsResponse> = 
   'metric_metadata',
 ];
 
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
 function isSubscriptionAnalyticsShape(value: unknown): value is SubscriptionAnalyticsResponse {
   if (!isPlainObject(value)) return false;
   if (!REQUIRED_TOP_LEVEL_KEYS.every((key) => key in value)) return false;
   if (!REQUIRED_NESTED_OBJECT_KEYS.every((key) => isPlainObject(value[key]))) return false;
   if (typeof value.generated_from_fixture !== 'boolean') return false;
   return true;
-}
-
-function isPermissionDenied(error: unknown): boolean {
-  if (error instanceof ApiClientError) {
-    if (error.status === 401 || error.status === 403) return true;
-    if (error.message && PERMISSION_DENIED_PATTERN.test(error.message)) return true;
-    return false;
-  }
-  if (error instanceof Error) {
-    return PERMISSION_DENIED_PATTERN.test(error.message);
-  }
-  return false;
-}
-
-function errorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  return String(error);
 }
 
 export function useSubscriptionAnalytics(

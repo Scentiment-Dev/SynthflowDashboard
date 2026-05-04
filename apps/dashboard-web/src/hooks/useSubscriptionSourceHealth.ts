@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ApiClientError } from '../services/apiClient';
 import { getSubscriptionSourceHealth } from '../services/dashboardApi';
 import { SOURCE_HEALTH_FIXTURES } from '../data/sourceHealthFixtures';
+import { errorMessage, isPermissionDenied, isPlainObject } from '../utils/apiState';
 import type {
   SourceHealthApiState,
+  SourceHealthEntry,
   SourceHealthScenario,
+  SourceHealthSystem,
   SubscriptionSourceHealthResponse,
 } from '../types/sourceHealth';
-
-const PERMISSION_DENIED_PATTERN = /403|forbidden|permission denied|unauthor(?:i[sz]ed)/i;
 
 const REQUIRED_TOP_LEVEL_KEYS: Array<keyof SubscriptionSourceHealthResponse> = [
   'module',
@@ -21,8 +21,45 @@ const REQUIRED_TOP_LEVEL_KEYS: Array<keyof SubscriptionSourceHealthResponse> = [
   'metadata',
 ];
 
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
+const KNOWN_SOURCE_SYSTEMS: ReadonlySet<SourceHealthSystem> = new Set([
+  'stay_ai',
+  'synthflow',
+  'shopify',
+  'portal',
+]);
+
+const SOURCE_ENTRY_FIELD_TYPES: Record<keyof SourceHealthEntry, 'string' | 'number'> = {
+  source_system: 'string',
+  source_authority_level: 'string',
+  record_count: 'number',
+  last_seen_at: 'string',
+  freshness_status: 'string',
+  freshness_minutes: 'number',
+  source_confirmation_status: 'string',
+  data_quality_status: 'string',
+  conflict_count: 'number',
+  missing_required_fields: 'string',
+  lineage_reference: 'string',
+  owner: 'string',
+  formula_version: 'string',
+  audit_reference: 'string',
+  trust_label: 'string',
+};
+
+function isSourceHealthEntryShape(value: unknown): value is SourceHealthEntry {
+  if (!isPlainObject(value)) return false;
+  for (const [key, expectedType] of Object.entries(SOURCE_ENTRY_FIELD_TYPES) as Array<
+    [keyof SourceHealthEntry, 'string' | 'number']
+  >) {
+    if (!(key in value)) return false;
+    if (key === 'missing_required_fields') continue;
+    if (typeof value[key] !== expectedType) return false;
+  }
+  if (!KNOWN_SOURCE_SYSTEMS.has(value.source_system as SourceHealthSystem)) return false;
+  const missingFields = value.missing_required_fields;
+  if (!Array.isArray(missingFields)) return false;
+  if (!missingFields.every((field) => typeof field === 'string')) return false;
+  return true;
 }
 
 function isSourceHealthShape(value: unknown): value is SubscriptionSourceHealthResponse {
@@ -32,24 +69,8 @@ function isSourceHealthShape(value: unknown): value is SubscriptionSourceHealthR
   if (typeof value.pending_or_unknown_final_outcome !== 'boolean') return false;
   if (!Array.isArray(value.sources)) return false;
   if (!isPlainObject(value.metadata)) return false;
+  if (!value.sources.every((entry) => isSourceHealthEntryShape(entry))) return false;
   return true;
-}
-
-function isPermissionDenied(error: unknown): boolean {
-  if (error instanceof ApiClientError) {
-    if (error.status === 401 || error.status === 403) return true;
-    if (error.message && PERMISSION_DENIED_PATTERN.test(error.message)) return true;
-    return false;
-  }
-  if (error instanceof Error) {
-    return PERMISSION_DENIED_PATTERN.test(error.message);
-  }
-  return false;
-}
-
-function errorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  return String(error);
 }
 
 export function useSubscriptionSourceHealth(
