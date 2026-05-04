@@ -58,3 +58,18 @@ Fixture data is allowed during local development, but the UI must show that the 
 | Section panels | `src/components/dashboard/subscription/{SubscriptionFinalStateBanner,SubscriptionOverviewGrid,PortalJourneyPanel,ShopifyContextPanel,SynthflowJourneyPanel,SourceConfirmationPanel,SubscriptionMetricMetadataPanel,SubscriptionStateAlertsPanel}.tsx` |
 | Page wiring | `src/pages/SubscriptionAnalyticsPage.tsx` |
 | Tests | `src/tests/SubscriptionAnalyticsContractWiring.test.tsx` |
+
+## Cycle 004 — Source health, freshness, and lineage UI
+
+| Area | Files |
+|---|---|
+| Contract types | `src/types/sourceHealth.ts` |
+| Fixtures | `src/data/sourceHealthFixtures.ts` (mirrors backend `baseline`, `missing_stayai_final_state`, `failing_quality_with_missing_stayai`, `conflicting_sources` scenarios) |
+| Service | `src/services/dashboardApi.ts` (`getSubscriptionSourceHealth`, `buildSubscriptionSourceHealthUrl`) |
+| Hook | `src/hooks/useSubscriptionSourceHealth.ts` |
+| State helpers | `src/utils/sourceHealthState.ts` (tones, labels, alerts, visual-state library, `formatLastSeenRelative`) |
+| View | `src/components/dashboard/sourceHealth/SourceHealthView.tsx` |
+| Cards & panels | `src/components/dashboard/sourceHealth/{SourceHealthOverviewBar,SourceHealthCard,SourceHealthAlertsPanel,FreshnessStateLegend,LineageConflictPanel}.tsx` |
+| Page wiring | `src/pages/SubscriptionAnalyticsPage.tsx` (mounts `SourceHealthView` above the Cycle 002 analytics view) |
+| Tests | `src/tests/SourceHealthLineageUi.test.tsx` |
+| Backend contract | `GET /subscriptions/source-health?scenario=...` (Agent A Cycle 004) and shared schema `packages/shared-contracts/schemas/subscription_source_health.schema.json` |

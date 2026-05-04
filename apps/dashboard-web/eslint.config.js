@@ -13,6 +13,7 @@ export default [
         window: 'readonly',
         HTMLElement: 'readonly',
         fetch: 'readonly',
+        URLSearchParams: 'readonly',
         vi: 'readonly',
         describe: 'readonly',
         it: 'readonly',

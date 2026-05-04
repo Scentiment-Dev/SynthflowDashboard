@@ -4,6 +4,11 @@ import type {
   SubscriptionAnalyticsResponse,
   SubscriptionAnalyticsScenario,
 } from '../types/subscriptionAnalytics';
+import type {
+  SourceHealthScenario,
+  SourceHealthSystem,
+  SubscriptionSourceHealthResponse,
+} from '../types/sourceHealth';
 
 export type ExportAuditRequest = {
   requested_by: string;
@@ -43,3 +48,20 @@ export const getNoDriftRules = () => apiGet<{ rules: string[] }>('/governance/no
 export const createExportAudit = (request: ExportAuditRequest) => apiPost<ExportAuditRecord, ExportAuditRequest>('/exports/audit', request);
 export const getSubscriptionAnalytics = (scenario: SubscriptionAnalyticsScenario = 'baseline') =>
   apiGet<SubscriptionAnalyticsResponse>(buildSubscriptionAnalyticsUrl(scenario));
+
+export const buildSubscriptionSourceHealthUrl = (
+  scenario: SourceHealthScenario = 'baseline',
+  sources?: SourceHealthSystem[],
+) => {
+  const params = new URLSearchParams({ scenario });
+  if (sources && sources.length > 0) {
+    sources.forEach((source) => params.append('sources', source));
+  }
+  return `/subscriptions/source-health?${params.toString()}`;
+};
+
+export const getSubscriptionSourceHealth = (
+  scenario: SourceHealthScenario = 'baseline',
+  sources?: SourceHealthSystem[],
+) =>
+  apiGet<SubscriptionSourceHealthResponse>(buildSubscriptionSourceHealthUrl(scenario, sources));

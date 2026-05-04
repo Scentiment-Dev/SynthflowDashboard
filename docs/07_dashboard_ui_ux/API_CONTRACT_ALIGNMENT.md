@@ -93,3 +93,74 @@ back to the typed fixture in
 The UI clearly tags fixture-backed responses as "Contract preview from fixture"
 and surfaces permission-denied/RBAC unavailable as separate states so local
 checks are never treated as production authorization.
+
+## Cycle 004 — Subscription source-health contract wiring
+
+Cycle 004 adds an operator-readable surface for subscription source authority,
+freshness, conflict status, lineage, and pending/missing final-outcome states
+on top of the merged Agent A Cycle 004 backend
+`GET /subscriptions/source-health?scenario={baseline|missing_stayai_final_state|failing_quality_with_missing_stayai|conflicting_sources}`
+and shared contract
+`packages/shared-contracts/schemas/subscription_source_health.schema.json`.
+
+### Frontend TypeScript shape
+
+`apps/dashboard-web/src/types/sourceHealth.ts` mirrors the
+`SubscriptionSourceHealthResponse` Pydantic model exactly with no field
+renames:
+
+- `module`, `generated_from_fixture`, `overall_source_health`, `conflict_status`
+- `pending_or_unknown_final_outcome`, `missing_stay_ai_final_state_warning`,
+  `portal_completion_warning`, `shopify_context_warning`
+- `sources[]` per `stay_ai`, `synthflow`, `shopify`, `portal` with
+  `source_authority_level`, `record_count`, `last_seen_at`, `freshness_status`,
+  `freshness_minutes`, `source_confirmation_status`, `data_quality_status`,
+  `conflict_count`, `missing_required_fields`, `lineage_reference`, `owner`,
+  `formula_version`, `audit_reference`, `trust_label`
+- `metadata` (`timestamp`, `fingerprint`, `formula_version`, `owner`,
+  `audit_reference`)
+
+### Source-of-truth rules enforced in UI
+
+- Stay.ai is visually labeled as the only system that can finalize a
+  subscription state (final-truth badge).
+- Synthflow is shown as journey-event authoritative and never overrides Stay.ai.
+- Shopify is shown as context only and never overrides Stay.ai (cannot-finalize
+  badge).
+- Portal completion requires a confirmed completion event, not link delivery
+  (portal pending warning + lineage panel).
+- Trust labels are surfaced as system-calculated; manual elevation is blocked.
+- Conflicts are surfaced for triage but Stay.ai authority is preserved in the
+  lineage/conflict panel.
+
+### Visual state surface
+
+`apps/dashboard-web/src/utils/sourceHealthState.ts#deriveSourceHealthAlerts`
+emits the following deterministic alerts based purely on contract fields:
+
+`loading`, `permission_denied`, `rbac_unavailable`, `fixture_preview`,
+`missing_source_<system>`, `missing_stay_ai_final`,
+`portal_link_sent_completion_missing`, `synthflow_journey_incomplete`,
+`stale_<system>`, `unknown_freshness_<system>`, `quality_failing_<system>`,
+`conflict_<system>`, `conflict_status_overall`,
+`pending_or_unknown_final_outcome`, `context_only_without_stay_ai_final`.
+
+`activeVisualStates` derives the active subset of the visual-state library
+(`fresh`, `stale`, `unknown_freshness`, `missing_source`,
+`missing_stay_ai_final`, `pending_source_confirmation`, `conflict_detected`,
+`context_only_available`, `portal_link_sent_completion_missing`,
+`synthflow_journey_incomplete`) so `FreshnessStateLegend` can highlight which
+states currently apply.
+
+### Local development behavior (Cycle 004)
+
+`useSubscriptionSourceHealth(scenario)` fetches the source-health endpoint and
+falls back to the typed fixture in
+`apps/dashboard-web/src/data/sourceHealthFixtures.ts` if either:
+
+1. The fetch rejects (analytics-api unreachable), or
+2. The response shape does not match the contract.
+
+Fixture-backed responses are tagged "Contract preview (fixture)" and
+permission-denied / RBAC-unavailable states are surfaced as distinct UI
+states. UI placeholders are never treated as production metric logic.
