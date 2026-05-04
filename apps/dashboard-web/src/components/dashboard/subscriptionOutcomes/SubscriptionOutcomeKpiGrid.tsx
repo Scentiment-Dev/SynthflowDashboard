@@ -5,8 +5,8 @@ import type {
 } from '../../../utils/subscriptionOutcomesState';
 import {
   formatCount,
-  formatRatePercent,
   funnelStageToneClasses,
+  safeRatio,
 } from '../../../utils/subscriptionOutcomesState';
 
 const TONE_CLASS_MAP: Record<SubscriptionOutcomeKpiCard['tone'], string> = {
@@ -76,10 +76,7 @@ export default function SubscriptionOutcomeKpiGrid({
 
       <div className="grid gap-3 md:grid-cols-3">
         {rateCards.map((rateCard) => {
-          const denominatorMissing = rateCard.denominator <= 0;
-          const display = denominatorMissing
-            ? 'n/a'
-            : formatRatePercent(rateCard.rate);
+          const { display } = safeRatio(rateCard.numerator, rateCard.denominator);
           return (
             <article
               key={rateCard.id}

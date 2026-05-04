@@ -6,7 +6,7 @@
 - Wave number: 01
 - Cycle number: 005
 - Branch name: `agent-b/wave-01/cycle-005-subscription-outcome-ui`
-- PR URL: pending PR creation after report write
+- PR URL: https://github.com/Scentiment-Dev/SynthflowDashboard/pull/21
 
 ## Cycle 004 Baseline Verification Status
 
@@ -224,8 +224,7 @@
 
 ## PR / Check Status
 
-- PR URL: pending push / PR creation (will be updated to the actual GitHub URL once
-  the branch is pushed and the PR is opened).
+- PR URL: https://github.com/Scentiment-Dev/SynthflowDashboard/pull/21
 - Local check status snapshot (pre-PR):
   - Typecheck: pass
   - Lint: pass (0 errors)
