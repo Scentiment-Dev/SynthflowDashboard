@@ -280,21 +280,26 @@
 ## PR / Check Status
 
 - PR URL: https://github.com/Scentiment-Dev/SynthflowDashboard/pull/21
-- Local check status snapshot (after Bugbot fix-pass):
+- Local check status snapshot (after Bugbot fix-pass 2):
   - Typecheck: pass
   - Lint: pass (0 errors; pre-existing warnings only)
   - Vitest: 202 / 202 tests pass across 12 files
   - Coverage: 99.28% / 96.58% / 99.59% / 99.86% (>= 95% on every metric)
   - Build: pass (vite production build completes)
-- Remote PR check status (most recent push):
+- Remote PR check status (final, on `cf14cdd`):
   - Repo validation, contract-tests, ingestion-tests, backend-tests, dbt-tests,
-    frontend, frontend-tests, lint-typecheck, release-readiness, smoke,
-    smoke-tests: pass.
+    frontend, frontend-tests, lint-typecheck (backend / ingestion / frontend),
+    release-readiness, smoke, smoke-tests: pass.
   - `Coverage and Codecov Upload`: pass.
   - `codecov/patch`: pass.
-  - `Cursor Bugbot`: completed with NEUTRAL on the prior commit; will re-run on
-    the fix-pass push covering the two Codex P1 review comments. Final status to
-    be confirmed once the watcher reports a non-pending result.
+  - `Cursor Bugbot`: completed (status `COMPLETED`, conclusion `NEUTRAL`,
+    summary text `Bugbot completed review - no issues found`). All review
+    threads from prior Bugbot/Codex passes are now resolved (each one was
+    replied to with a fix-evidence summary linking the addressing commit and
+    its regression test, then resolved through the GitHub Reviews API).
+  - PR `mergeStateStatus`: `CLEAN`. PR `mergeable`: `MERGEABLE`. No
+    outstanding required check, no unresolved review thread, no requested
+    review left blocking the merge.
 
 ## Open Issues / Blockers / Risks / Drift Concerns
 
@@ -337,17 +342,23 @@
 
 ## Confidence Percentage
 
-- 98%
+- 99%
 
 ## Completion Statement
 
 - Local implementation and validation for Cycle 005 subscription outcome analytics
   UI are complete: every required KPI, rate, funnel stage, source-authority chip,
   trust/freshness/source-confirmation chip, and UI state is implemented and
-  tested. Coverage is comfortably above the 95% gate (99.27% / 96.55% / 99.59% /
-  99.86%). Lint, typecheck, full test suite, and production build all pass.
-- Merge-readiness is gated on Codecov + Bugbot + CI status on the PR; this report
-  will be re-confirmed once PR checks come back green.
+  tested. Coverage is comfortably above the 95% gate (99.28% / 96.58% / 99.59% /
+  99.86%). Lint, typecheck, full test suite (202 / 202), and production build
+  all pass.
+- All Bugbot/Codex review findings (2 P1 + 4 Low across three Bugbot passes) are
+  resolved in code with regression tests, replied to with fix evidence on the
+  PR, and the underlying review threads are marked resolved via the GitHub
+  Reviews API.
+- Merge-readiness is confirmed: Bugbot status `COMPLETED` with no issues found,
+  Codecov status `pass`, every CI required-check is `SUCCESS`, PR
+  `mergeStateStatus = CLEAN`, PR `mergeable = MERGEABLE`.
 
 ## Recommended Next Steps
 
