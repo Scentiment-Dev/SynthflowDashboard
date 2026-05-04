@@ -6,7 +6,7 @@
 - Wave number: 01
 - Cycle number: 005
 - Branch name: `agent-a/wave-01/cycle-005-subscription-outcome-metrics`
-- PR URL: Pending creation in this cycle run
+- PR URL: https://github.com/Scentiment-Dev/SynthflowDashboard/pull/20
 
 ## Cycle 004 Baseline Verification Status
 
@@ -35,7 +35,7 @@
   - Missing/pending Stay.ai confirmation drives unknown outcomes and lowers trust.
 - A5: Added known-answer API tests for required outcome paths and metadata presence.
 - A6: Ran required test suites and coverage gate (>=95%) locally.
-- A7: Cycle report prepared; PR/check evidence updated after PR creation/check watch.
+- A7: Created PR `#20` and captured CI/check status evidence.
 
 ## Files Created / Modified / Deleted
 
@@ -75,34 +75,41 @@
 ## Codecov Status
 
 - Local coverage XML generated successfully.
-- PR Codecov status: Pending PR creation/check run.
+- PR `#20` check `codecov/patch`: success.
+- PR `#20` workflow `Coverage and Codecov Upload`: success.
 
 ## Bugbot Status
 
-- Pending PR creation/check run.
+- PR `#20` check `Cursor Bugbot`: in progress at last poll.
 
 ## Validation Commands
 
 - Baseline verification command set executed (git + gh PR verification + Cycle 004 folder check).
 - `gh pr checks --watch` run pre-PR returned: `no pull requests found for branch "agent-a/wave-01/cycle-005-subscription-outcome-metrics"`.
+- Created PR via `gh pr create`.
+- Polled PR checks via `gh pr checks --watch` and `gh pr view 20 --json statusCheckRollup`.
 
 ## PR / Check Status
 
-- PR: not yet created at this report revision.
-- Required checks (Bugbot + Codecov): pending.
+- PR: https://github.com/Scentiment-Dev/SynthflowDashboard/pull/20
+- Current check status snapshot:
+  - Codecov: pass
+  - Coverage workflow: pass
+  - Backend/ingestion/frontend/contracts/dbt/lint/release/smoke checks: pass
+  - Bugbot: in progress (not yet complete at last poll)
 
 ## Open Issues / Blockers / Risks / Drift Concerns
 
 - Open issues: none in local implementation/tests.
 - Blockers: none for local delivery.
 - Risks:
-  - Merge-readiness is blocked until PR checks complete and Bugbot + Codecov are green.
+  - Merge-readiness is blocked until Bugbot finishes and reports success.
 - Drift concerns:
   - None identified; source-truth rules kept deterministic and fixture-backed.
 
 ## Handoffs Required
 
-- After PR creation, monitor required checks to completion and update this report with final URLs/status.
+- Monitor PR `#20` until Bugbot finishes; update report once Bugbot is complete.
 
 ## Confidence Percentage
 
@@ -111,10 +118,9 @@
 ## Completion Statement
 
 - Local implementation and validation for Cycle 005 subscription outcome backend metrics are complete and coverage-compliant.
-- Merge-readiness is pending PR-level Bugbot and Codecov verification evidence.
+- Merge-readiness is pending final Bugbot completion evidence (Codecov already passed).
 
 ## Recommended Next Steps
 
-- Create PR with title `[Wave 01][Cycle 005][Agent A] Subscription outcome metrics backend`.
-- Run `gh pr checks --watch` until all required checks complete.
-- Update this report with PR URL and final Bugbot/Codecov statuses.
+- Continue polling PR `#20` until `Cursor Bugbot` reaches success.
+- Refresh the report with final Bugbot completion timestamp/status.
