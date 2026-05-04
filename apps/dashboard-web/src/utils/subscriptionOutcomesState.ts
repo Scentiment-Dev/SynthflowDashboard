@@ -430,18 +430,11 @@ export function buildSubscriptionOutcomeFunnel(
     {
       id: 'unknown_pending',
       label: '8. Unknown / pending states',
-      count:
-        metrics.subscription_outcome_unknown_total +
-        metrics.pending_stayai_confirmation_total +
-        metrics.missing_stayai_final_state_total,
-      share: share(
-        metrics.subscription_outcome_unknown_total +
-          metrics.pending_stayai_confirmation_total +
-          metrics.missing_stayai_final_state_total,
-      ),
+      count: metrics.subscription_outcome_unknown_total,
+      share: share(metrics.subscription_outcome_unknown_total),
       tone: 'unknown',
       authority: 'Stay.ai (pending / missing)',
-      rule: 'Outcomes excluded from finalization until Stay.ai final state arrives.',
+      rule: 'Single canonical unresolved bucket from the contract; pending Stay.ai confirmation and missing Stay.ai final state are sub-categorizations surfaced in the KPI grid (not summed here to avoid double counting).',
       isFinalAuthority: true,
     },
   ];

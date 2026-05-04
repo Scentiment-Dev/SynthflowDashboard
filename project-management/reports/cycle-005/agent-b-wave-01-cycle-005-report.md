@@ -79,6 +79,9 @@
   - `apps/dashboard-web/src/data/subscriptionOutcomesFixtures.ts`
   - `apps/dashboard-web/src/utils/subscriptionOutcomesState.ts`
   - `apps/dashboard-web/src/hooks/useSubscriptionOutcomes.ts`
+  - `apps/dashboard-web/src/components/dashboard/MetadataFilterChips.tsx`
+    (shared filter chip list extracted during the Bugbot fix-pass; consumed by
+    both the Cycle 005 and Cycle 002 metadata panels).
   - `apps/dashboard-web/src/components/dashboard/subscriptionOutcomes/SubscriptionOutcomesView.tsx`
   - `apps/dashboard-web/src/components/dashboard/subscriptionOutcomes/SubscriptionOutcomeKpiGrid.tsx`
   - `apps/dashboard-web/src/components/dashboard/subscriptionOutcomes/SubscriptionOutcomeFunnel.tsx`
@@ -105,6 +108,10 @@
     section with file map and UI behavior rules.
   - `docs/06_analytics_modules/DASHBOARD_MODULE_SPECS.md` — added a "Cycle 005
     subscription outcome UI behavior" section.
+  - `apps/dashboard-web/src/components/dashboard/subscription/SubscriptionMetricMetadataPanel.tsx` —
+    refactored to consume the shared `MetadataFilterChips` (Bugbot Low fix; no
+    behavioral change, all Cycle 002 tests still pass against the existing
+    `metric-metadata-fingerprint` test id and `No filters reported` empty state).
 - Deleted: none.
 - Backend / API / `.github/**` / `codecov.yml` files: not modified, per the
   instruction lock.
@@ -116,14 +123,17 @@
   warnings are pre-existing `no-unused-vars` matches, including the same `_reason`
   pattern already used by Cycle 002 and Cycle 004 tests).
 - `npm --prefix apps/dashboard-web run test:run` -> `12 test files passed,
-  194 tests passed`. New file `SubscriptionOutcomeAnalytics.test.tsx`
-  contributes 50 tests covering: URL builder, hook contract validation
+  201 tests passed`. New file `SubscriptionOutcomeAnalytics.test.tsx`
+  contributes 57 tests covering: URL builder, hook contract validation
   (valid response, generic error, 403 permission denied, shape mismatch with
   missing keys / null nested object / non-boolean fixture flag / array nested
-  object, non-Error rejection, late resolve/reject after unmount), state
-  helpers (`clampRatio`, `formatRatePercent`, `formatCount`, `safeRatio`, all
-  tone helpers), funnel builder (8 stages, share calculation, zero-contact
-  safety), KPI/rate card builders, alerts derivation (baseline / pending /
+  object, non-number metric / NaN metric / non-string metadata / non-array
+  `metric_definitions` / non-string-element `metric_definitions` /
+  non-object `filters`, non-Error rejection, late resolve/reject after
+  unmount), state helpers (`clampRatio`, `formatRatePercent`, `formatCount`,
+  `safeRatio`, all tone helpers), funnel builder (8 stages, share
+  calculation, zero-contact safety, no-double-count regression test for the
+  Bugbot P1), KPI/rate card builders, alerts derivation (baseline / pending /
   missing / empty / loading-with-error / permission-denied / metadata-missing /
   generated-from-fixture), each section panel (alerts, KPI grid, funnel,
   metadata), top-level view integration (status bar in fixture / live API /
@@ -139,11 +149,12 @@
   on lines, statements, branches, and functions).
 - Artifact: `apps/dashboard-web/coverage/` directory (lcov + text + text-summary +
   html reporters per `vite.config.ts`).
-- Coverage result (final run with all Cycle 005 code present):
-  - Statements: 99.27% (819 / 825)
-  - Branches: 96.55% (560 / 580)
-  - Functions: 99.59% (248 / 249)
-  - Lines: 99.86% (719 / 720)
+- Coverage result (final run with all Cycle 005 code + Bugbot fix-pass code
+  present):
+  - Statements: 99.28% (831 / 837)
+  - Branches: 96.58% (566 / 586)
+  - Functions: 99.59% (247 / 248)
+  - Lines: 99.86% (726 / 727)
 - Coverage >= 95%: yes — every threshold is comfortably above 95% on every metric.
 - New Cycle 005 modules specifically:
   - `src/components/dashboard/subscriptionOutcomes/*.tsx`: 100% statements / 96.15%
@@ -166,8 +177,37 @@
 ## Bugbot Status
 
 - Bugbot is configured at the repo level (Agent A Cycle 005 PR `#20` shows `Cursor
-  Bugbot` as a required check). This PR will trigger Bugbot automatically; final
-  Bugbot status will be confirmed after PR creation.
+  Bugbot` as a required check). PR `#21` triggered Bugbot on every push. The first
+  pass surfaced one Cursor Bugbot Low (`safeRatio` exported but unused in
+  production), one Cursor Bugbot Low (duplicated `FilterChips` in two metadata
+  panels), and two Codex `chatgpt-codex-connector` P1 review comments
+  (funnel stage 8 double-counting unknown/pending/missing; hook shape guard
+  accepting partially-broken nested payloads). All four findings have been
+  addressed in this branch:
+  - `safeRatio` is now used by `SubscriptionOutcomeKpiGrid` so the rate cards
+    delegate to the same n/a fallback as the rest of the module (no dead code).
+  - `FilterChips` was extracted to `apps/dashboard-web/src/components/dashboard/MetadataFilterChips.tsx`
+    and is now imported by both `SubscriptionOutcomeMetadataPanel.tsx` (Cycle 005)
+    and `SubscriptionMetricMetadataPanel.tsx` (Cycle 002), so a future styling
+    change propagates to both panels.
+  - `buildSubscriptionOutcomeFunnel` now uses ONLY
+    `subscription_outcome_unknown_total` for stage 8, since the backend's
+    `_is_unknown_outcome` already counts pending and missing records under that
+    canonical bucket. The pending Stay.ai confirmation and missing Stay.ai final
+    state remain prominently surfaced as their own KPI cards and dedicated alert
+    rows so no information is hidden — only the stage 8 sum is no longer inflated.
+    A regression test `does not double-count pending or missing Stay.ai
+    sub-categories into stage 8` locks this in.
+  - `useSubscriptionOutcomes.isSubscriptionOutcomesShape` was tightened: every
+    metric used by the funnel/KPI builders is now validated as a finite number,
+    every metadata field used by `deriveSubscriptionOutcomeAlerts` is validated
+    as a string, `metadata.metric_definitions` is validated as `string[]`, and
+    `metadata.filters` is validated as a plain object. Six new tests cover each
+    rejected sub-shape (non-number metric, NaN metric, non-string metadata field,
+    non-array `metric_definitions`, non-string-element `metric_definitions`,
+    non-object `filters`).
+- Final Bugbot status will be confirmed after the fix push triggers a re-run on
+  PR `#21`.
 
 ## Visual Evidence Status
 
@@ -225,14 +265,21 @@
 ## PR / Check Status
 
 - PR URL: https://github.com/Scentiment-Dev/SynthflowDashboard/pull/21
-- Local check status snapshot (pre-PR):
+- Local check status snapshot (after Bugbot fix-pass):
   - Typecheck: pass
-  - Lint: pass (0 errors)
-  - Vitest: 194 / 194 tests pass across 12 files
-  - Coverage: 99.27% / 96.55% / 99.59% / 99.86% (>= 95% on every metric)
+  - Lint: pass (0 errors; pre-existing warnings only)
+  - Vitest: 201 / 201 tests pass across 12 files
+  - Coverage: 99.28% / 96.58% / 99.59% / 99.86% (>= 95% on every metric)
   - Build: pass (vite production build completes)
-- Codecov / Bugbot / CI checks: will run automatically once the PR is opened. This
-  task is not declared merge-ready until both Codecov and Bugbot show success.
+- Remote PR check status (most recent push):
+  - Repo validation, contract-tests, ingestion-tests, backend-tests, dbt-tests,
+    frontend, frontend-tests, lint-typecheck, release-readiness, smoke,
+    smoke-tests: pass.
+  - `Coverage and Codecov Upload`: pass.
+  - `codecov/patch`: pass.
+  - `Cursor Bugbot`: completed with NEUTRAL on the prior commit; will re-run on
+    the fix-pass push covering the two Codex P1 review comments. Final status to
+    be confirmed once the watcher reports a non-pending result.
 
 ## Open Issues / Blockers / Risks / Drift Concerns
 

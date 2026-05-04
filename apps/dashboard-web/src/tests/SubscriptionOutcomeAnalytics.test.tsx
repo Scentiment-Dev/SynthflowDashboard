@@ -161,6 +161,88 @@ describe('useSubscriptionOutcomes', () => {
     });
   });
 
+  it('falls back to fixture when a required metric number is missing or non-finite', async () => {
+    const broken = JSON.parse(JSON.stringify(baseline)) as SubscriptionOutcomesResponse;
+    (broken.metrics as unknown as Record<string, unknown>).subscription_contacts_total =
+      'not-a-number';
+    vi.spyOn(dashboardApi, 'getSubscriptionOutcomes').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(
+        /subscription outcomes response shape mismatch/i,
+      );
+    });
+  });
+
+  it('falls back to fixture when a required metric number is NaN', async () => {
+    const broken = JSON.parse(JSON.stringify(baseline)) as SubscriptionOutcomesResponse;
+    (broken.metrics as unknown as Record<string, unknown>).retention_rate = Number.NaN;
+    vi.spyOn(dashboardApi, 'getSubscriptionOutcomes').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(
+        /subscription outcomes response shape mismatch/i,
+      );
+    });
+  });
+
+  it('falls back to fixture when a required metadata string field is missing', async () => {
+    const broken = JSON.parse(JSON.stringify(baseline)) as SubscriptionOutcomesResponse;
+    (broken.metadata as unknown as Record<string, unknown>).freshness_status = 42;
+    vi.spyOn(dashboardApi, 'getSubscriptionOutcomes').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(
+        /subscription outcomes response shape mismatch/i,
+      );
+    });
+  });
+
+  it('falls back to fixture when metadata.metric_definitions is not an array of strings', async () => {
+    const broken = JSON.parse(JSON.stringify(baseline)) as SubscriptionOutcomesResponse;
+    (broken.metadata as unknown as Record<string, unknown>).metric_definitions = [
+      'ok',
+      123,
+    ];
+    vi.spyOn(dashboardApi, 'getSubscriptionOutcomes').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(
+        /subscription outcomes response shape mismatch/i,
+      );
+    });
+  });
+
+  it('falls back to fixture when metadata.metric_definitions is missing entirely', async () => {
+    const broken = JSON.parse(JSON.stringify(baseline)) as SubscriptionOutcomesResponse;
+    (broken.metadata as unknown as Record<string, unknown>).metric_definitions = 'not-an-array';
+    vi.spyOn(dashboardApi, 'getSubscriptionOutcomes').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(
+        /subscription outcomes response shape mismatch/i,
+      );
+    });
+  });
+
+  it('falls back to fixture when metadata.filters is not a plain object', async () => {
+    const broken = JSON.parse(JSON.stringify(baseline)) as SubscriptionOutcomesResponse;
+    (broken.metadata as unknown as Record<string, unknown>).filters = ['date_range'];
+    vi.spyOn(dashboardApi, 'getSubscriptionOutcomes').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(
+        /subscription outcomes response shape mismatch/i,
+      );
+    });
+  });
+
   it('coerces non-Error rejections into a string message', async () => {
     vi.spyOn(dashboardApi, 'getSubscriptionOutcomes').mockRejectedValueOnce('boom');
     render(<HookProbe />);
@@ -314,7 +396,24 @@ describe('buildSubscriptionOutcomeFunnel', () => {
     expect(finalStage?.share).toBeCloseTo(0.5, 5);
 
     const unknownStage = stages.find((stage) => stage.id === 'unknown_pending');
-    expect(unknownStage?.count).toBeGreaterThanOrEqual(1);
+    expect(unknownStage?.count).toBe(baseline.metrics.subscription_outcome_unknown_total);
+    expect(unknownStage?.share).toBeCloseTo(
+      baseline.metrics.subscription_outcome_unknown_total /
+        baseline.metrics.subscription_contacts_total,
+      5,
+    );
+  });
+
+  it('does not double-count pending or missing Stay.ai sub-categories into stage 8', () => {
+    const data = JSON.parse(JSON.stringify(baseline)) as SubscriptionOutcomesResponse;
+    data.metrics.subscription_contacts_total = 10;
+    data.metrics.subscription_outcome_unknown_total = 1;
+    data.metrics.pending_stayai_confirmation_total = 1;
+    data.metrics.missing_stayai_final_state_total = 1;
+    const stages = buildSubscriptionOutcomeFunnel(data.metrics);
+    const unknownStage = stages.find((stage) => stage.id === 'unknown_pending');
+    expect(unknownStage?.count).toBe(1);
+    expect(unknownStage?.share).toBeCloseTo(0.1, 5);
   });
 
   it('returns zero shares when total subscription contacts is zero', () => {
