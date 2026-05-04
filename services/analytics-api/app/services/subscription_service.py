@@ -11,6 +11,10 @@ from app.schemas.source_truth import (
 from app.schemas.subscription import (
     DataQualityStatus,
     FreshnessStatus,
+    SubscriptionOutcomeActionType,
+    SubscriptionOutcomeMetricMetadata,
+    SubscriptionOutcomeMetrics,
+    SubscriptionOutcomesResponse,
     SourceAuthorityLevel,
     SourceConfirmationMetrics,
     SourceConfirmationStatus,
@@ -95,6 +99,31 @@ class SourceHealthSourceFixture(TypedDict):
 class SourceHealthFixture(TypedDict):
     sources: list[SourceHealthSourceFixture]
     timestamp: str
+    formula_version: str
+    owner: str
+    audit_reference: str
+
+
+class SubscriptionOutcomeRecordFixture(TypedDict):
+    contact_id: str
+    action_requested: bool
+    action_type: SubscriptionOutcomeActionType
+    stayai_final_state: SubscriptionTruthState | None
+    stayai_confirmation_status: SourceConfirmationStatus
+    approved_official_completion_path: bool
+    portal_link_sent: bool
+    portal_completion_confirmed: bool
+    shopify_context_available: bool
+    synthflow_journey_present: bool
+    synthflow_journey_status: str
+    non_cancellation_action_completed: bool
+
+
+class SubscriptionOutcomeScenarioFixture(TypedDict):
+    records: list[SubscriptionOutcomeRecordFixture]
+    freshness_status: FreshnessStatus
+    timestamp: str
+    filters: dict[str, object]
     formula_version: str
     owner: str
     audit_reference: str
@@ -483,6 +512,378 @@ SUBSCRIPTION_SOURCE_HEALTH_FIXTURES: dict[str, SourceHealthFixture] = {
 }
 
 
+SUBSCRIPTION_OUTCOME_FIXTURES: dict[str, SubscriptionOutcomeScenarioFixture] = {
+    "baseline": {
+        "records": [
+            {
+                "contact_id": "sub-001",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.CANCEL,
+                "stayai_final_state": SubscriptionTruthState.CANCELLED,
+                "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "approved_official_completion_path": False,
+                "portal_link_sent": True,
+                "portal_completion_confirmed": True,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": False,
+            },
+            {
+                "contact_id": "sub-002",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.SAVE,
+                "stayai_final_state": SubscriptionTruthState.RETAINED,
+                "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "approved_official_completion_path": False,
+                "portal_link_sent": False,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": False,
+            },
+            {
+                "contact_id": "sub-003",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.PAUSE,
+                "stayai_final_state": SubscriptionTruthState.ACTIVE,
+                "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "approved_official_completion_path": False,
+                "portal_link_sent": False,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": True,
+            },
+            {
+                "contact_id": "sub-004",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.CANCEL,
+                "stayai_final_state": None,
+                "stayai_confirmation_status": SourceConfirmationStatus.PENDING,
+                "approved_official_completion_path": False,
+                "portal_link_sent": True,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "unresolved",
+                "non_cancellation_action_completed": False,
+            },
+        ],
+        "freshness_status": FreshnessStatus.FRESH,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"date_range": "last_7_days", "module": "subscriptions"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-baseline-20260504",
+    },
+    "confirmed_cancellation": {
+        "records": [
+            {
+                "contact_id": "sub-cancel-001",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.CANCEL,
+                "stayai_final_state": SubscriptionTruthState.CANCELLED,
+                "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "approved_official_completion_path": False,
+                "portal_link_sent": True,
+                "portal_completion_confirmed": True,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": False,
+            }
+        ],
+        "freshness_status": FreshnessStatus.FRESH,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "confirmed_cancellation"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-confirmed-cancellation-20260504",
+    },
+    "pending_cancellation_confirmation": {
+        "records": [
+            {
+                "contact_id": "sub-pending-cancel-001",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.CANCEL,
+                "stayai_final_state": SubscriptionTruthState.PENDING,
+                "stayai_confirmation_status": SourceConfirmationStatus.PENDING,
+                "approved_official_completion_path": False,
+                "portal_link_sent": True,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": False,
+            }
+        ],
+        "freshness_status": FreshnessStatus.STALE,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "pending_cancellation_confirmation"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-pending-cancellation-20260504",
+    },
+    "save_confirmed_retained": {
+        "records": [
+            {
+                "contact_id": "sub-save-001",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.SAVE,
+                "stayai_final_state": SubscriptionTruthState.RETAINED,
+                "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "approved_official_completion_path": False,
+                "portal_link_sent": False,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": False,
+            }
+        ],
+        "freshness_status": FreshnessStatus.FRESH,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "save_confirmed_retained"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-save-confirmed-20260504",
+    },
+    "save_missing_confirmation": {
+        "records": [
+            {
+                "contact_id": "sub-save-missing-001",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.SAVE,
+                "stayai_final_state": None,
+                "stayai_confirmation_status": SourceConfirmationStatus.MISSING,
+                "approved_official_completion_path": False,
+                "portal_link_sent": False,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": False,
+            }
+        ],
+        "freshness_status": FreshnessStatus.STALE,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "save_missing_confirmation"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-save-missing-20260504",
+    },
+    "non_cancellation_action_completed": {
+        "records": [
+            {
+                "contact_id": "sub-non-cancel-001",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.FREQUENCY_CHANGE,
+                "stayai_final_state": SubscriptionTruthState.ACTIVE,
+                "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "approved_official_completion_path": False,
+                "portal_link_sent": False,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": True,
+            }
+        ],
+        "freshness_status": FreshnessStatus.FRESH,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "non_cancellation_action_completed"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-non-cancel-20260504",
+    },
+    "portal_link_without_completion": {
+        "records": [
+            {
+                "contact_id": "sub-portal-001",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.CANCEL,
+                "stayai_final_state": None,
+                "stayai_confirmation_status": SourceConfirmationStatus.PENDING,
+                "approved_official_completion_path": False,
+                "portal_link_sent": True,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": False,
+            }
+        ],
+        "freshness_status": FreshnessStatus.FRESH,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "portal_link_without_completion"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-portal-link-20260504",
+    },
+    "shopify_context_missing_final_state": {
+        "records": [
+            {
+                "contact_id": "sub-shopify-001",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.CANCEL,
+                "stayai_final_state": None,
+                "stayai_confirmation_status": SourceConfirmationStatus.MISSING,
+                "approved_official_completion_path": False,
+                "portal_link_sent": False,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": False,
+                "synthflow_journey_status": "unknown",
+                "non_cancellation_action_completed": False,
+            }
+        ],
+        "freshness_status": FreshnessStatus.STALE,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "shopify_context_missing_final_state"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-shopify-context-20260504",
+    },
+    "synthflow_journey_incomplete": {
+        "records": [
+            {
+                "contact_id": "sub-synthflow-001",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.CANCEL,
+                "stayai_final_state": None,
+                "stayai_confirmation_status": SourceConfirmationStatus.PENDING,
+                "approved_official_completion_path": False,
+                "portal_link_sent": False,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "transferred",
+                "non_cancellation_action_completed": False,
+            }
+        ],
+        "freshness_status": FreshnessStatus.FRESH,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "synthflow_journey_incomplete"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-synthflow-incomplete-20260504",
+    },
+    "unknown_outcome": {
+        "records": [
+            {
+                "contact_id": "sub-unknown-001",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.OTHER,
+                "stayai_final_state": None,
+                "stayai_confirmation_status": SourceConfirmationStatus.MISSING,
+                "approved_official_completion_path": False,
+                "portal_link_sent": False,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": False,
+                "synthflow_journey_present": False,
+                "synthflow_journey_status": "unknown",
+                "non_cancellation_action_completed": False,
+            }
+        ],
+        "freshness_status": FreshnessStatus.UNKNOWN,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "unknown_outcome"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-unknown-20260504",
+    },
+    "duplicate_contact_records": {
+        "records": [
+            {
+                "contact_id": "sub-dup-001",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.CANCEL,
+                "stayai_final_state": SubscriptionTruthState.CANCELLED,
+                "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "approved_official_completion_path": False,
+                "portal_link_sent": True,
+                "portal_completion_confirmed": True,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": False,
+            },
+            {
+                "contact_id": "sub-dup-001",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.PAUSE,
+                "stayai_final_state": SubscriptionTruthState.ACTIVE,
+                "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "approved_official_completion_path": False,
+                "portal_link_sent": False,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": True,
+            },
+        ],
+        "freshness_status": FreshnessStatus.FRESH,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "duplicate_contact_records"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-duplicate-contact-20260504",
+    },
+    "save_not_requested": {
+        "records": [
+            {
+                "contact_id": "sub-save-not-requested-001",
+                "action_requested": False,
+                "action_type": SubscriptionOutcomeActionType.SAVE,
+                "stayai_final_state": SubscriptionTruthState.RETAINED,
+                "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "approved_official_completion_path": False,
+                "portal_link_sent": False,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": False,
+            }
+        ],
+        "freshness_status": FreshnessStatus.FRESH,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "save_not_requested"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-save-not-requested-20260504",
+    },
+    "cancellation_not_requested_official_path": {
+        "records": [
+            {
+                "contact_id": "sub-cancel-not-requested-001",
+                "action_requested": False,
+                "action_type": SubscriptionOutcomeActionType.CANCEL,
+                "stayai_final_state": SubscriptionTruthState.CANCELLED,
+                "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "approved_official_completion_path": True,
+                "portal_link_sent": False,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": False,
+            }
+        ],
+        "freshness_status": FreshnessStatus.FRESH,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "cancellation_not_requested_official_path"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-cancel-not-requested-20260504",
+    },
+}
+
+
 def _calculate_trust_label(source_confirmation: SourceConfirmationMetrics) -> TrustLabel:
     if (
         source_confirmation.source_confirmation_status == SourceConfirmationStatus.MISSING
@@ -495,6 +896,79 @@ def _calculate_trust_label(source_confirmation: SourceConfirmationMetrics) -> Tr
     ):
         return TrustLabel.MEDIUM
     return TrustLabel.HIGH
+
+
+def _safe_rate(numerator: int, denominator: int) -> float:
+    if denominator <= 0:
+        return 0.0
+    return round(numerator / denominator, 4)
+
+
+def _is_confirmed_cancellation(record: SubscriptionOutcomeRecordFixture) -> bool:
+    if (
+        not record["action_requested"]
+        or record["action_type"] != SubscriptionOutcomeActionType.CANCEL
+    ):
+        return False
+    if record["approved_official_completion_path"]:
+        return True
+    return bool(
+        record["stayai_confirmation_status"] == SourceConfirmationStatus.CONFIRMED
+        and record["stayai_final_state"] == SubscriptionTruthState.CANCELLED
+    )
+
+
+def _is_confirmed_retained(record: SubscriptionOutcomeRecordFixture) -> bool:
+    return bool(
+        record["action_requested"]
+        and record["action_type"] == SubscriptionOutcomeActionType.SAVE
+        and record["stayai_confirmation_status"] == SourceConfirmationStatus.CONFIRMED
+        and record["stayai_final_state"]
+        in {
+            SubscriptionTruthState.RETAINED,
+            SubscriptionTruthState.SAVED,
+            SubscriptionTruthState.ACTIVE,
+        }
+    )
+
+
+def _is_non_cancellation_action_completed(record: SubscriptionOutcomeRecordFixture) -> bool:
+    return bool(
+        record["action_requested"]
+        and record["action_type"]
+        not in {SubscriptionOutcomeActionType.CANCEL, SubscriptionOutcomeActionType.SAVE}
+        and record["non_cancellation_action_completed"]
+    )
+
+
+def _is_unknown_outcome(
+    record: SubscriptionOutcomeRecordFixture,
+    *,
+    confirmed_cancellation: bool,
+    confirmed_retained: bool,
+    non_cancellation_action_completed: bool,
+) -> bool:
+    if not record["action_requested"]:
+        return False
+    return not (
+        confirmed_cancellation
+        or confirmed_retained
+        or non_cancellation_action_completed
+    )
+
+
+def _outcomes_fingerprint(
+    *,
+    scenario: str,
+    metrics: SubscriptionOutcomeMetrics,
+    formula_version: str,
+) -> str:
+    payload = {
+        "scenario": scenario,
+        "formula_version": formula_version,
+        "metrics": metrics.model_dump(mode="json"),
+    }
+    return sha256(dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
 
 
 def _analytics_fingerprint(
@@ -628,6 +1102,150 @@ def get_subscription_analytics(scenario: str = "baseline") -> SubscriptionAnalyt
         synthflow_journey=synthflow,
         source_confirmation=source_confirmation,
         metric_metadata=metric_metadata,
+    )
+
+
+def get_subscription_outcomes(scenario: str = "baseline") -> SubscriptionOutcomesResponse:
+    effective_scenario = (
+        scenario if scenario in SUBSCRIPTION_OUTCOME_FIXTURES else "baseline"
+    )
+    fixture = SUBSCRIPTION_OUTCOME_FIXTURES[effective_scenario]
+    records = fixture["records"]
+    unique_contact_ids = {record["contact_id"] for record in records}
+    cancellation_requests_total = sum(
+        1
+        for record in records
+        if record["action_requested"]
+        and record["action_type"] == SubscriptionOutcomeActionType.CANCEL
+    )
+    confirmed_cancellations_total = 0
+    save_or_retention_attempts_total = 0
+    confirmed_retained_total = 0
+    non_cancellation_actions_total = 0
+    pending_stayai_confirmation_total = 0
+    missing_stayai_final_state_total = 0
+    portal_link_sent_total = 0
+    portal_completion_confirmed_total = 0
+    shopify_context_available_total = 0
+    synthflow_subscription_journeys_total = 0
+    subscription_outcome_unknown_total = 0
+
+    for record in records:
+        confirmed_cancellation = _is_confirmed_cancellation(record)
+        confirmed_retained = _is_confirmed_retained(record)
+        non_cancellation_action_completed = _is_non_cancellation_action_completed(record)
+        if confirmed_cancellation:
+            confirmed_cancellations_total += 1
+        if (
+            record["action_requested"]
+            and record["action_type"] == SubscriptionOutcomeActionType.SAVE
+        ):
+            save_or_retention_attempts_total += 1
+        if confirmed_retained:
+            confirmed_retained_total += 1
+        if non_cancellation_action_completed:
+            non_cancellation_actions_total += 1
+        if (
+            record["action_type"]
+            in {SubscriptionOutcomeActionType.CANCEL, SubscriptionOutcomeActionType.SAVE}
+            and record["stayai_confirmation_status"] == SourceConfirmationStatus.PENDING
+        ):
+            pending_stayai_confirmation_total += 1
+        if (
+            record["action_type"]
+            in {SubscriptionOutcomeActionType.CANCEL, SubscriptionOutcomeActionType.SAVE}
+            and record["stayai_final_state"] is None
+        ):
+            missing_stayai_final_state_total += 1
+        if record["portal_link_sent"]:
+            portal_link_sent_total += 1
+        if record["portal_completion_confirmed"]:
+            portal_completion_confirmed_total += 1
+        if record["shopify_context_available"]:
+            shopify_context_available_total += 1
+        if record["synthflow_journey_present"]:
+            synthflow_subscription_journeys_total += 1
+        if _is_unknown_outcome(
+            record,
+            confirmed_cancellation=confirmed_cancellation,
+            confirmed_retained=confirmed_retained,
+            non_cancellation_action_completed=non_cancellation_action_completed,
+        ):
+            subscription_outcome_unknown_total += 1
+
+    metrics = SubscriptionOutcomeMetrics(
+        subscription_contacts_total=len(unique_contact_ids),
+        subscription_action_requests_total=sum(
+            1 for record in records if record["action_requested"]
+        ),
+        cancellation_requests_total=cancellation_requests_total,
+        confirmed_cancellations_total=confirmed_cancellations_total,
+        save_or_retention_attempts_total=save_or_retention_attempts_total,
+        confirmed_retained_total=confirmed_retained_total,
+        non_cancellation_actions_total=non_cancellation_actions_total,
+        pending_stayai_confirmation_total=pending_stayai_confirmation_total,
+        missing_stayai_final_state_total=missing_stayai_final_state_total,
+        portal_link_sent_total=portal_link_sent_total,
+        portal_completion_confirmed_total=portal_completion_confirmed_total,
+        shopify_context_available_total=shopify_context_available_total,
+        synthflow_subscription_journeys_total=synthflow_subscription_journeys_total,
+        subscription_outcome_unknown_total=subscription_outcome_unknown_total,
+        retention_rate=_safe_rate(
+            confirmed_retained_total, save_or_retention_attempts_total
+        ),
+        cancellation_confirmation_rate=_safe_rate(
+            confirmed_cancellations_total, cancellation_requests_total
+        ),
+        portal_completion_rate=_safe_rate(
+            portal_completion_confirmed_total, portal_link_sent_total
+        ),
+    )
+    source_confirmation_status = SourceConfirmationStatus.CONFIRMED
+    if missing_stayai_final_state_total > 0:
+        source_confirmation_status = SourceConfirmationStatus.MISSING
+    elif pending_stayai_confirmation_total > 0:
+        source_confirmation_status = SourceConfirmationStatus.PENDING
+
+    trust_label = TrustLabel.HIGH
+    if source_confirmation_status == SourceConfirmationStatus.MISSING:
+        trust_label = TrustLabel.LOW
+    elif (
+        source_confirmation_status == SourceConfirmationStatus.PENDING
+        or subscription_outcome_unknown_total > 0
+    ):
+        trust_label = TrustLabel.MEDIUM
+
+    formula_version = fixture["formula_version"]
+    metadata = SubscriptionOutcomeMetricMetadata(
+        metric_id="subscription_outcome_metrics",
+        filters=fixture["filters"],
+        metric_definitions=[
+            "retention_rate = confirmed_retained_total / save_or_retention_attempts_total",
+            "cancellation_confirmation_rate = confirmed_cancellations_total / cancellation_requests_total",
+            "portal_completion_rate = portal_completion_confirmed_total / portal_link_sent_total",
+            "confirmed_cancellations_total requires Stay.ai cancelled final state or approved official completion path",
+            "confirmed_retained_total requires Stay.ai retained/saved/active confirmed final state after a save attempt",
+            "Shopify and Synthflow contribute context/journey metrics only and do not finalize subscription state",
+        ],
+        trust_label=trust_label,
+        freshness_status=fixture["freshness_status"],
+        formula_version=formula_version,
+        owner=fixture["owner"],
+        timestamp=fixture["timestamp"],
+        fingerprint=_outcomes_fingerprint(
+            scenario=effective_scenario,
+            metrics=metrics,
+            formula_version=formula_version,
+        ),
+        audit_reference=fixture["audit_reference"],
+        source_confirmation_status=source_confirmation_status,
+    )
+
+    return SubscriptionOutcomesResponse(
+        source_confirmation_status=source_confirmation_status,
+        scenario=effective_scenario,
+        metrics=metrics,
+        metadata=metadata,
     )
 
 

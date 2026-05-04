@@ -47,6 +47,19 @@ def test_missing_source_data_lowers_trust_or_maps_to_pending_unknown():
     assert fixture["metric_metadata"]["trust_label"] in {"high", "medium", "low", "untrusted"}
 
 
+def test_subscription_outcomes_fixture_keeps_stayai_as_source_of_truth():
+    fixture = _read_json("subscription_outcomes_response.example.json")
+    metrics = fixture["metrics"]
+    metadata = fixture["metadata"]
+
+    assert fixture["source_of_truth_system"] == "stayai"
+    assert metrics["confirmed_cancellations_total"] <= metrics["cancellation_requests_total"]
+    assert metrics["confirmed_retained_total"] <= metrics["save_or_retention_attempts_total"]
+    assert metrics["portal_completion_confirmed_total"] <= metrics["portal_link_sent_total"]
+    assert metadata["source_confirmation_status"] in {"confirmed", "pending", "missing"}
+    assert metadata["trust_label"] in {"high", "medium", "low", "untrusted"}
+
+
 def test_abandoned_dropped_unresolved_transferred_excluded_from_successful_containment():
     service_text = SOURCE_TRUTH_SERVICE.read_text()
     assert "abandoned or request.unresolved or request.transferred_to_agent" in service_text
