@@ -30,6 +30,12 @@ const AUTHORITY_BADGE_CLASSES: Record<SourceHealthEntry['source_authority_level'
   completion_signal: 'bg-cyan-100 text-cyan-900 ring-cyan-300',
 };
 
+const AUTHORITY_BADGE_FALLBACK = 'bg-slate-100 text-slate-700 ring-slate-300';
+
+function authorityBadgeClasses(level: SourceHealthEntry['source_authority_level']): string {
+  return AUTHORITY_BADGE_CLASSES[level] ?? AUTHORITY_BADGE_FALLBACK;
+}
+
 const SYSTEM_ACCENT: Record<SourceHealthEntry['source_system'], string> = {
   stay_ai: 'border-violet-300',
   synthflow: 'border-indigo-300',
@@ -61,7 +67,7 @@ export default function SourceHealthCard({ source }: { source: SourceHealthEntry
         <div className="flex flex-col items-end gap-1">
           <span
             data-testid={`source-health-card-${source.source_system}-authority`}
-            className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ring-1 ${AUTHORITY_BADGE_CLASSES[source.source_authority_level]}`}
+            className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ring-1 ${authorityBadgeClasses(source.source_authority_level)}`}
           >
             {authorityLabel(source.source_authority_level)}
           </span>

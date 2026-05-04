@@ -387,6 +387,21 @@ describe('useSubscriptionSourceHealth', () => {
       expect(screen.getByTestId('hook-error')).toHaveTextContent(/shape mismatch/i);
     });
   });
+
+  it('falls back to fixture when source_authority_level is unknown', async () => {
+    const broken = clone(baseline);
+    broken.sources = broken.sources.map((source) =>
+      source.source_system === 'stay_ai'
+        ? ({ ...source, source_authority_level: 'super_authoritative' } as unknown as typeof source)
+        : source,
+    );
+    vi.spyOn(dashboardApi, 'getSubscriptionSourceHealth').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(/shape mismatch/i);
+    });
+  });
 });
 
 describe('source-health derivation helpers', () => {
@@ -447,6 +462,9 @@ describe('source-health derivation helpers', () => {
     expect(authorityLabel('journey_event_authoritative')).toMatch(/Journey/);
     expect(authorityLabel('context_only')).toMatch(/Context/);
     expect(authorityLabel('completion_signal')).toMatch(/Completion/);
+    expect(
+      authorityLabel('not_a_real_authority' as unknown as 'authoritative_final_state'),
+    ).toMatch(/Authority unknown/);
   });
 
   it('formats freshness durations into human strings', () => {

@@ -241,8 +241,10 @@ export function authorityLabel(level: SourceAuthorityLevel): string {
       return 'Journey-event authoritative';
     case 'context_only':
       return 'Context only';
-    default:
+    case 'completion_signal':
       return 'Completion signal';
+    default:
+      return 'Authority unknown';
   }
 }
 

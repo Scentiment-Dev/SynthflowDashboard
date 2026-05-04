@@ -3,6 +3,7 @@ import { getSubscriptionSourceHealth } from '../services/dashboardApi';
 import { SOURCE_HEALTH_FIXTURES } from '../data/sourceHealthFixtures';
 import { errorMessage, isPermissionDenied, isPlainObject } from '../utils/apiState';
 import type {
+  SourceAuthorityLevel,
   SourceHealthApiState,
   SourceHealthEntry,
   SourceHealthMetadata,
@@ -27,6 +28,13 @@ const KNOWN_SOURCE_SYSTEMS: ReadonlySet<SourceHealthSystem> = new Set([
   'synthflow',
   'shopify',
   'portal',
+]);
+
+const KNOWN_SOURCE_AUTHORITY_LEVELS: ReadonlySet<SourceAuthorityLevel> = new Set([
+  'authoritative_final_state',
+  'journey_event_authoritative',
+  'context_only',
+  'completion_signal',
 ]);
 
 // Per-source scalar primitives only. Array fields (e.g. missing_required_fields)
@@ -69,6 +77,11 @@ function isSourceHealthEntryShape(value: unknown): value is SourceHealthEntry {
     if (typeof value[key] !== expectedType) return false;
   }
   if (!KNOWN_SOURCE_SYSTEMS.has(value.source_system as SourceHealthSystem)) return false;
+  if (
+    !KNOWN_SOURCE_AUTHORITY_LEVELS.has(value.source_authority_level as SourceAuthorityLevel)
+  ) {
+    return false;
+  }
   if (!('missing_required_fields' in value)) return false;
   const missingFields = value.missing_required_fields;
   if (!Array.isArray(missingFields)) return false;
