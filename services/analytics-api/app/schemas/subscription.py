@@ -52,6 +52,32 @@ class SourceConfirmationStatus(StrEnum):
     MISSING = "missing"
 
 
+class SourceSystem(StrEnum):
+    STAY_AI = "stay_ai"
+    SYNTHFLOW = "synthflow"
+    SHOPIFY = "shopify"
+    PORTAL = "portal"
+
+
+class SourceAuthorityLevel(StrEnum):
+    AUTHORITATIVE_FINAL_STATE = "authoritative_final_state"
+    JOURNEY_EVENT_AUTHORITATIVE = "journey_event_authoritative"
+    CONTEXT_ONLY = "context_only"
+    COMPLETION_SIGNAL = "completion_signal"
+
+
+class FreshnessStatus(StrEnum):
+    FRESH = "fresh"
+    STALE = "stale"
+    UNKNOWN = "unknown"
+
+
+class DataQualityStatus(StrEnum):
+    PASSING = "passing"
+    WARNING = "warning"
+    FAILING = "failing"
+
+
 class SubscriptionOverviewMetrics(BaseModel):
     subscription_overview_count: int
     cancellation_requests_count: int
@@ -112,3 +138,42 @@ class SubscriptionAnalyticsResponse(BaseModel):
     synthflow_journey: SynthflowJourneyMetrics
     source_confirmation: SourceConfirmationMetrics
     metric_metadata: SubscriptionAnalyticsMetricMetadata
+
+
+class SubscriptionSourceHealthSource(BaseModel):
+    source_system: SourceSystem
+    source_authority_level: SourceAuthorityLevel
+    record_count: int
+    last_seen_at: str
+    freshness_status: FreshnessStatus
+    freshness_minutes: int
+    source_confirmation_status: SourceConfirmationStatus
+    data_quality_status: DataQualityStatus
+    conflict_count: int
+    missing_required_fields: list[str] = Field(default_factory=list)
+    lineage_reference: str
+    owner: str
+    formula_version: str
+    audit_reference: str
+    trust_label: TrustLabel
+
+
+class SubscriptionSourceHealthMetadata(BaseModel):
+    timestamp: str
+    fingerprint: str
+    formula_version: str
+    owner: str
+    audit_reference: str
+
+
+class SubscriptionSourceHealthResponse(BaseModel):
+    module: str = "subscriptions"
+    generated_from_fixture: bool = True
+    overall_source_health: str
+    conflict_status: str
+    pending_or_unknown_final_outcome: bool
+    missing_stay_ai_final_state_warning: str | None = None
+    portal_completion_warning: str | None = None
+    shopify_context_warning: str
+    sources: list[SubscriptionSourceHealthSource]
+    metadata: SubscriptionSourceHealthMetadata

@@ -9,13 +9,20 @@ from app.schemas.source_truth import (
     SubscriptionOutcomeValidationRequest,
 )
 from app.schemas.subscription import (
+    DataQualityStatus,
+    FreshnessStatus,
+    SourceAuthorityLevel,
     SourceConfirmationMetrics,
     SourceConfirmationStatus,
+    SourceSystem,
     SubscriptionActionConfirmationRequest,
     SubscriptionActionConfirmationResponse,
     SubscriptionAnalyticsMetricMetadata,
     SubscriptionAnalyticsResponse,
     SubscriptionOverviewMetrics,
+    SubscriptionSourceHealthMetadata,
+    SubscriptionSourceHealthResponse,
+    SubscriptionSourceHealthSource,
     SubscriptionTruthState,
     SubscriptionSummary,
     PortalJourneyMetrics,
@@ -65,6 +72,32 @@ class SubscriptionAnalyticsFixture(TypedDict):
     freshness: str
     timestamp: str
     filters: dict[str, object]
+
+
+class SourceHealthSourceFixture(TypedDict):
+    source_system: SourceSystem
+    source_authority_level: SourceAuthorityLevel
+    record_count: int
+    last_seen_at: str
+    freshness_status: FreshnessStatus
+    freshness_minutes: int
+    source_confirmation_status: SourceConfirmationStatus
+    data_quality_status: DataQualityStatus
+    conflict_count: int
+    missing_required_fields: list[str]
+    lineage_reference: str
+    owner: str
+    formula_version: str
+    audit_reference: str
+    trust_label: TrustLabel
+
+
+class SourceHealthFixture(TypedDict):
+    sources: list[SourceHealthSourceFixture]
+    timestamp: str
+    formula_version: str
+    owner: str
+    audit_reference: str
 
 
 SUBSCRIPTION_ANALYTICS_FIXTURES: dict[str, SubscriptionAnalyticsFixture] = {
@@ -142,6 +175,313 @@ SUBSCRIPTION_ANALYTICS_FIXTURES: dict[str, SubscriptionAnalyticsFixture] = {
     },
 }
 
+SUBSCRIPTION_SOURCE_HEALTH_FIXTURES: dict[str, SourceHealthFixture] = {
+    "baseline": {
+        "sources": [
+            {
+                "source_system": SourceSystem.STAY_AI,
+                "source_authority_level": SourceAuthorityLevel.AUTHORITATIVE_FINAL_STATE,
+                "record_count": 120,
+                "last_seen_at": "2026-05-04T09:55:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 5,
+                "source_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "data_quality_status": DataQualityStatus.PASSING,
+                "conflict_count": 0,
+                "missing_required_fields": [],
+                "lineage_reference": "ingestion.stayai.subscription_state.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-baseline-20260504",
+                "trust_label": TrustLabel.HIGH,
+            },
+            {
+                "source_system": SourceSystem.SYNTHFLOW,
+                "source_authority_level": SourceAuthorityLevel.JOURNEY_EVENT_AUTHORITATIVE,
+                "record_count": 148,
+                "last_seen_at": "2026-05-04T09:53:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 7,
+                "source_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "data_quality_status": DataQualityStatus.PASSING,
+                "conflict_count": 0,
+                "missing_required_fields": [],
+                "lineage_reference": "ingestion.synthflow.call_journey.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-baseline-20260504",
+                "trust_label": TrustLabel.HIGH,
+            },
+            {
+                "source_system": SourceSystem.SHOPIFY,
+                "source_authority_level": SourceAuthorityLevel.CONTEXT_ONLY,
+                "record_count": 116,
+                "last_seen_at": "2026-05-04T09:51:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 9,
+                "source_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "data_quality_status": DataQualityStatus.PASSING,
+                "conflict_count": 0,
+                "missing_required_fields": [],
+                "lineage_reference": "ingestion.shopify.order_context.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-baseline-20260504",
+                "trust_label": TrustLabel.MEDIUM,
+            },
+            {
+                "source_system": SourceSystem.PORTAL,
+                "source_authority_level": SourceAuthorityLevel.COMPLETION_SIGNAL,
+                "record_count": 16,
+                "last_seen_at": "2026-05-04T09:48:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 12,
+                "source_confirmation_status": SourceConfirmationStatus.PENDING,
+                "data_quality_status": DataQualityStatus.WARNING,
+                "conflict_count": 0,
+                "missing_required_fields": ["confirmed_completion_event_id"],
+                "lineage_reference": "ingestion.portal.completion_signal.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-baseline-20260504",
+                "trust_label": TrustLabel.MEDIUM,
+            },
+        ],
+        "timestamp": "2026-05-04T10:00:00Z",
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-source-health-baseline-20260504",
+    },
+    "missing_stayai_final_state": {
+        "sources": [
+            {
+                "source_system": SourceSystem.STAY_AI,
+                "source_authority_level": SourceAuthorityLevel.AUTHORITATIVE_FINAL_STATE,
+                "record_count": 120,
+                "last_seen_at": "2026-05-04T06:15:00Z",
+                "freshness_status": FreshnessStatus.STALE,
+                "freshness_minutes": 225,
+                "source_confirmation_status": SourceConfirmationStatus.MISSING,
+                "data_quality_status": DataQualityStatus.WARNING,
+                "conflict_count": 0,
+                "missing_required_fields": ["final_subscription_state"],
+                "lineage_reference": "ingestion.stayai.subscription_state.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-missing-stayai-20260504",
+                "trust_label": TrustLabel.LOW,
+            },
+            {
+                "source_system": SourceSystem.SYNTHFLOW,
+                "source_authority_level": SourceAuthorityLevel.JOURNEY_EVENT_AUTHORITATIVE,
+                "record_count": 148,
+                "last_seen_at": "2026-05-04T09:53:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 7,
+                "source_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "data_quality_status": DataQualityStatus.PASSING,
+                "conflict_count": 0,
+                "missing_required_fields": [],
+                "lineage_reference": "ingestion.synthflow.call_journey.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-missing-stayai-20260504",
+                "trust_label": TrustLabel.HIGH,
+            },
+            {
+                "source_system": SourceSystem.SHOPIFY,
+                "source_authority_level": SourceAuthorityLevel.CONTEXT_ONLY,
+                "record_count": 116,
+                "last_seen_at": "2026-05-04T09:51:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 9,
+                "source_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "data_quality_status": DataQualityStatus.PASSING,
+                "conflict_count": 0,
+                "missing_required_fields": [],
+                "lineage_reference": "ingestion.shopify.order_context.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-missing-stayai-20260504",
+                "trust_label": TrustLabel.MEDIUM,
+            },
+            {
+                "source_system": SourceSystem.PORTAL,
+                "source_authority_level": SourceAuthorityLevel.COMPLETION_SIGNAL,
+                "record_count": 16,
+                "last_seen_at": "2026-05-04T09:48:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 12,
+                "source_confirmation_status": SourceConfirmationStatus.PENDING,
+                "data_quality_status": DataQualityStatus.WARNING,
+                "conflict_count": 0,
+                "missing_required_fields": ["confirmed_completion_event_id"],
+                "lineage_reference": "ingestion.portal.completion_signal.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-missing-stayai-20260504",
+                "trust_label": TrustLabel.MEDIUM,
+            },
+        ],
+        "timestamp": "2026-05-04T10:00:00Z",
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-source-health-missing-stayai-20260504",
+    },
+    "failing_quality_with_missing_stayai": {
+        "sources": [
+            {
+                "source_system": SourceSystem.STAY_AI,
+                "source_authority_level": SourceAuthorityLevel.AUTHORITATIVE_FINAL_STATE,
+                "record_count": 120,
+                "last_seen_at": "2026-05-04T06:15:00Z",
+                "freshness_status": FreshnessStatus.STALE,
+                "freshness_minutes": 225,
+                "source_confirmation_status": SourceConfirmationStatus.MISSING,
+                "data_quality_status": DataQualityStatus.WARNING,
+                "conflict_count": 0,
+                "missing_required_fields": ["final_subscription_state"],
+                "lineage_reference": "ingestion.stayai.subscription_state.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-failing-quality-20260504",
+                "trust_label": TrustLabel.LOW,
+            },
+            {
+                "source_system": SourceSystem.SYNTHFLOW,
+                "source_authority_level": SourceAuthorityLevel.JOURNEY_EVENT_AUTHORITATIVE,
+                "record_count": 148,
+                "last_seen_at": "2026-05-04T09:53:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 7,
+                "source_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "data_quality_status": DataQualityStatus.FAILING,
+                "conflict_count": 0,
+                "missing_required_fields": ["journey_disposition"],
+                "lineage_reference": "ingestion.synthflow.call_journey.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-failing-quality-20260504",
+                "trust_label": TrustLabel.LOW,
+            },
+            {
+                "source_system": SourceSystem.SHOPIFY,
+                "source_authority_level": SourceAuthorityLevel.CONTEXT_ONLY,
+                "record_count": 116,
+                "last_seen_at": "2026-05-04T09:51:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 9,
+                "source_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "data_quality_status": DataQualityStatus.PASSING,
+                "conflict_count": 0,
+                "missing_required_fields": [],
+                "lineage_reference": "ingestion.shopify.order_context.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-failing-quality-20260504",
+                "trust_label": TrustLabel.MEDIUM,
+            },
+            {
+                "source_system": SourceSystem.PORTAL,
+                "source_authority_level": SourceAuthorityLevel.COMPLETION_SIGNAL,
+                "record_count": 16,
+                "last_seen_at": "2026-05-04T09:48:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 12,
+                "source_confirmation_status": SourceConfirmationStatus.PENDING,
+                "data_quality_status": DataQualityStatus.WARNING,
+                "conflict_count": 0,
+                "missing_required_fields": ["confirmed_completion_event_id"],
+                "lineage_reference": "ingestion.portal.completion_signal.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-failing-quality-20260504",
+                "trust_label": TrustLabel.MEDIUM,
+            },
+        ],
+        "timestamp": "2026-05-04T10:00:00Z",
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-source-health-failing-quality-20260504",
+    },
+    "conflicting_sources": {
+        "sources": [
+            {
+                "source_system": SourceSystem.STAY_AI,
+                "source_authority_level": SourceAuthorityLevel.AUTHORITATIVE_FINAL_STATE,
+                "record_count": 120,
+                "last_seen_at": "2026-05-04T09:55:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 5,
+                "source_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "data_quality_status": DataQualityStatus.PASSING,
+                "conflict_count": 2,
+                "missing_required_fields": [],
+                "lineage_reference": "ingestion.stayai.subscription_state.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-conflicts-20260504",
+                "trust_label": TrustLabel.HIGH,
+            },
+            {
+                "source_system": SourceSystem.SYNTHFLOW,
+                "source_authority_level": SourceAuthorityLevel.JOURNEY_EVENT_AUTHORITATIVE,
+                "record_count": 148,
+                "last_seen_at": "2026-05-04T09:53:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 7,
+                "source_confirmation_status": SourceConfirmationStatus.PENDING,
+                "data_quality_status": DataQualityStatus.WARNING,
+                "conflict_count": 2,
+                "missing_required_fields": ["journey_final_outcome"],
+                "lineage_reference": "ingestion.synthflow.call_journey.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-conflicts-20260504",
+                "trust_label": TrustLabel.MEDIUM,
+            },
+            {
+                "source_system": SourceSystem.SHOPIFY,
+                "source_authority_level": SourceAuthorityLevel.CONTEXT_ONLY,
+                "record_count": 116,
+                "last_seen_at": "2026-05-04T09:51:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 9,
+                "source_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "data_quality_status": DataQualityStatus.PASSING,
+                "conflict_count": 1,
+                "missing_required_fields": [],
+                "lineage_reference": "ingestion.shopify.order_context.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-conflicts-20260504",
+                "trust_label": TrustLabel.MEDIUM,
+            },
+            {
+                "source_system": SourceSystem.PORTAL,
+                "source_authority_level": SourceAuthorityLevel.COMPLETION_SIGNAL,
+                "record_count": 16,
+                "last_seen_at": "2026-05-04T09:48:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 12,
+                "source_confirmation_status": SourceConfirmationStatus.PENDING,
+                "data_quality_status": DataQualityStatus.WARNING,
+                "conflict_count": 0,
+                "missing_required_fields": ["confirmed_completion_event_id"],
+                "lineage_reference": "ingestion.portal.completion_signal.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-conflicts-20260504",
+                "trust_label": TrustLabel.MEDIUM,
+            },
+        ],
+        "timestamp": "2026-05-04T10:00:00Z",
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-source-health-conflicts-20260504",
+    },
+}
+
 
 def _calculate_trust_label(source_confirmation: SourceConfirmationMetrics) -> TrustLabel:
     if (
@@ -171,6 +511,36 @@ def _analytics_fingerprint(
         "source_confirmation": source_confirmation.model_dump(mode="json"),
     }
     return sha256(dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
+
+
+def _source_health_fingerprint(
+    *,
+    scenario: str,
+    sources: list[SubscriptionSourceHealthSource],
+    formula_version: str,
+) -> str:
+    payload = {
+        "scenario": scenario,
+        "formula_version": formula_version,
+        "sources": [source.model_dump(mode="json") for source in sources],
+    }
+    return sha256(dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
+
+
+def _overall_source_health(
+    *,
+    sources: list[SubscriptionSourceHealthSource],
+    pending_or_unknown_final_outcome: bool,
+) -> str:
+    if any(source.data_quality_status == DataQualityStatus.FAILING for source in sources):
+        return "degraded"
+    if pending_or_unknown_final_outcome:
+        return "warning"
+    if any(source.freshness_status == FreshnessStatus.STALE for source in sources):
+        return "warning"
+    if any(source.conflict_count > 0 for source in sources):
+        return "warning"
+    return "healthy"
 
 
 def get_subscription_summary() -> SubscriptionSummary:
@@ -258,4 +628,87 @@ def get_subscription_analytics(scenario: str = "baseline") -> SubscriptionAnalyt
         synthflow_journey=synthflow,
         source_confirmation=source_confirmation,
         metric_metadata=metric_metadata,
+    )
+
+
+def get_subscription_source_health(
+    scenario: str = "baseline",
+    source_systems: list[SourceSystem] | None = None,
+) -> SubscriptionSourceHealthResponse:
+    effective_scenario = (
+        scenario if scenario in SUBSCRIPTION_SOURCE_HEALTH_FIXTURES else "baseline"
+    )
+    fixture = SUBSCRIPTION_SOURCE_HEALTH_FIXTURES[effective_scenario]
+    all_sources = [
+        SubscriptionSourceHealthSource(**source_fixture)
+        for source_fixture in fixture["sources"]
+    ]
+    filtered_sources = (
+        [source for source in all_sources if source.source_system in source_systems]
+        if source_systems
+        else all_sources
+    )
+    stay_ai_source = next(
+        (source for source in all_sources if source.source_system == SourceSystem.STAY_AI),
+        None,
+    )
+    missing_stay_ai_final_state = (
+        stay_ai_source is None
+        or stay_ai_source.source_confirmation_status != SourceConfirmationStatus.CONFIRMED
+    )
+    pending_or_unknown_final_outcome = missing_stay_ai_final_state
+    conflict_count = sum(source.conflict_count for source in all_sources)
+    if stay_ai_source is None:
+        conflict_status = "unknown"
+    elif conflict_count > 0:
+        conflict_status = "conflict_detected"
+    elif pending_or_unknown_final_outcome:
+        conflict_status = "pending"
+    else:
+        conflict_status = "none"
+    portal_source = next(
+        (source for source in all_sources if source.source_system == SourceSystem.PORTAL),
+        None,
+    )
+    portal_completion_warning = None
+    if (
+        portal_source
+        and portal_source.source_confirmation_status != SourceConfirmationStatus.CONFIRMED
+    ):
+        portal_completion_warning = (
+            "Portal link sent without confirmed completion remains incomplete."
+        )
+    missing_stay_ai_final_state_warning = None
+    if missing_stay_ai_final_state:
+        missing_stay_ai_final_state_warning = (
+            "Missing Stay.ai confirmed final state keeps final subscription outcome pending or unknown."
+        )
+    shopify_context_warning = (
+        "Shopify data is context-only and cannot finalize cancellation or retention outcomes."
+    )
+    formula_version = fixture["formula_version"]
+    fingerprint = _source_health_fingerprint(
+        scenario=effective_scenario,
+        sources=all_sources,
+        formula_version=formula_version,
+    )
+    metadata = SubscriptionSourceHealthMetadata(
+        timestamp=fixture["timestamp"],
+        fingerprint=fingerprint,
+        formula_version=formula_version,
+        owner=fixture["owner"],
+        audit_reference=fixture["audit_reference"],
+    )
+    return SubscriptionSourceHealthResponse(
+        overall_source_health=_overall_source_health(
+            sources=all_sources,
+            pending_or_unknown_final_outcome=pending_or_unknown_final_outcome,
+        ),
+        conflict_status=conflict_status,
+        pending_or_unknown_final_outcome=pending_or_unknown_final_outcome,
+        missing_stay_ai_final_state_warning=missing_stay_ai_final_state_warning,
+        portal_completion_warning=portal_completion_warning,
+        shopify_context_warning=shopify_context_warning,
+        sources=filtered_sources,
+        metadata=metadata,
     )
