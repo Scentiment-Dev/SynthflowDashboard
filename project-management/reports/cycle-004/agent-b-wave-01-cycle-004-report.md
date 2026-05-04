@@ -8,8 +8,12 @@
 - Branch name: `agent-b/wave-01/cycle-004-source-health-lineage-ui`
 - PR URL: https://github.com/Scentiment-Dev/SynthflowDashboard/pull/18
 - PR title: `[Wave 01][Cycle 004][Agent B] Source health lineage UI`
-- PR state at report time: OPEN, MERGEABLE, awaiting reviewer approval (`mergeStateStatus: BLOCKED` is standard branch-protection state pending PM review).
+- PR state at report time: OPEN, MERGEABLE, `mergeStateStatus: CLEAN` after Codex/Bugbot comment-resolution loop. All 16 status checks SUCCESS (Cursor Bugbot SUCCESS, not just NEUTRAL — full pass with zero findings on the final commit).
 - Implementation commit: `694449c2e3fe6e574cf3c9e75b956116e15c63a7` (29 files changed, 2886 insertions)
+- Comment-resolution commits on top of the implementation:
+  - `143d3bc` — resolves the four original review threads (1 Codex P1, 1 Bugbot Medium, 2 Bugbot Low).
+  - `138b582` — resolves two Bugbot Low follow-ups raised on `143d3bc` (validator-table type clarity, metadata sub-field validation).
+  - `8d66fa3` — resolves two Bugbot Low follow-ups raised on `138b582` (authority-level validator + authority-label explicit case + UI fallback). Bugbot returned SUCCESS on this commit.
 
 ## Cycle 003 Evidence Verification Status
 
@@ -199,15 +203,42 @@ Deleted: none.
 ## Confidence Percentage
 
 - Confidence: 99%
-- Justification: All assigned scope (B1–B7) is implemented with lint/typecheck/test/coverage/build all green locally; coverage exceeds the 95% gate on every metric; visual states verified at desktop width across all four contract scenarios; locked source-of-truth rules (Stay.ai authority, Shopify context-only, Portal link vs completion, system-calculated trust, fixture preview tag) are all enforced in the UI; PR #18 is OPEN with all 14 SUCCESS checks (including `Coverage and Codecov Upload` and `codecov/patch`) and Cursor Bugbot completed NEUTRAL with no findings. The remaining 1% uncertainty is the unavoidable platform-side state of `codecov/project` not emitting on this PR (documented external behavior).
+- Justification: All assigned scope (B1–B7) is implemented with lint/typecheck/test/coverage/build all green locally; coverage exceeds the 95% gate on every metric (statements 99.22% / branches 96.46% / functions 99.5% / lines 99.82%); visual states verified at desktop width across all four contract scenarios; locked source-of-truth rules (Stay.ai authority, Shopify context-only, Portal link vs completion, system-calculated trust, fixture preview tag) are all enforced in the UI; PR #18 is OPEN with all 16 SUCCESS checks (including `Coverage and Codecov Upload`, `codecov/patch`, and Cursor Bugbot conclusion **SUCCESS** with zero findings); `mergeStateStatus: CLEAN` confirms no branch-protection blocks remain; all 8 Codex/Bugbot review threads RESOLVED with reply citations to the resolving commit. The remaining 1% uncertainty is the unavoidable platform-side state of `codecov/project` not emitting on this PR (documented external behavior).
 
 ## Completion Statement
 
-- Implementation tasks B1–B7 are complete and PR-merge-ready. Local coverage (98.88% statements / 96.18% branches / 99% functions / 99.63% lines) is well above the 95% gate. PR #18 is OPEN and MERGEABLE with all CI/Codecov/Bugbot checks emitting and passing (Bugbot NEUTRAL = no findings). Cycle 003 evidence gate is satisfied via PM supersession recorded in-repo, and Cycle 004 Agent A backend is merged. Agent B Cycle 004 implementation is declared complete and merge-ready pending PM/reviewer approval.
+- Implementation tasks B1–B7 are complete and PR-merge-ready. Local coverage on the final commit `8d66fa3` (statements 99.22% / branches 96.46% / functions 99.5% / lines 99.82%) is well above the 95% gate. PR #18 is OPEN, `MERGEABLE`, and `mergeStateStatus: CLEAN` with all 16 CI/Codecov/Bugbot checks SUCCESS — Cursor Bugbot returned a clean SUCCESS conclusion (zero findings) on the final commit, after three resolution loops that addressed every Codex and Bugbot comment. All 8 Codex/Bugbot review threads are RESOLVED with reply citations. Cycle 003 evidence gate is satisfied via PM supersession recorded in-repo, and Cycle 004 Agent A backend is merged. Agent B Cycle 004 implementation is declared complete and merge-ready pending PM/reviewer approval.
+
+## Code-Review Comment Resolution (Codex + Cursor Bugbot)
+
+All eight review threads opened on PR #18 by `chatgpt-codex-connector` (Codex) and `cursor` (Bugbot) are RESOLVED with reply citations to the resolving commit, and Bugbot returned a clean SUCCESS conclusion (not NEUTRAL) on the final commit `8d66fa3`.
+
+| # | Thread | Source | Severity | Resolved by | Fix summary |
+|---|---|---|---|---|---|
+| 1 | `useSubscriptionSourceHealth.ts` r3183205441 | Codex | P1 | `143d3bc` (deepened `8d66fa3`) | Added `isSourceHealthEntryShape` per-source guard with `KNOWN_SOURCE_SYSTEMS`. Later strengthened in `8d66fa3` with `KNOWN_SOURCE_AUTHORITY_LEVELS`. UI lookups (`SOURCE_SYSTEM_COPY[source.source_system]`, `AUTHORITY_BADGE_CLASSES[source.source_authority_level]`) cannot now resolve to `undefined` from a malformed payload. |
+| 2 | `sourceHealthState.ts` r3183212901 | Bugbot | Medium | `143d3bc` | `freshnessTone('stale')` returns `'warning'` so card cell, legend entry, and alert level all share the same amber tone. Added a regression test asserting legend tone === `freshnessTone` for `fresh` / `stale` / `unknown`. |
+| 3 | `useSubscriptionSourceHealth.ts` r3183212914 | Bugbot | Low | `143d3bc` | Extracted `PERMISSION_DENIED_PATTERN`, `isPlainObject`, `isPermissionDenied`, `errorMessage` to `apps/dashboard-web/src/utils/apiState.ts` and wired both `useSubscriptionAnalytics` and `useSubscriptionSourceHealth` to import from the shared module. |
+| 4 | `sourceHealthState.ts` r3183212920 | Bugbot | Low | `143d3bc` | Removed the unused `now` callback parameter and the misleading `void now` no-op from `formatLastSeenRelative`. |
+| 5 | `useSubscriptionSourceHealth.ts` r3183325xxx (Bugbot pass 2) | Bugbot | Low | `138b582` | Split `SOURCE_ENTRY_FIELD_TYPES` into `SOURCE_ENTRY_PRIMITIVE_FIELD_TYPES` typed `Record<Exclude<keyof SourceHealthEntry, 'missing_required_fields'>, ...>` so the array field cannot be miscoded as `'string'`. Removed the fragile `continue` skip; array validation is explicit. |
+| 6 | `useSubscriptionSourceHealth.ts` (Bugbot pass 2 metadata) | Bugbot | Low | `138b582` | Added `isSourceHealthMetadataShape` that asserts each required `SourceHealthMetadata` string key (timestamp, fingerprint, formula_version, owner, audit_reference) so `SourceHealthOverviewBar` cannot render `undefined` in the fingerprint/audit-reference badges. |
+| 7 | `useSubscriptionSourceHealth.ts` (Bugbot pass 3 authority) | Bugbot | Low | `8d66fa3` | Added `KNOWN_SOURCE_AUTHORITY_LEVELS` set and authority-level validation. `SourceHealthCard` wraps the badge lookup in `authorityBadgeClasses()` with a slate fallback for defense-in-depth. |
+| 8 | `sourceHealthState.ts` (Bugbot pass 3 authorityLabel) | Bugbot | Low | `8d66fa3` | `authorityLabel` now has an explicit `case 'completion_signal'` branch and the default arm returns `'Authority unknown'`, matching the convention used by `overallHealthLabel` / `conflictStatusLabel`. |
+
+Final verification on commit `8d66fa3`:
+
+- `npm --prefix apps/dashboard-web run lint` => 0 errors.
+- `npm --prefix apps/dashboard-web run typecheck` => 0 errors.
+- `npm --prefix apps/dashboard-web run test:run` => **144/144 pass** (8 new per-source validation tests, 1 metadata-omitted test, 1 metadata-non-string test, 1 missing_required_fields-key-omitted test, 1 unknown-authority-level test, 1 authority-label-fallback test, 1 stale-tone consistency test, 1 ApiClientError empty-message test).
+- `npm --prefix apps/dashboard-web run test:coverage` => statements **99.22%**, branches **96.46%**, functions **99.5%**, lines **99.82%** (all above the 95% gate).
+- `npm --prefix apps/dashboard-web run build` => succeeded.
+- `gh pr view 18 --json statusCheckRollup,mergeStateStatus` => 16/16 SUCCESS, **`mergeStateStatus: CLEAN`**.
+- `gh api graphql ... reviewThreads` => 8/8 RESOLVED.
+
+Cursor Bugbot conclusion progression: NEUTRAL (initial) → NEUTRAL (after `143d3bc`) → NEUTRAL (after `138b582`) → **SUCCESS** (after `8d66fa3`, zero findings).
 
 ## Recommended Next Steps
 
-- PM/reviewer approves PR #18 to release the branch-protection block, then merges to `main`.
+- PR #18 is `MERGEABLE` and `CLEAN`. PM/reviewer can merge to `main` directly; no further branch-protection block remains.
 - Hand off to Agent C for any optional governance/quality cross-check; no contract evolution is required from Agent A.
 - If subsequent cycles want to add server-side filter UI for the `sources` query parameter, the URL builder (`buildSubscriptionSourceHealthUrl`) and hook are already wired to accept a `SourceHealthSystem[]` filter.
 
