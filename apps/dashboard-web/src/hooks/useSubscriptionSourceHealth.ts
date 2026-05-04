@@ -5,6 +5,7 @@ import { errorMessage, isPermissionDenied, isPlainObject } from '../utils/apiSta
 import type {
   SourceHealthApiState,
   SourceHealthEntry,
+  SourceHealthMetadata,
   SourceHealthScenario,
   SourceHealthSystem,
   SubscriptionSourceHealthResponse,
@@ -28,7 +29,13 @@ const KNOWN_SOURCE_SYSTEMS: ReadonlySet<SourceHealthSystem> = new Set([
   'portal',
 ]);
 
-const SOURCE_ENTRY_FIELD_TYPES: Record<keyof SourceHealthEntry, 'string' | 'number'> = {
+// Per-source scalar primitives only. Array fields (e.g. missing_required_fields)
+// are validated separately so the type table cannot accidentally coerce
+// `string[]` to `'string'`.
+const SOURCE_ENTRY_PRIMITIVE_FIELD_TYPES: Record<
+  Exclude<keyof SourceHealthEntry, 'missing_required_fields'>,
+  'string' | 'number'
+> = {
   source_system: 'string',
   source_authority_level: 'string',
   record_count: 'number',
@@ -38,7 +45,6 @@ const SOURCE_ENTRY_FIELD_TYPES: Record<keyof SourceHealthEntry, 'string' | 'numb
   source_confirmation_status: 'string',
   data_quality_status: 'string',
   conflict_count: 'number',
-  missing_required_fields: 'string',
   lineage_reference: 'string',
   owner: 'string',
   formula_version: 'string',
@@ -46,20 +52,35 @@ const SOURCE_ENTRY_FIELD_TYPES: Record<keyof SourceHealthEntry, 'string' | 'numb
   trust_label: 'string',
 };
 
+const REQUIRED_METADATA_STRING_KEYS: Array<keyof SourceHealthMetadata> = [
+  'timestamp',
+  'fingerprint',
+  'formula_version',
+  'owner',
+  'audit_reference',
+];
+
 function isSourceHealthEntryShape(value: unknown): value is SourceHealthEntry {
   if (!isPlainObject(value)) return false;
-  for (const [key, expectedType] of Object.entries(SOURCE_ENTRY_FIELD_TYPES) as Array<
-    [keyof SourceHealthEntry, 'string' | 'number']
+  for (const [key, expectedType] of Object.entries(SOURCE_ENTRY_PRIMITIVE_FIELD_TYPES) as Array<
+    [keyof typeof SOURCE_ENTRY_PRIMITIVE_FIELD_TYPES, 'string' | 'number']
   >) {
     if (!(key in value)) return false;
-    if (key === 'missing_required_fields') continue;
     if (typeof value[key] !== expectedType) return false;
   }
   if (!KNOWN_SOURCE_SYSTEMS.has(value.source_system as SourceHealthSystem)) return false;
+  if (!('missing_required_fields' in value)) return false;
   const missingFields = value.missing_required_fields;
   if (!Array.isArray(missingFields)) return false;
   if (!missingFields.every((field) => typeof field === 'string')) return false;
   return true;
+}
+
+function isSourceHealthMetadataShape(value: unknown): value is SourceHealthMetadata {
+  if (!isPlainObject(value)) return false;
+  return REQUIRED_METADATA_STRING_KEYS.every(
+    (key) => key in value && typeof value[key] === 'string',
+  );
 }
 
 function isSourceHealthShape(value: unknown): value is SubscriptionSourceHealthResponse {
@@ -68,7 +89,7 @@ function isSourceHealthShape(value: unknown): value is SubscriptionSourceHealthR
   if (typeof value.generated_from_fixture !== 'boolean') return false;
   if (typeof value.pending_or_unknown_final_outcome !== 'boolean') return false;
   if (!Array.isArray(value.sources)) return false;
-  if (!isPlainObject(value.metadata)) return false;
+  if (!isSourceHealthMetadataShape(value.metadata)) return false;
   if (!value.sources.every((entry) => isSourceHealthEntryShape(entry))) return false;
   return true;
 }

@@ -349,6 +349,44 @@ describe('useSubscriptionSourceHealth', () => {
       expect(screen.getByTestId('hook-error')).toHaveTextContent(/shape mismatch/i);
     });
   });
+
+  it('falls back to fixture when metadata omits a required string field', async () => {
+    const broken = clone(baseline);
+    delete (broken.metadata as Record<string, unknown>).fingerprint;
+    vi.spyOn(dashboardApi, 'getSubscriptionSourceHealth').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(/shape mismatch/i);
+    });
+  });
+
+  it('falls back to fixture when metadata audit_reference is not a string', async () => {
+    const broken = clone(baseline);
+    (broken.metadata as Record<string, unknown>).audit_reference = 42;
+    vi.spyOn(dashboardApi, 'getSubscriptionSourceHealth').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(/shape mismatch/i);
+    });
+  });
+
+  it('falls back to fixture when missing_required_fields key is omitted entirely', async () => {
+    const broken = clone(baseline);
+    broken.sources = broken.sources.map((source) => {
+      if (source.source_system !== 'shopify') return source;
+      const partial = { ...source } as Record<string, unknown>;
+      delete partial.missing_required_fields;
+      return partial as unknown as typeof source;
+    });
+    vi.spyOn(dashboardApi, 'getSubscriptionSourceHealth').mockResolvedValueOnce(broken);
+    render(<HookProbe />);
+    await waitFor(() => {
+      expect(screen.getByTestId('hook-source')).toHaveTextContent('fixture');
+      expect(screen.getByTestId('hook-error')).toHaveTextContent(/shape mismatch/i);
+    });
+  });
 });
 
 describe('source-health derivation helpers', () => {
