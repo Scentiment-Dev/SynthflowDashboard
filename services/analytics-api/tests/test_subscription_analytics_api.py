@@ -92,3 +92,76 @@ def test_exports_audit_requires_export_permission_server_side(client: TestClient
     )
     assert response.status_code == 403
     assert "Explicit deny" in response.json()["detail"]
+
+
+def test_subscription_source_health_has_expected_authority_labels(client: TestClient) -> None:
+    response = client.get("/subscriptions/source-health")
+    assert response.status_code == 200
+    payload = response.json()
+
+    sources = {source["source_system"]: source for source in payload["sources"]}
+    assert sources["stay_ai"]["source_authority_level"] == "authoritative_final_state"
+    assert sources["synthflow"]["source_authority_level"] == "journey_event_authoritative"
+    assert sources["shopify"]["source_authority_level"] == "context_only"
+    assert sources["portal"]["source_authority_level"] == "completion_signal"
+    assert payload["shopify_context_warning"]
+
+
+def test_subscription_source_health_missing_stay_ai_forces_pending_outcome(client: TestClient) -> None:
+    response = client.get(
+        "/subscriptions/source-health",
+        params={"scenario": "missing_stayai_final_state"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    sources = {source["source_system"]: source for source in payload["sources"]}
+
+    assert payload["pending_or_unknown_final_outcome"] is True
+    assert payload["conflict_status"] == "pending"
+    assert payload["overall_source_health"] == "warning"
+    assert payload["missing_stay_ai_final_state_warning"]
+    assert sources["stay_ai"]["source_confirmation_status"] == "missing"
+    assert sources["stay_ai"]["freshness_status"] == "stale"
+    assert sources["stay_ai"]["trust_label"] == "low"
+    assert sources["shopify"]["source_authority_level"] == "context_only"
+
+
+def test_subscription_source_health_conflicts_do_not_override_stay_ai(client: TestClient) -> None:
+    response = client.get(
+        "/subscriptions/source-health",
+        params={"scenario": "conflicting_sources"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    sources = {source["source_system"]: source for source in payload["sources"]}
+
+    assert payload["conflict_status"] == "conflict_detected"
+    assert payload["overall_source_health"] == "warning"
+    assert sources["stay_ai"]["source_authority_level"] == "authoritative_final_state"
+    assert sources["stay_ai"]["source_confirmation_status"] == "confirmed"
+    assert sources["stay_ai"]["trust_label"] == "high"
+    assert sources["synthflow"]["conflict_count"] > 0
+
+
+def test_subscription_source_health_portal_link_sent_not_completion(client: TestClient) -> None:
+    response = client.get("/subscriptions/source-health")
+    assert response.status_code == 200
+    payload = response.json()
+    portal = next(source for source in payload["sources"] if source["source_system"] == "portal")
+
+    assert portal["source_confirmation_status"] == "pending"
+    assert portal["missing_required_fields"] == ["confirmed_completion_event_id"]
+    assert "link sent" in payload["portal_completion_warning"].lower()
+
+
+def test_subscription_source_health_unknown_source_is_rejected(client: TestClient) -> None:
+    response = client.get("/subscriptions/source-health?sources=unknown_source")
+    assert response.status_code == 422
+
+
+def test_subscription_source_health_metadata_contains_audit_and_fingerprint(client: TestClient) -> None:
+    response = client.get("/subscriptions/source-health")
+    assert response.status_code == 200
+    metadata = response.json()["metadata"]
+    for field in ["timestamp", "fingerprint", "formula_version", "owner", "audit_reference"]:
+        assert field in metadata

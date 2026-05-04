@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Subscription Source Health Response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "module",
+    "generated_from_fixture",
+    "overall_source_health",
+    "conflict_status",
+    "pending_or_unknown_final_outcome",
+    "shopify_context_warning",
+    "sources",
+    "metadata"
+  ],
+  "properties": {
+    "module": { "type": "string", "const": "subscriptions" },
+    "generated_from_fixture": { "type": "boolean" },
+    "overall_source_health": { "type": "string", "enum": ["healthy", "warning", "degraded", "unknown"] },
+    "conflict_status": { "type": "string", "enum": ["none", "pending", "conflict_detected", "unknown"] },
+    "pending_or_unknown_final_outcome": { "type": "boolean" },
+    "missing_stay_ai_final_state_warning": { "type": ["string", "null"] },
+    "portal_completion_warning": { "type": ["string", "null"] },
+    "shopify_context_warning": { "type": "string" },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_system",
+          "source_authority_level",
+          "record_count",
+          "last_seen_at",
+          "freshness_status",
+          "freshness_minutes",
+          "source_confirmation_status",
+          "data_quality_status",
+          "conflict_count",
+          "missing_required_fields",
+          "lineage_reference",
+          "owner",
+          "formula_version",
+          "audit_reference",
+          "trust_label"
+        ],
+        "properties": {
+          "source_system": { "type": "string", "enum": ["stay_ai", "synthflow", "shopify", "portal"] },
+          "source_authority_level": {
+            "type": "string",
+            "enum": [
+              "authoritative_final_state",
+              "journey_event_authoritative",
+              "context_only",
+              "completion_signal"
+            ]
+          },
+          "record_count": { "type": "integer", "minimum": 0 },
+          "last_seen_at": { "type": "string", "format": "date-time" },
+          "freshness_status": { "type": "string", "enum": ["fresh", "stale", "unknown"] },
+          "freshness_minutes": { "type": "integer", "minimum": 0 },
+          "source_confirmation_status": { "type": "string", "enum": ["confirmed", "pending", "missing"] },
+          "data_quality_status": { "type": "string", "enum": ["passing", "warning", "failing"] },
+          "conflict_count": { "type": "integer", "minimum": 0 },
+          "missing_required_fields": { "type": "array", "items": { "type": "string" } },
+          "lineage_reference": { "type": "string" },
+          "owner": { "type": "string" },
+          "formula_version": { "type": "string" },
+          "audit_reference": { "type": "string" },
+          "trust_label": { "type": "string", "enum": ["high", "medium", "low", "untrusted"] }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timestamp", "fingerprint", "formula_version", "owner", "audit_reference"],
+      "properties": {
+        "timestamp": { "type": "string", "format": "date-time" },
+        "fingerprint": { "type": "string" },
+        "formula_version": { "type": "string" },
+        "owner": { "type": "string" },
+        "audit_reference": { "type": "string" }
+      }
+    }
+  }
+}

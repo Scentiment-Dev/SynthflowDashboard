@@ -1,17 +1,20 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from app.api.dependencies import require_api_permission
 from app.core.security import Permission, UserContext
 from app.schemas.source_truth import PortalSuccessValidationRequest, SourceTruthDecision
 from app.schemas.subscription import (
+    SourceSystem,
     SubscriptionActionConfirmationRequest,
     SubscriptionActionConfirmationResponse,
     SubscriptionAnalyticsResponse,
+    SubscriptionSourceHealthResponse,
     SubscriptionSummary,
 )
 from app.services.subscription_service import (
     confirm_subscription_action,
     get_subscription_analytics,
+    get_subscription_source_health,
     get_subscription_summary,
     validate_portal_success,
 )
@@ -32,6 +35,15 @@ def analytics(
     _: UserContext = Depends(require_api_permission(Permission.READ_SUBSCRIPTIONS)),
 ) -> SubscriptionAnalyticsResponse:
     return get_subscription_analytics(scenario)
+
+
+@router.get("/source-health", response_model=SubscriptionSourceHealthResponse)
+def source_health(
+    scenario: str = "baseline",
+    sources: list[SourceSystem] | None = Query(default=None),
+    _: UserContext = Depends(require_api_permission(Permission.READ_SUBSCRIPTIONS)),
+) -> SubscriptionSourceHealthResponse:
+    return get_subscription_source_health(scenario=scenario, source_systems=sources)
 
 
 @router.post("/actions/confirm", response_model=SubscriptionActionConfirmationResponse)
