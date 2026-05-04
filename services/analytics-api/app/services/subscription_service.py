@@ -328,6 +328,82 @@ SUBSCRIPTION_SOURCE_HEALTH_FIXTURES: dict[str, SourceHealthFixture] = {
         "owner": "analytics",
         "audit_reference": "audit-source-health-missing-stayai-20260504",
     },
+    "failing_quality_with_missing_stayai": {
+        "sources": [
+            {
+                "source_system": SourceSystem.STAY_AI,
+                "source_authority_level": SourceAuthorityLevel.AUTHORITATIVE_FINAL_STATE,
+                "record_count": 120,
+                "last_seen_at": "2026-05-04T06:15:00Z",
+                "freshness_status": FreshnessStatus.STALE,
+                "freshness_minutes": 225,
+                "source_confirmation_status": SourceConfirmationStatus.MISSING,
+                "data_quality_status": DataQualityStatus.WARNING,
+                "conflict_count": 0,
+                "missing_required_fields": ["final_subscription_state"],
+                "lineage_reference": "ingestion.stayai.subscription_state.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-failing-quality-20260504",
+                "trust_label": TrustLabel.LOW,
+            },
+            {
+                "source_system": SourceSystem.SYNTHFLOW,
+                "source_authority_level": SourceAuthorityLevel.JOURNEY_EVENT_AUTHORITATIVE,
+                "record_count": 148,
+                "last_seen_at": "2026-05-04T09:53:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 7,
+                "source_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "data_quality_status": DataQualityStatus.FAILING,
+                "conflict_count": 0,
+                "missing_required_fields": ["journey_disposition"],
+                "lineage_reference": "ingestion.synthflow.call_journey.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-failing-quality-20260504",
+                "trust_label": TrustLabel.LOW,
+            },
+            {
+                "source_system": SourceSystem.SHOPIFY,
+                "source_authority_level": SourceAuthorityLevel.CONTEXT_ONLY,
+                "record_count": 116,
+                "last_seen_at": "2026-05-04T09:51:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 9,
+                "source_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "data_quality_status": DataQualityStatus.PASSING,
+                "conflict_count": 0,
+                "missing_required_fields": [],
+                "lineage_reference": "ingestion.shopify.order_context.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-failing-quality-20260504",
+                "trust_label": TrustLabel.MEDIUM,
+            },
+            {
+                "source_system": SourceSystem.PORTAL,
+                "source_authority_level": SourceAuthorityLevel.COMPLETION_SIGNAL,
+                "record_count": 16,
+                "last_seen_at": "2026-05-04T09:48:00Z",
+                "freshness_status": FreshnessStatus.FRESH,
+                "freshness_minutes": 12,
+                "source_confirmation_status": SourceConfirmationStatus.PENDING,
+                "data_quality_status": DataQualityStatus.WARNING,
+                "conflict_count": 0,
+                "missing_required_fields": ["confirmed_completion_event_id"],
+                "lineage_reference": "ingestion.portal.completion_signal.v1",
+                "owner": "analytics",
+                "formula_version": "v0.5.0",
+                "audit_reference": "audit-source-health-failing-quality-20260504",
+                "trust_label": TrustLabel.MEDIUM,
+            },
+        ],
+        "timestamp": "2026-05-04T10:00:00Z",
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-source-health-failing-quality-20260504",
+    },
     "conflicting_sources": {
         "sources": [
             {
@@ -456,10 +532,10 @@ def _overall_source_health(
     sources: list[SubscriptionSourceHealthSource],
     pending_or_unknown_final_outcome: bool,
 ) -> str:
-    if pending_or_unknown_final_outcome:
-        return "warning"
     if any(source.data_quality_status == DataQualityStatus.FAILING for source in sources):
         return "degraded"
+    if pending_or_unknown_final_outcome:
+        return "warning"
     if any(source.freshness_status == FreshnessStatus.STALE for source in sources):
         return "warning"
     if any(source.conflict_count > 0 for source in sources):
@@ -567,13 +643,13 @@ def get_subscription_source_health(
         SubscriptionSourceHealthSource(**source_fixture)
         for source_fixture in fixture["sources"]
     ]
-    sources = (
+    filtered_sources = (
         [source for source in all_sources if source.source_system in source_systems]
         if source_systems
         else all_sources
     )
     stay_ai_source = next(
-        (source for source in sources if source.source_system == SourceSystem.STAY_AI),
+        (source for source in all_sources if source.source_system == SourceSystem.STAY_AI),
         None,
     )
     missing_stay_ai_final_state = (
@@ -581,7 +657,7 @@ def get_subscription_source_health(
         or stay_ai_source.source_confirmation_status != SourceConfirmationStatus.CONFIRMED
     )
     pending_or_unknown_final_outcome = missing_stay_ai_final_state
-    conflict_count = sum(source.conflict_count for source in sources)
+    conflict_count = sum(source.conflict_count for source in all_sources)
     if stay_ai_source is None:
         conflict_status = "unknown"
     elif conflict_count > 0:
@@ -591,7 +667,7 @@ def get_subscription_source_health(
     else:
         conflict_status = "none"
     portal_source = next(
-        (source for source in sources if source.source_system == SourceSystem.PORTAL),
+        (source for source in all_sources if source.source_system == SourceSystem.PORTAL),
         None,
     )
     portal_completion_warning = None
@@ -613,7 +689,7 @@ def get_subscription_source_health(
     formula_version = fixture["formula_version"]
     fingerprint = _source_health_fingerprint(
         scenario=effective_scenario,
-        sources=sources,
+        sources=all_sources,
         formula_version=formula_version,
     )
     metadata = SubscriptionSourceHealthMetadata(
@@ -625,7 +701,7 @@ def get_subscription_source_health(
     )
     return SubscriptionSourceHealthResponse(
         overall_source_health=_overall_source_health(
-            sources=sources,
+            sources=all_sources,
             pending_or_unknown_final_outcome=pending_or_unknown_final_outcome,
         ),
         conflict_status=conflict_status,
@@ -633,6 +709,6 @@ def get_subscription_source_health(
         missing_stay_ai_final_state_warning=missing_stay_ai_final_state_warning,
         portal_completion_warning=portal_completion_warning,
         shopify_context_warning=shopify_context_warning,
-        sources=sources,
+        sources=filtered_sources,
         metadata=metadata,
     )

@@ -126,6 +126,20 @@ def test_subscription_source_health_missing_stay_ai_forces_pending_outcome(clien
     assert sources["shopify"]["source_authority_level"] == "context_only"
 
 
+def test_subscription_source_health_uses_degraded_for_failing_quality(client: TestClient) -> None:
+    response = client.get(
+        "/subscriptions/source-health",
+        params={"scenario": "failing_quality_with_missing_stayai"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    sources = {source["source_system"]: source for source in payload["sources"]}
+
+    assert payload["pending_or_unknown_final_outcome"] is True
+    assert payload["overall_source_health"] == "degraded"
+    assert sources["synthflow"]["data_quality_status"] == "failing"
+
+
 def test_subscription_source_health_conflicts_do_not_override_stay_ai(client: TestClient) -> None:
     response = client.get(
         "/subscriptions/source-health",
@@ -157,6 +171,18 @@ def test_subscription_source_health_portal_link_sent_not_completion(client: Test
 def test_subscription_source_health_unknown_source_is_rejected(client: TestClient) -> None:
     response = client.get("/subscriptions/source-health?sources=unknown_source")
     assert response.status_code == 422
+
+
+def test_subscription_source_health_filter_does_not_change_global_assessment(client: TestClient) -> None:
+    response = client.get("/subscriptions/source-health?sources=shopify")
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["pending_or_unknown_final_outcome"] is False
+    assert payload["conflict_status"] == "none"
+    assert payload["missing_stay_ai_final_state_warning"] is None
+    assert len(payload["sources"]) == 1
+    assert payload["sources"][0]["source_system"] == "shopify"
 
 
 def test_subscription_source_health_metadata_contains_audit_and_fingerprint(client: TestClient) -> None:
