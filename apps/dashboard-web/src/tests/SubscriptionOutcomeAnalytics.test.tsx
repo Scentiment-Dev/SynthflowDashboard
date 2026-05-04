@@ -297,6 +297,13 @@ describe('subscription outcome state helpers', () => {
     expect(formatRatePercent(2)).toBe('100%');
   });
 
+  it('rounds to integer percent when the post-decimal rounding lands on a whole number', () => {
+    // 9999/10000 -> 99.99% pre-rounding -> 100.0% rounded; should display as "100%".
+    expect(formatRatePercent(9999 / 10000)).toBe('100%');
+    expect(formatRatePercent(0.9995)).toBe('100%');
+    expect(formatRatePercent(0.4994)).toBe('49.9%');
+  });
+
   it('formats counts as locale-aware integers and falls back on non-finite values', () => {
     expect(formatCount(1234)).toBe('1,234');
     expect(formatCount(5)).toBe('5');

@@ -123,8 +123,8 @@
   warnings are pre-existing `no-unused-vars` matches, including the same `_reason`
   pattern already used by Cycle 002 and Cycle 004 tests).
 - `npm --prefix apps/dashboard-web run test:run` -> `12 test files passed,
-  201 tests passed`. New file `SubscriptionOutcomeAnalytics.test.tsx`
-  contributes 57 tests covering: URL builder, hook contract validation
+  202 tests passed`. New file `SubscriptionOutcomeAnalytics.test.tsx`
+  contributes 58 tests covering: URL builder, hook contract validation
   (valid response, generic error, 403 permission denied, shape mismatch with
   missing keys / null nested object / non-boolean fixture flag / array nested
   object, non-number metric / NaN metric / non-string metadata / non-array
@@ -177,13 +177,18 @@
 ## Bugbot Status
 
 - Bugbot is configured at the repo level (Agent A Cycle 005 PR `#20` shows `Cursor
-  Bugbot` as a required check). PR `#21` triggered Bugbot on every push. The first
-  pass surfaced one Cursor Bugbot Low (`safeRatio` exported but unused in
-  production), one Cursor Bugbot Low (duplicated `FilterChips` in two metadata
-  panels), and two Codex `chatgpt-codex-connector` P1 review comments
-  (funnel stage 8 double-counting unknown/pending/missing; hook shape guard
-  accepting partially-broken nested payloads). All four findings have been
-  addressed in this branch:
+  Bugbot` as a required check). PR `#21` triggered Bugbot on every push. Across
+  three Bugbot passes the bot surfaced six findings, all addressed in this
+  branch. The first two passes surfaced one Cursor Bugbot Low (`safeRatio`
+  exported but unused in production), one Cursor Bugbot Low (duplicated
+  `FilterChips` in two metadata panels), and two Codex
+  `chatgpt-codex-connector` P1 review comments (funnel stage 8 double-counting
+  unknown/pending/missing; hook shape guard accepting partially-broken nested
+  payloads). The third pass surfaced two Cursor Bugbot Low nits
+  (`formatRatePercent` rendering "100.0%" at the 99.95 boundary;
+  `SUBSCRIPTION_OUTCOME_KPI_CARDS` and `SUBSCRIPTION_OUTCOME_RATE_CARDS`
+  exported but only consumed inside their own file). All six findings have
+  been resolved in this branch:
   - `safeRatio` is now used by `SubscriptionOutcomeKpiGrid` so the rate cards
     delegate to the same n/a fallback as the rest of the module (no dead code).
   - `FilterChips` was extracted to `apps/dashboard-web/src/components/dashboard/MetadataFilterChips.tsx`
@@ -206,8 +211,18 @@
     rejected sub-shape (non-number metric, NaN metric, non-string metadata field,
     non-array `metric_definitions`, non-string-element `metric_definitions`,
     non-object `filters`).
-- Final Bugbot status will be confirmed after the fix push triggers a re-run on
-  PR `#21`.
+  - `formatRatePercent` now applies its own one-decimal rounding before checking
+    "is this a whole number?" so a rate like `9999/10000` (99.99% pre-rounding)
+    renders as `100%` rather than `100.0%`. A regression test covers this and
+    the surrounding 0.4994 / 0.9995 boundary cases.
+  - `SUBSCRIPTION_OUTCOME_KPI_CARDS` and `SUBSCRIPTION_OUTCOME_RATE_CARDS` are
+    no longer exported. They are now plain module-private `const` declarations,
+    consumed only by `buildSubscriptionOutcomeKpiCards` and
+    `buildSubscriptionOutcomeRateCards`. This narrows the public surface area of
+    `subscriptionOutcomesState.ts` to just the helpers and types actually
+    imported by other modules and tests.
+- Final Bugbot status will be confirmed after the fix-pass push triggers a
+  re-run on PR `#21`.
 
 ## Visual Evidence Status
 
@@ -268,7 +283,7 @@
 - Local check status snapshot (after Bugbot fix-pass):
   - Typecheck: pass
   - Lint: pass (0 errors; pre-existing warnings only)
-  - Vitest: 201 / 201 tests pass across 12 files
+  - Vitest: 202 / 202 tests pass across 12 files
   - Coverage: 99.28% / 96.58% / 99.59% / 99.86% (>= 95% on every metric)
   - Build: pass (vite production build completes)
 - Remote PR check status (most recent push):

@@ -84,9 +84,9 @@ export function clampRatio(value: number): number {
 
 export function formatRatePercent(value: number): string {
   const safe = clampRatio(value) * 100;
-  const rounded = Math.round(safe);
-  const isWhole = Math.abs(safe - rounded) < 1e-9;
-  return `${safe.toFixed(isWhole ? 0 : 1)}%`;
+  const oneDecimal = Math.round(safe * 10) / 10;
+  const isWhole = Math.abs(oneDecimal - Math.round(oneDecimal)) < 1e-9;
+  return `${oneDecimal.toFixed(isWhole ? 0 : 1)}%`;
 }
 
 export function formatCount(value: number): string {
@@ -170,7 +170,7 @@ export function funnelStageBarClasses(tone: FunnelStageTone): string {
   }
 }
 
-export const SUBSCRIPTION_OUTCOME_KPI_CARDS: ReadonlyArray<
+const SUBSCRIPTION_OUTCOME_KPI_CARDS: ReadonlyArray<
   Omit<SubscriptionOutcomeKpiCard, 'value'>
 > = [
   {
@@ -287,7 +287,7 @@ export const SUBSCRIPTION_OUTCOME_KPI_CARDS: ReadonlyArray<
   },
 ];
 
-export const SUBSCRIPTION_OUTCOME_RATE_CARDS: ReadonlyArray<
+const SUBSCRIPTION_OUTCOME_RATE_CARDS: ReadonlyArray<
   Omit<SubscriptionOutcomeRateCard, 'rate' | 'numerator' | 'denominator'>
 > = [
   {
