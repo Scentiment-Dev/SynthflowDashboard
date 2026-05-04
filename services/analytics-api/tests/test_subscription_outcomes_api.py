@@ -186,6 +186,18 @@ def test_subscription_outcomes_deduplicates_contacts_total(client: TestClient) -
     assert metrics["subscription_contacts_total"] == 1
 
 
+def test_subscription_outcomes_save_requires_action_requested(client: TestClient) -> None:
+    response = client.get(
+        "/subscriptions/outcomes",
+        params={"scenario": "save_not_requested"},
+    )
+    assert response.status_code == 200
+    metrics = response.json()["metrics"]
+    assert metrics["save_or_retention_attempts_total"] == 0
+    assert metrics["confirmed_retained_total"] == 0
+    assert metrics["retention_rate"] == 0.0
+
+
 def test_subscription_outcomes_requires_subscription_permission(client: TestClient) -> None:
     response = client.get(
         "/subscriptions/outcomes",

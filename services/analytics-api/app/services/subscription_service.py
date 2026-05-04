@@ -833,6 +833,30 @@ SUBSCRIPTION_OUTCOME_FIXTURES: dict[str, SubscriptionOutcomeScenarioFixture] = {
         "owner": "analytics",
         "audit_reference": "audit-subscription-outcomes-duplicate-contact-20260504",
     },
+    "save_not_requested": {
+        "records": [
+            {
+                "contact_id": "sub-save-not-requested-001",
+                "action_requested": False,
+                "action_type": SubscriptionOutcomeActionType.SAVE,
+                "stayai_final_state": SubscriptionTruthState.RETAINED,
+                "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "approved_official_completion_path": False,
+                "portal_link_sent": False,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": False,
+            }
+        ],
+        "freshness_status": FreshnessStatus.FRESH,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "save_not_requested"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-save-not-requested-20260504",
+    },
 }
 
 
@@ -868,7 +892,8 @@ def _is_confirmed_cancellation(record: SubscriptionOutcomeRecordFixture) -> bool
 
 def _is_confirmed_retained(record: SubscriptionOutcomeRecordFixture) -> bool:
     return bool(
-        record["action_type"] == SubscriptionOutcomeActionType.SAVE
+        record["action_requested"]
+        and record["action_type"] == SubscriptionOutcomeActionType.SAVE
         and record["stayai_confirmation_status"] == SourceConfirmationStatus.CONFIRMED
         and record["stayai_final_state"]
         in {
@@ -1083,7 +1108,10 @@ def get_subscription_outcomes(scenario: str = "baseline") -> SubscriptionOutcome
         non_cancellation_action_completed = _is_non_cancellation_action_completed(record)
         if confirmed_cancellation:
             confirmed_cancellations_total += 1
-        if record["action_type"] == SubscriptionOutcomeActionType.SAVE:
+        if (
+            record["action_requested"]
+            and record["action_type"] == SubscriptionOutcomeActionType.SAVE
+        ):
             save_or_retention_attempts_total += 1
         if confirmed_retained:
             confirmed_retained_total += 1

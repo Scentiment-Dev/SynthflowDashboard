@@ -8,9 +8,9 @@
 | portal_completion_rate | Portal Completion Rate | subscriptions | confirmed_portal_completed / portal_started | Portal/Stay.ai | Link sent is diagnostic only. |
 | subscription_contacts_total | Subscription Contacts Total | subscriptions | count(distinct subscription_contact_id) | Stay.ai + Synthflow | Contact volume metric only; does not imply outcome confirmation. |
 | subscription_action_requests_total | Subscription Action Requests Total | subscriptions | count(action_requested=true) | Stay.ai + Synthflow | Request counts cannot be treated as final outcomes. |
-| cancellation_requests_total | Cancellation Requests Total | subscriptions | count(action_type='cancel') | Stay.ai + Synthflow | Request counts cannot be treated as final outcomes. |
+| cancellation_requests_total | Cancellation Requests Total | subscriptions | count(action_requested=true AND action_type='cancel') | Stay.ai + Synthflow | Request counts cannot be treated as final outcomes. |
 | confirmed_cancellations_total | Confirmed Cancellations Total | subscriptions | count(stayai_final_state='cancelled' OR approved_official_completion_path=true) | Stay.ai | Confirmed cancellation requires Stay.ai cancelled state or approved official path. |
-| save_or_retention_attempts_total | Save/Retention Attempts Total | subscriptions | count(action_type='save') | Stay.ai + Synthflow | Save attempt is not automatically retained outcome. |
+| save_or_retention_attempts_total | Save/Retention Attempts Total | subscriptions | count(action_requested=true AND action_type='save') | Stay.ai + Synthflow | Save attempt is not automatically retained outcome. |
 | confirmed_retained_total | Confirmed Retained Total | subscriptions | count(action_type='save' AND stayai_final_state IN ['retained','saved','active'] AND stayai_confirmed=true) | Stay.ai | Confirmed retained requires Stay.ai final retained/saved/active state. |
 | non_cancellation_actions_total | Non-cancellation Actions Total | subscriptions | count(non_cancel_action_completed=true) | Stay.ai + Synthflow | Non-cancel actions are tracked separately from cancel/save outcomes. |
 | pending_stayai_confirmation_total | Pending Stay.ai Confirmation Total | subscriptions | count(action_type IN ['cancel','save'] AND stayai_confirmation_status='pending') | Stay.ai | Pending confirmation lowers confidence and blocks finalization. |
