@@ -117,7 +117,10 @@ export default function SubscriptionOutcomesView() {
             <>
               <WifiOff className="h-4 w-4 text-amber-600" aria-hidden />
               <span>
-                Contract preview from fixture (analytics-api unreachable
+                Contract preview from fixture (
+                {state.error?.toLowerCase().includes('shape mismatch')
+                  ? 'analytics-api returned a malformed contract'
+                  : 'analytics-api unreachable'}
                 {state.error ? `: ${state.error}` : ''}). Values are non-production.
               </span>
             </>

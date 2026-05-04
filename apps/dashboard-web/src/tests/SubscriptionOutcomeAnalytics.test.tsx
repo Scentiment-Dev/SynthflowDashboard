@@ -769,6 +769,23 @@ describe('SubscriptionOutcomesView integration', () => {
           /upstream connection reset/i,
         ),
       ).toBeInTheDocument();
+      expect(
+        within(screen.getByTestId('subscription-outcome-status-bar')).getByText(
+          /analytics-api unreachable/i,
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('differentiates a malformed contract from an unreachable API in the status bar', async () => {
+    vi.spyOn(dashboardApi, 'getSubscriptionOutcomes').mockResolvedValue(
+      { module: 'subscriptions' } as unknown as SubscriptionOutcomesResponse,
+    );
+    render(<SubscriptionOutcomesView />);
+    await waitFor(() => {
+      const bar = within(screen.getByTestId('subscription-outcome-status-bar'));
+      expect(bar.getByText(/malformed contract/i)).toBeInTheDocument();
+      expect(bar.queryByText(/analytics-api unreachable/i)).not.toBeInTheDocument();
     });
   });
 });
