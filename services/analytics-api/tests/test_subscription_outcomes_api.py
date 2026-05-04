@@ -175,6 +175,17 @@ def test_subscription_outcomes_metadata_contains_required_audit_fields(client: T
         assert field in metrics
 
 
+def test_subscription_outcomes_deduplicates_contacts_total(client: TestClient) -> None:
+    response = client.get(
+        "/subscriptions/outcomes",
+        params={"scenario": "duplicate_contact_records"},
+    )
+    assert response.status_code == 200
+    metrics = response.json()["metrics"]
+    assert metrics["subscription_action_requests_total"] == 2
+    assert metrics["subscription_contacts_total"] == 1
+
+
 def test_subscription_outcomes_requires_subscription_permission(client: TestClient) -> None:
     response = client.get(
         "/subscriptions/outcomes",

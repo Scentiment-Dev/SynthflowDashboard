@@ -795,6 +795,44 @@ SUBSCRIPTION_OUTCOME_FIXTURES: dict[str, SubscriptionOutcomeScenarioFixture] = {
         "owner": "analytics",
         "audit_reference": "audit-subscription-outcomes-unknown-20260504",
     },
+    "duplicate_contact_records": {
+        "records": [
+            {
+                "contact_id": "sub-dup-001",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.CANCEL,
+                "stayai_final_state": SubscriptionTruthState.CANCELLED,
+                "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "approved_official_completion_path": False,
+                "portal_link_sent": True,
+                "portal_completion_confirmed": True,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": False,
+            },
+            {
+                "contact_id": "sub-dup-001",
+                "action_requested": True,
+                "action_type": SubscriptionOutcomeActionType.PAUSE,
+                "stayai_final_state": SubscriptionTruthState.ACTIVE,
+                "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+                "approved_official_completion_path": False,
+                "portal_link_sent": False,
+                "portal_completion_confirmed": False,
+                "shopify_context_available": True,
+                "synthflow_journey_present": True,
+                "synthflow_journey_status": "completed",
+                "non_cancellation_action_completed": True,
+            },
+        ],
+        "freshness_status": FreshnessStatus.FRESH,
+        "timestamp": "2026-05-04T00:00:00Z",
+        "filters": {"scenario": "duplicate_contact_records"},
+        "formula_version": "v0.5.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-outcomes-duplicate-contact-20260504",
+    },
 }
 
 
@@ -1020,6 +1058,7 @@ def get_subscription_outcomes(scenario: str = "baseline") -> SubscriptionOutcome
     )
     fixture = SUBSCRIPTION_OUTCOME_FIXTURES[effective_scenario]
     records = fixture["records"]
+    unique_contact_ids = {record["contact_id"] for record in records}
     cancellation_requests_total = sum(
         1
         for record in records
@@ -1079,7 +1118,7 @@ def get_subscription_outcomes(scenario: str = "baseline") -> SubscriptionOutcome
             subscription_outcome_unknown_total += 1
 
     metrics = SubscriptionOutcomeMetrics(
-        subscription_contacts_total=len(records),
+        subscription_contacts_total=len(unique_contact_ids),
         subscription_action_requests_total=sum(
             1 for record in records if record["action_requested"]
         ),
