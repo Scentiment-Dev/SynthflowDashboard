@@ -31,10 +31,18 @@ export function GovernancePage() {
   return (
     <div className="space-y-8">
       <section className="surface-ink surface-grid-overlay relative overflow-hidden p-6 sm:p-8">
-        <div className="ambient-glow ambient-glow--violet" style={{ top: '-30%', left: '-15%', width: '60%', height: '110%' }} />
-        <div className="ambient-glow ambient-glow--brand" style={{ bottom: '-50%', right: '-15%', width: '60%', height: '110%' }} />
+        <span
+          className="ambient-glow bg-violet-500/40"
+          style={{ top: '-30%', left: '-15%', width: '60%', height: '110%' }}
+          aria-hidden
+        />
+        <span
+          className="ambient-glow bg-cyan-400/30"
+          style={{ bottom: '-50%', right: '-15%', width: '60%', height: '110%', animationDelay: '-6s' }}
+          aria-hidden
+        />
         <div className="relative z-10 flex flex-col gap-3">
-          <p className="eyebrow flex items-center gap-1.5 text-brand-200">
+          <p className="eyebrow flex items-center gap-1.5 text-violet-200">
             <ShieldCheck className="h-3 w-3" /> Governance · trust controls
           </p>
           <h1 className="display-title text-3xl text-white sm:text-4xl">

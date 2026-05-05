@@ -158,13 +158,17 @@ export default function SubscriptionOutcomeKpiGrid({
                   </span>
                 ) : null}
               </div>
-              <div className="relative h-1.5 overflow-hidden rounded-full bg-violet-100">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-violet-500 to-indigo-400"
-                  style={{ width: `${ratePct.toFixed(2)}%` }}
-                  role="presentation"
-                />
-              </div>
+              {display !== 'n/a' ? (
+                <div className="relative h-1.5 overflow-hidden rounded-full bg-violet-100">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-violet-500 to-indigo-400"
+                    style={{ width: `${ratePct.toFixed(2)}%` }}
+                    role="presentation"
+                  />
+                </div>
+              ) : (
+                <div className="relative h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden />
+              )}
               <p className="relative text-sm leading-6 text-violet-900/90">{rateCard.helper}</p>
               <p
                 data-testid={`outcome-rate-formula-${rateCard.id}`}

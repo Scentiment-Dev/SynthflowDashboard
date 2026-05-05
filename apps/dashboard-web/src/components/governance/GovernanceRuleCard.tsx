@@ -1,4 +1,6 @@
 import { Shield } from 'lucide-react';
+import PremiumCard from '../design/PremiumCard';
+import StatusPill from '../design/StatusPill';
 
 export type GovernanceRuleCardProps = {
   title: string;
@@ -8,8 +10,12 @@ export type GovernanceRuleCardProps = {
 
 export function GovernanceRuleCard({ title, rule, enforcedIn }: GovernanceRuleCardProps) {
   return (
-    <article className="surface-card lift-on-hover relative overflow-hidden p-5">
-      <div className="ambient-glow ambient-glow--violet" style={{ top: '-60%', right: '-30%', width: '100%', height: '120%', opacity: 0.45 }} />
+    <PremiumCard as="article" padded={false} className="lift-on-hover relative overflow-hidden p-5">
+      <span
+        className="ambient-glow bg-violet-500/30"
+        style={{ top: '-60%', right: '-30%', width: '100%', height: '120%', opacity: 0.45 }}
+        aria-hidden
+      />
       <div className="relative z-10">
         <p className="eyebrow flex items-center gap-1.5">
           <Shield className="h-3 w-3" /> Governance Rule
@@ -18,15 +24,12 @@ export function GovernanceRuleCard({ title, rule, enforcedIn }: GovernanceRuleCa
         <p className="mt-2 text-sm leading-6 text-slate-600">{rule}</p>
         <div className="mt-3.5 flex flex-wrap gap-1.5">
           {enforcedIn.map((item) => (
-            <span
-              key={item}
-              className="inline-flex items-center rounded-full bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-700 ring-1 ring-slate-200"
-            >
+            <StatusPill key={item} tone="neutral" size="sm">
               {item}
-            </span>
+            </StatusPill>
           ))}
         </div>
       </div>
-    </article>
+    </PremiumCard>
   );
 }

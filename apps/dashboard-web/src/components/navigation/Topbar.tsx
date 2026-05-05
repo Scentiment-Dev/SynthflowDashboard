@@ -21,14 +21,14 @@ const PLATFORM_LABEL: Record<string, string> = {
   shopify: 'Shopify',
   synthflow: 'Synthflow',
   portal: 'Portal',
+  live_agent: 'Live agent',
 };
 
 const SEGMENT_LABEL: Record<string, string> = {
   all: 'All journeys',
   subscriptions: 'Subscriptions',
   cancellations: 'Cancellations',
-  retention: 'Retention',
-  orders: 'Orders',
+  order_status: 'Order status',
   escalations: 'Escalations',
 };
 

@@ -16,7 +16,12 @@ export default function TimeSeriesChart({
   const delta =
     last !== null && first !== null && first !== 0 ? ((last - first) / first) * 100 : null;
   const deltaDisplay = delta !== null ? `${delta >= 0 ? '+' : ''}${delta.toFixed(1)}%` : '—';
-  const deltaTone = delta !== null && delta >= 0 ? 'text-emerald-700 bg-emerald-50 ring-emerald-200' : 'text-rose-700 bg-rose-50 ring-rose-200';
+  const deltaTone =
+    delta === null
+      ? 'text-slate-600 bg-slate-50 ring-slate-200'
+      : delta >= 0
+        ? 'text-emerald-700 bg-emerald-50 ring-emerald-200'
+        : 'text-rose-700 bg-rose-50 ring-rose-200';
 
   return (
     <section className="surface-card p-5 sm:p-6">

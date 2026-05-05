@@ -8,9 +8,12 @@ import ModuleHeader from '../components/dashboard/ModuleHeader';
 import ExportReadinessPanel from '../components/dashboard/ExportReadinessPanel';
 import MetricDefinitionPanel from '../components/dashboard/MetricDefinitionPanel';
 import SubscriptionOutcomeKpiGrid from '../components/dashboard/subscriptionOutcomes/SubscriptionOutcomeKpiGrid';
+import PremiumCard from '../components/design/PremiumCard';
 import SectionHeader from '../components/design/SectionHeader';
+import StatusPill from '../components/design/StatusPill';
 import Sidebar from '../components/navigation/Sidebar';
 import Topbar from '../components/navigation/Topbar';
+import { ShieldCheck } from 'lucide-react';
 import {
   DashboardFilterProvider,
   useDashboardFilters,
@@ -175,9 +178,11 @@ describe('branch coverage for dashboard UI helpers', () => {
       <TimeSeriesChart title="Trend" description="Series detail" data={data} />,
     );
     expect(screen.getByText(/Series detail/i)).toBeInTheDocument();
+    expect(screen.getByText(/-20\.0%/)).toBeInTheDocument();
 
     rerender(<TimeSeriesChart title="Trend" data={[]} />);
     expect(screen.queryByText(/Series detail/i)).not.toBeInTheDocument();
+    expect(screen.getAllByText(/—/).length).toBeGreaterThan(0);
 
     rerender(
       <TimeSeriesChart
@@ -188,6 +193,18 @@ describe('branch coverage for dashboard UI helpers', () => {
         ]}
       />,
     );
+    expect(screen.getAllByText(/—/).length).toBeGreaterThan(0);
+
+    rerender(
+      <TimeSeriesChart
+        title="Trend"
+        data={[
+          { period: '2026-04-01', value: 50, trust_label: 'medium' as const },
+          { period: '2026-04-02', value: 100, trust_label: 'medium' as const },
+        ]}
+      />,
+    );
+    expect(screen.getByText(/\+100\.0%/)).toBeInTheDocument();
   });
 
   it('covers FunnelChart empty steps branch', () => {
@@ -269,8 +286,8 @@ describe('branch coverage for dashboard UI helpers', () => {
   });
 
   it('covers Topbar filter-label fallbacks for live_agent platform and order_status segment', () => {
-    let setPlatform: ((value: 'live_agent') => void) | null = null;
-    let setSegment: ((value: 'order_status') => void) | null = null;
+    let setPlatform: ((next: 'live_agent') => void) | null = null;
+    let setSegment: ((next: 'order_status') => void) | null = null;
 
     function FilterDriver() {
       const filters = useDashboardFilters();
@@ -302,8 +319,8 @@ describe('branch coverage for dashboard UI helpers', () => {
       setSegment?.('order_status');
     });
 
-    expect(screen.getByText(/^live_agent$/i)).toBeInTheDocument();
-    expect(screen.getByText(/^order_status$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Live agent$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Order status$/i)).toBeInTheDocument();
   });
 
   it('covers SubscriptionOutcomeKpiGrid totalForShare fallback when subscription_contacts_total is missing', () => {
@@ -343,5 +360,89 @@ describe('branch coverage for dashboard UI helpers', () => {
       </MemoryRouter>,
     );
     expect(screen.getAllByText(/Priority/i).length).toBeGreaterThan(0);
+  });
+
+  it('covers PremiumCard variant, padded, and as branches', () => {
+    const { container, rerender } = render(
+      <PremiumCard variant="default" padded={false} className="extra">
+        <p>Default</p>
+      </PremiumCard>,
+    );
+    expect(container.querySelector('section.surface-card.extra')).not.toBeNull();
+    expect(container.querySelector('section.surface-card.p-5')).toBeNull();
+
+    rerender(
+      <PremiumCard as="article" variant="elevated" padded>
+        <p>Elevated</p>
+      </PremiumCard>,
+    );
+    expect(container.querySelector('article.surface-card-elevated.p-5')).not.toBeNull();
+
+    rerender(
+      <PremiumCard as="div" variant="inset" padded={false}>
+        <p>Inset</p>
+      </PremiumCard>,
+    );
+    expect(container.querySelector('div.rounded-2xl')).not.toBeNull();
+  });
+
+  it('covers StatusPill tone, size, icon, and pulse branches', () => {
+    const { container, rerender } = render(
+      <StatusPill tone="success" size="md" pulse>
+        Healthy
+      </StatusPill>,
+    );
+    expect(screen.getByText(/Healthy/i)).toBeInTheDocument();
+    expect(container.querySelector('.bg-emerald-500')).not.toBeNull();
+
+    rerender(
+      <StatusPill tone="warning" size="sm" icon={<ShieldCheck />}>
+        Warning
+      </StatusPill>,
+    );
+    expect(screen.getByText(/Warning/i)).toBeInTheDocument();
+
+    rerender(
+      <StatusPill tone="danger">Danger</StatusPill>,
+    );
+    expect(screen.getByText(/Danger/i)).toBeInTheDocument();
+
+    rerender(
+      <StatusPill tone="info">Info</StatusPill>,
+    );
+    expect(screen.getByText(/Info/i)).toBeInTheDocument();
+
+    rerender(
+      <StatusPill tone="brand">Brand</StatusPill>,
+    );
+    expect(screen.getByText(/Brand/i)).toBeInTheDocument();
+  });
+
+  it('covers SubscriptionOutcomeKpiGrid n/a rate card branch (zero denominator hides progress bar)', () => {
+    const { container } = render(
+      <SubscriptionOutcomeKpiGrid
+        cards={[]}
+        rateCards={[
+          {
+            id: 'retention_rate',
+            label: 'Retention rate',
+            helper: 'Stay.ai-confirmed retention.',
+            authority: 'Stay.ai',
+            numeratorKey: 'confirmed_retained_total',
+            denominatorKey: 'subscription_contacts_total',
+            rate: 0,
+            numerator: 0,
+            denominator: 0,
+            formula: 'confirmed_retained_total / subscription_contacts_total',
+            isFinalAuthority: true,
+          },
+        ]}
+      />,
+    );
+    const card = screen.getByTestId('outcome-rate-retention_rate');
+    expect(card).toBeInTheDocument();
+    expect(screen.getByText(/n\/a/i)).toBeInTheDocument();
+    expect(card.querySelector('span.text-violet-500.uppercase')).toBeNull();
+    expect(container.querySelector('.bg-gradient-to-r.from-violet-500.to-indigo-400')).toBeNull();
   });
 });
