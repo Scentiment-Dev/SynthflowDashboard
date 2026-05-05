@@ -916,12 +916,26 @@ def _freshness_explanation(freshness_status: FreshnessStatus | str) -> str:
     return "Freshness is unknown until source update timing is confirmed."
 
 
-def _trust_explanation(source_confirmation_status: SourceConfirmationStatus) -> str:
-    if source_confirmation_status == SourceConfirmationStatus.CONFIRMED:
-        return "Trust is high because Stay.ai confirmation is present for final state-sensitive paths."
-    if source_confirmation_status == SourceConfirmationStatus.PENDING:
+def _trust_explanation(
+    trust_label: TrustLabel,
+    *,
+    source_confirmation_status: SourceConfirmationStatus | None = None,
+) -> str:
+    if trust_label == TrustLabel.HIGH:
+        return (
+            "Trust is high because Stay.ai confirmation is present without pending or missing "
+            "final-state evidence."
+        )
+    if trust_label == TrustLabel.MEDIUM:
+        if source_confirmation_status == SourceConfirmationStatus.CONFIRMED:
+            return (
+                "Trust is medium because unresolved or unknown outcomes still require caution "
+                "even with confirmed primary source records."
+            )
         return "Trust is medium because some records are still pending Stay.ai confirmation."
-    return "Trust is low because Stay.ai final state confirmation is missing for one or more records."
+    if trust_label == TrustLabel.LOW:
+        return "Trust is low because Stay.ai final state confirmation is missing for one or more records."
+    return "Trust is untrusted because source confirmation and quality evidence are insufficient."
 
 
 def _source_authority_explanation(source_system: SourceSystem | str) -> str:
@@ -945,14 +959,15 @@ def _metric_presentation(
     executive_summary: str,
     format_type: str,
     unit: str,
+    metric_trust_label: TrustLabel,
     source_confirmation_status: SourceConfirmationStatus,
     freshness_status: FreshnessStatus | str,
     drilldown_hint: str,
 ) -> PresentationMetadata:
-    if source_confirmation_status == SourceConfirmationStatus.CONFIRMED:
+    if metric_trust_label == TrustLabel.HIGH:
         severity = MetricSeverity.SUCCESS
         visual_tone = VisualTone.POSITIVE
-    elif source_confirmation_status == SourceConfirmationStatus.PENDING:
+    elif metric_trust_label == TrustLabel.MEDIUM:
         severity = MetricSeverity.WARNING
         visual_tone = VisualTone.CAUTION
     else:
@@ -971,7 +986,10 @@ def _metric_presentation(
         severity=severity,
         visual_tone=visual_tone,
         source_authority_explanation=_source_authority_explanation("stayai"),
-        trust_explanation=_trust_explanation(source_confirmation_status),
+        trust_explanation=_trust_explanation(
+            metric_trust_label,
+            source_confirmation_status=source_confirmation_status,
+        ),
         freshness_explanation=_freshness_explanation(freshness_status),
         drilldown_hint=drilldown_hint,
         empty_state_copy="No eligible records were available for this calculation window.",
@@ -1071,7 +1089,10 @@ def _source_health_fingerprint(
     payload = {
         "scenario": scenario,
         "formula_version": formula_version,
-        "sources": [source.model_dump(mode="json") for source in sources],
+        "sources": [
+            source.model_dump(mode="json", exclude={"presentation"})
+            for source in sources
+        ],
     }
     return sha256(dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
 
@@ -1176,6 +1197,7 @@ def get_subscription_analytics(scenario: str = "baseline") -> SubscriptionAnalyt
             ),
             format_type="count_and_rate_bundle",
             unit="mixed",
+            metric_trust_label=trust_label,
             source_confirmation_status=source_confirmation_status,
             freshness_status=fixture["freshness"],
             drilldown_hint="Open subscription outcomes to inspect confirmation gaps and portal completion states.",
@@ -1336,6 +1358,7 @@ def get_subscription_outcomes(scenario: str = "baseline") -> SubscriptionOutcome
             ),
             format_type="count_and_rate_bundle",
             unit="mixed",
+            metric_trust_label=trust_label,
             source_confirmation_status=source_confirmation_status,
             freshness_status=fixture["freshness_status"],
             drilldown_hint="Review source health and record-level confirmations before interpreting final-state trends.",
@@ -1388,7 +1411,10 @@ def get_subscription_source_health(
             severity=severity,
             visual_tone=visual_tone,
             source_authority_explanation=_source_authority_explanation(source_system),
-            trust_explanation=_trust_explanation(source_confirmation_status),
+            trust_explanation=_trust_explanation(
+                source_fixture["trust_label"],
+                source_confirmation_status=source_confirmation_status,
+            ),
             freshness_explanation=_freshness_explanation(freshness_status),
             drilldown_hint=f"Inspect lineage and missing fields for {source_system}.",
             empty_state_copy=f"No {source_system} records were present in this filtered view.",

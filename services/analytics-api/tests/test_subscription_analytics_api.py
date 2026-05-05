@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
+from app.services import subscription_service
+
 
 PRESENTATION_FIELDS = [
     "display_label",
@@ -52,6 +54,8 @@ def test_subscription_analytics_missing_stayai_confirmation_is_low_trust(client:
     assert payload["final_subscription_state"] == "unknown"
     assert payload["source_confirmation_status"] == "missing"
     assert payload["metric_metadata"]["trust_label"] == "low"
+    assert payload["metric_metadata"]["presentation"]["severity"] == "critical"
+    assert payload["metric_metadata"]["presentation"]["visual_tone"] == "critical"
     assert payload["source_confirmation"]["missing_records_count"] > 0
     assert payload["subscription_overview"]["confirmed_cancellations_count"] == 0
     assert payload["subscription_overview"]["confirmed_retained_subscriptions_count"] == 0
@@ -235,3 +239,31 @@ def test_subscription_source_health_source_rows_include_presentation_metadata(cl
     for source in sources:
         for field in PRESENTATION_FIELDS:
             assert field in source["presentation"]
+
+
+def test_source_health_fingerprint_is_stable_under_presentation_copy_change(
+    client: TestClient,
+    monkeypatch,
+) -> None:
+    baseline = client.get("/subscriptions/source-health")
+    assert baseline.status_code == 200
+    baseline_payload = baseline.json()
+
+    monkeypatch.setattr(
+        subscription_service,
+        "_source_authority_explanation",
+        lambda _source_system: "Presentation-only authority copy change for UI phrasing.",
+    )
+
+    mutated = client.get("/subscriptions/source-health")
+    assert mutated.status_code == 200
+    mutated_payload = mutated.json()
+
+    assert (
+        baseline_payload["metadata"]["fingerprint"]
+        == mutated_payload["metadata"]["fingerprint"]
+    )
+    assert (
+        baseline_payload["sources"][0]["presentation"]["source_authority_explanation"]
+        != mutated_payload["sources"][0]["presentation"]["source_authority_explanation"]
+    )

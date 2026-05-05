@@ -151,6 +151,9 @@ def test_subscription_outcomes_unknown_outcome_is_tracked(client: TestClient) ->
     assert metrics["missing_stayai_final_state_total"] == 0
     assert metadata["source_confirmation_status"] == "confirmed"
     assert metadata["trust_label"] == "medium"
+    assert metadata["presentation"]["severity"] == "warning"
+    assert metadata["presentation"]["visual_tone"] == "caution"
+    assert "medium" in metadata["presentation"]["trust_explanation"].lower()
 
 
 def test_subscription_outcomes_metadata_contains_required_audit_fields(client: TestClient) -> None:
