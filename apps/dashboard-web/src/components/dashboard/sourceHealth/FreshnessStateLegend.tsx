@@ -13,19 +13,22 @@ export default function FreshnessStateLegend({
   return (
     <section
       data-testid="freshness-state-legend"
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+      className="surface-card p-5 sm:p-6"
     >
-      <header className="flex flex-col gap-1 md:flex-row md:items-end md:justify-between">
+      <header className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
         <div>
-          <h3 className="text-base font-semibold text-slate-950">Freshness and data quality states</h3>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
+          <p className="eyebrow">Freshness · data quality states</p>
+          <h3 className="display-title mt-1 text-base sm:text-lg">
+            Freshness and data quality states
+          </h3>
+          <p className="mt-1.5 max-w-2xl text-sm leading-6 text-slate-600">
             Each state is system-derived. Active states for the current contract response are
             highlighted; inactive states are listed for operator reference.
           </p>
         </div>
         <span
           data-testid="freshness-state-legend-active-count"
-          className="inline-flex w-fit items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200"
+          className="inline-flex w-fit items-center rounded-full bg-slate-50 px-3 py-1 text-[11px] font-semibold text-slate-700 ring-1 ring-slate-200"
         >
           {activeSet.size} active
         </span>

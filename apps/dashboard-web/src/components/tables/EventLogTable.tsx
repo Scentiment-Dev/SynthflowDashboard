@@ -1,3 +1,4 @@
+import { ScrollText } from 'lucide-react';
 import type { EventTableRow } from '../../types/events';
 import SourceBadge from '../status/SourceBadge';
 import TrustBadge from '../status/TrustBadge';
@@ -10,26 +11,34 @@ const starterRows: EventTableRow[] = [
 
 export default function EventLogTable({ rows = starterRows }: { rows?: EventTableRow[] }) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h3 className="text-base font-semibold text-slate-950">Recent normalized event trace</h3>
-      <p className="mt-1 text-sm leading-6 text-slate-600">Starter table for API-backed normalized events, source references, and downstream audit review.</p>
-      <div className="mt-4 overflow-hidden rounded-xl border border-slate-200">
+    <section className="surface-card p-5 sm:p-6">
+      <header>
+        <p className="eyebrow flex items-center gap-1.5">
+          <ScrollText className="h-3 w-3" /> Event trace
+        </p>
+        <h3 className="display-title mt-1 text-base sm:text-lg">Recent normalized event trace</h3>
+        <p className="mt-1.5 text-sm leading-6 text-slate-600">
+          Latest normalized events with their source authority and trust label, ready for
+          downstream audit review.
+        </p>
+      </header>
+      <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200/70">
         <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
-          <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-            <tr>
-              <th className="px-4 py-3">Time</th>
-              <th className="px-4 py-3">Source</th>
-              <th className="px-4 py-3">Event</th>
-              <th className="px-4 py-3">Outcome</th>
-              <th className="px-4 py-3">Trust</th>
+          <thead className="bg-slate-50/80">
+            <tr className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <th className="px-4 py-2.5">Time</th>
+              <th className="px-4 py-2.5">Source</th>
+              <th className="px-4 py-2.5">Event</th>
+              <th className="px-4 py-2.5">Outcome</th>
+              <th className="px-4 py-2.5">Trust</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 bg-white">
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td className="px-4 py-3 text-slate-600">{row.occurred_at}</td>
+              <tr key={row.id} className="transition-colors hover:bg-slate-50/60">
+                <td className="px-4 py-3 font-mono text-xs text-slate-600">{row.occurred_at}</td>
                 <td className="px-4 py-3"><SourceBadge source={row.source} /></td>
-                <td className="px-4 py-3 font-medium text-slate-950">{row.event_type}</td>
+                <td className="px-4 py-3 font-semibold text-slate-900">{row.event_type}</td>
                 <td className="px-4 py-3 text-slate-700">{row.outcome}</td>
                 <td className="px-4 py-3"><TrustBadge trustLabel={row.trust_label} /></td>
               </tr>

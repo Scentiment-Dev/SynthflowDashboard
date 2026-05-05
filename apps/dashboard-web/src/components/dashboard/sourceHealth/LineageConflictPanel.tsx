@@ -17,15 +17,18 @@ export default function LineageConflictPanel({
   return (
     <section
       data-testid="lineage-conflict-panel"
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+      className="surface-card p-5 sm:p-6"
     >
       <header className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
-          <h3 className="text-base font-semibold text-slate-950">Lineage and conflict explanation</h3>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
+          <p className="eyebrow">Lineage · conflict explanation</p>
+          <h3 className="display-title mt-1 text-base sm:text-lg">
+            Lineage and conflict explanation
+          </h3>
+          <p className="mt-1.5 max-w-2xl text-sm leading-6 text-slate-600">
             What each source signal means and whether it can be used as final subscription truth.
-            Reads top-down for operators and leadership; raw lineage references are provided
-            inline for engineers.
+            Reads top-down for operators and leadership; raw lineage references are provided inline
+            for engineers.
           </p>
         </div>
         <span

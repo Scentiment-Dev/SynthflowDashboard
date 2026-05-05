@@ -8,13 +8,13 @@ export default function ShopifyContextPanel({
   shopify: ShopifyContextMetrics;
 }) {
   return (
-    <section
-      data-testid="shopify-context-panel"
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-    >
+    <section data-testid="shopify-context-panel" className="surface-card p-5 sm:p-6">
       <header>
-        <h3 className="text-base font-semibold text-slate-950">Shopify context</h3>
-        <p className="mt-1 text-sm leading-6 text-slate-600">
+        <p className="eyebrow flex items-center gap-1.5">
+          <Boxes className="h-3 w-3" /> Shopify context
+        </p>
+        <h3 className="display-title mt-1 text-base sm:text-lg">Shopify joins for context only</h3>
+        <p className="mt-1.5 text-sm leading-6 text-slate-600">
           Shopify provides order, product, customer, fulfillment and tracking context. It does not
           finalize subscription state — Stay.ai always wins.
         </p>

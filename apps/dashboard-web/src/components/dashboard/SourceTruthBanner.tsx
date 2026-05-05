@@ -1,16 +1,30 @@
 import { ShieldCheck } from 'lucide-react';
 import SourceBadge from '../status/SourceBadge';
 
-export default function SourceTruthBanner({ sourcePriority, lockedRules }: { sourcePriority: string[]; lockedRules: string[] }) {
+export default function SourceTruthBanner({
+  sourcePriority,
+  lockedRules,
+}: {
+  sourcePriority: string[];
+  lockedRules: string[];
+}) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <section className="surface-card relative overflow-hidden p-5 sm:p-6">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-8 -top-12 h-40 w-40 rounded-full bg-violet-100/50 blur-3xl"
+      />
+      <div className="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-3xl">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
-            <ShieldCheck className="h-4 w-4 text-slate-600" /> Source-of-truth controls
+            <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-50 ring-1 ring-emerald-200">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
+            </span>
+            Source-of-truth controls
           </div>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            These controls are shown directly in the dashboard so users can see why a metric is trusted, limited, or blocked.
+            These guards are surfaced inline so operators can see why a metric is trusted, limited,
+            or blocked before it ever ships to a stakeholder.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -19,9 +33,13 @@ export default function SourceTruthBanner({ sourcePriority, lockedRules }: { sou
           ))}
         </div>
       </div>
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
+      <div className="relative mt-5 grid gap-3 md:grid-cols-2">
         {lockedRules.map((rule) => (
-          <div key={rule} className="rounded-xl border border-slate-100 bg-slate-50 p-3 text-sm leading-6 text-slate-700">
+          <div
+            key={rule}
+            className="rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2.5 text-sm leading-6 text-slate-700"
+          >
+            <span className="mr-2 inline-flex h-1.5 w-1.5 -translate-y-0.5 rounded-full bg-violet-500 align-middle" />
             {rule}
           </div>
         ))}

@@ -54,35 +54,46 @@ export default function SourceHealthView() {
     <div data-testid="source-health-view" className="space-y-6">
       <section
         data-testid="source-health-status-bar"
-        className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between"
+        className="surface-card flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between"
       >
         <div className="flex items-center gap-3 text-sm text-slate-700">
           {state.loading ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin text-slate-500" aria-hidden />
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-50 ring-1 ring-slate-200">
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-500" aria-hidden />
+              </span>
               <span>Loading source-health contract from analytics-api…</span>
             </>
           ) : state.source === 'api' ? (
             <>
-              <Wifi className="h-4 w-4 text-emerald-600" aria-hidden />
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 ring-1 ring-emerald-200">
+                <Wifi className="h-3.5 w-3.5 text-emerald-700" aria-hidden />
+              </span>
               <span>
-                Live API contract loaded. Overall health:{' '}
-                <strong>{state.data.overall_source_health}</strong>.
+                <strong>Live API contract loaded.</strong> Overall health:{' '}
+                <span className="font-semibold text-slate-900">
+                  {state.data.overall_source_health}
+                </span>
+                .
               </span>
             </>
           ) : state.permissionDenied ? (
             <>
-              <ServerCrash className="h-4 w-4 text-rose-600" aria-hidden />
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-rose-50 ring-1 ring-rose-200">
+                <ServerCrash className="h-3.5 w-3.5 text-rose-700" aria-hidden />
+              </span>
               <span>
-                Permission denied by server: rendering shared-contract preview only. UI does not
-                bypass server-side authorization.
+                <strong>Permission denied by server</strong>: rendering shared-contract preview
+                only. UI does not bypass server-side authorization.
               </span>
             </>
           ) : (
             <>
-              <WifiOff className="h-4 w-4 text-amber-600" aria-hidden />
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-50 ring-1 ring-amber-200">
+                <WifiOff className="h-3.5 w-3.5 text-amber-700" aria-hidden />
+              </span>
               <span>
-                Contract preview from fixture (analytics-api unreachable
+                <strong>Contract preview from fixture</strong> (analytics-api unreachable
                 {state.error ? `: ${state.error}` : ''}). Values are non-production.
               </span>
             </>
@@ -93,7 +104,7 @@ export default function SourceHealthView() {
           className="flex flex-wrap items-center gap-2 text-sm"
         >
           <legend className="sr-only">Source-health scenario</legend>
-          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             Scenario
           </span>
           {SCENARIOS.map((option) => {
@@ -106,10 +117,10 @@ export default function SourceHealthView() {
                 aria-pressed={active}
                 title={option.helper}
                 data-testid={`source-health-scenario-${option.id}`}
-                className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-semibold transition ${
                   active
                     ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400'
+                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
                 }`}
               >
                 {option.label}
