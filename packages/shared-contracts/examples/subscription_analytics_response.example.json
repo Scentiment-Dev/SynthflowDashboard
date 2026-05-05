@@ -57,6 +57,24 @@
     "fingerprint": "3393587d3d7fd964fc8b95fa08817f79420c749836fdeef53cb1bc8258b0bcc4",
     "audit_reference": "audit-subscriptions-baseline-20260501",
     "source_system": "analytics_api",
-    "source_confirmation_status": "confirmed"
+    "source_confirmation_status": "confirmed",
+    "presentation": {
+      "display_label": "Subscription Analytics Overview",
+      "short_label": "Overview",
+      "executive_summary": "Preview baseline summarizing subscription outcomes with Stay.ai confirmation as source truth guardrail.",
+      "format_type": "count_and_rate_bundle",
+      "unit": "mixed",
+      "trend_direction": "unknown",
+      "comparison_label": "Comparison baseline unavailable in fixture preview",
+      "comparison_value": null,
+      "severity": "warning",
+      "visual_tone": "caution",
+      "source_authority_explanation": "Stay.ai is the source of truth for final subscription state and outcome confirmation.",
+      "trust_explanation": "Trust is medium because unresolved or unknown outcomes still require caution even with confirmed primary source records.",
+      "freshness_explanation": "Data freshness is within the expected update window.",
+      "drilldown_hint": "Use subscription outcomes and source health views for confirmation and lineage detail.",
+      "empty_state_copy": "No eligible records were available for this calculation window.",
+      "blocked_state_copy": "This metric is blocked until Stay.ai confirmation records are available."
+    }
   }
 }

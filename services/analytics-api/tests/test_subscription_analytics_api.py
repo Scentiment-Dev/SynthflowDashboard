@@ -2,6 +2,28 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
+from app.services import subscription_service
+
+
+PRESENTATION_FIELDS = [
+    "display_label",
+    "short_label",
+    "executive_summary",
+    "format_type",
+    "unit",
+    "trend_direction",
+    "comparison_label",
+    "comparison_value",
+    "severity",
+    "visual_tone",
+    "source_authority_explanation",
+    "trust_explanation",
+    "freshness_explanation",
+    "drilldown_hint",
+    "empty_state_copy",
+    "blocked_state_copy",
+]
+
 
 def test_subscription_analytics_baseline_contract(client: TestClient) -> None:
     response = client.get("/subscriptions/analytics")
@@ -32,6 +54,8 @@ def test_subscription_analytics_missing_stayai_confirmation_is_low_trust(client:
     assert payload["final_subscription_state"] == "unknown"
     assert payload["source_confirmation_status"] == "missing"
     assert payload["metric_metadata"]["trust_label"] == "low"
+    assert payload["metric_metadata"]["presentation"]["severity"] == "critical"
+    assert payload["metric_metadata"]["presentation"]["visual_tone"] == "critical"
     assert payload["source_confirmation"]["missing_records_count"] > 0
     assert payload["subscription_overview"]["confirmed_cancellations_count"] == 0
     assert payload["subscription_overview"]["confirmed_retained_subscriptions_count"] == 0
@@ -53,8 +77,20 @@ def test_subscription_analytics_metadata_contains_export_audit_fields(client: Te
         "fingerprint",
         "audit_reference",
         "source_confirmation_status",
+        "presentation",
     ]:
         assert field in metadata
+    for field in PRESENTATION_FIELDS:
+        assert field in metadata["presentation"]
+
+
+def test_subscription_summary_uses_presentation_safe_copy(client: TestClient) -> None:
+    response = client.get("/subscriptions/summary")
+    assert response.status_code == 200
+    cards = response.json()["cards"]
+    rendered_values = " ".join(str(card["value"]).lower() for card in cards)
+    assert "starter" not in rendered_values
+    assert "skeleton" not in rendered_values
 
 
 def test_unknown_scenario_uses_baseline_fixture_metadata(client: TestClient) -> None:
@@ -120,6 +156,8 @@ def test_subscription_source_health_missing_stay_ai_forces_pending_outcome(clien
     assert payload["conflict_status"] == "pending"
     assert payload["overall_source_health"] == "warning"
     assert payload["missing_stay_ai_final_state_warning"]
+    assert payload["metadata"]["presentation"]["severity"] == "warning"
+    assert payload["metadata"]["presentation"]["visual_tone"] == "caution"
     assert sources["stay_ai"]["source_confirmation_status"] == "missing"
     assert sources["stay_ai"]["freshness_status"] == "stale"
     assert sources["stay_ai"]["trust_label"] == "low"
@@ -137,6 +175,8 @@ def test_subscription_source_health_uses_degraded_for_failing_quality(client: Te
 
     assert payload["pending_or_unknown_final_outcome"] is True
     assert payload["overall_source_health"] == "degraded"
+    assert payload["metadata"]["presentation"]["severity"] == "critical"
+    assert payload["metadata"]["presentation"]["visual_tone"] == "critical"
     assert sources["synthflow"]["data_quality_status"] == "failing"
 
 
@@ -191,3 +231,43 @@ def test_subscription_source_health_metadata_contains_audit_and_fingerprint(clie
     metadata = response.json()["metadata"]
     for field in ["timestamp", "fingerprint", "formula_version", "owner", "audit_reference"]:
         assert field in metadata
+    for field in PRESENTATION_FIELDS:
+        assert field in metadata["presentation"]
+
+
+def test_subscription_source_health_source_rows_include_presentation_metadata(client: TestClient) -> None:
+    response = client.get("/subscriptions/source-health")
+    assert response.status_code == 200
+    sources = response.json()["sources"]
+    assert sources
+    for source in sources:
+        for field in PRESENTATION_FIELDS:
+            assert field in source["presentation"]
+
+
+def test_source_health_fingerprint_is_stable_under_presentation_copy_change(
+    client: TestClient,
+    monkeypatch,
+) -> None:
+    baseline = client.get("/subscriptions/source-health")
+    assert baseline.status_code == 200
+    baseline_payload = baseline.json()
+
+    monkeypatch.setattr(
+        subscription_service,
+        "_source_authority_explanation",
+        lambda _source_system: "Presentation-only authority copy change for UI phrasing.",
+    )
+
+    mutated = client.get("/subscriptions/source-health")
+    assert mutated.status_code == 200
+    mutated_payload = mutated.json()
+
+    assert (
+        baseline_payload["metadata"]["fingerprint"]
+        == mutated_payload["metadata"]["fingerprint"]
+    )
+    assert (
+        baseline_payload["sources"][0]["presentation"]["source_authority_explanation"]
+        != mutated_payload["sources"][0]["presentation"]["source_authority_explanation"]
+    )

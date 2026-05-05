@@ -164,3 +164,34 @@ falls back to the typed fixture in
 Fixture-backed responses are tagged "Contract preview (fixture)" and
 permission-denied / RBAC-unavailable states are surfaced as distinct UI
 states. UI placeholders are never treated as production metric logic.
+
+## Cycle 006 — Presentation metadata contract support
+
+Cycle 006 extends backend/shared contracts so premium UI components can render
+truth-safe labels, summaries, tones, and drilldown hints without hardcoding
+marketing copy or source authority claims.
+
+### New presentation metadata shape
+
+The following object now exists in:
+
+- `metric_metadata.presentation` on subscription analytics
+- `metadata.presentation` on subscription outcomes
+- `sources[].presentation` and `metadata.presentation` on source health
+
+Field set:
+
+- `display_label`, `short_label`, `executive_summary`
+- `format_type`, `unit`
+- `trend_direction`, `comparison_label`, `comparison_value`
+- `severity`, `visual_tone`
+- `source_authority_explanation`, `trust_explanation`, `freshness_explanation`
+- `drilldown_hint`, `empty_state_copy`, `blocked_state_copy`
+
+### Guardrails preserved
+
+- Stay.ai remains the source of truth for final subscription state/outcome.
+- Shopify remains context-only and does not finalize outcomes.
+- Portal link sent remains separate from confirmed portal completion.
+- Trust/freshness messaging remains system-derived and does not manually elevate
+  confidence.

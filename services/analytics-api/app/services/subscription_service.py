@@ -11,6 +11,8 @@ from app.schemas.source_truth import (
 from app.schemas.subscription import (
     DataQualityStatus,
     FreshnessStatus,
+    MetricSeverity,
+    PresentationMetadata,
     SubscriptionOutcomeActionType,
     SubscriptionOutcomeMetricMetadata,
     SubscriptionOutcomeMetrics,
@@ -28,6 +30,8 @@ from app.schemas.subscription import (
     SubscriptionSourceHealthResponse,
     SubscriptionSourceHealthSource,
     SubscriptionTruthState,
+    TrendDirection,
+    VisualTone,
     SubscriptionSummary,
     PortalJourneyMetrics,
     ShopifyContextMetrics,
@@ -904,6 +908,92 @@ def _safe_rate(numerator: int, denominator: int) -> float:
     return round(numerator / denominator, 4)
 
 
+def _freshness_explanation(freshness_status: FreshnessStatus | str) -> str:
+    if freshness_status == FreshnessStatus.FRESH:
+        return "Data freshness is within the expected update window."
+    if freshness_status == FreshnessStatus.STALE:
+        return "Data is stale and may lag behind recent subscription changes."
+    return "Freshness is unknown until source update timing is confirmed."
+
+
+def _trust_explanation(
+    trust_label: TrustLabel,
+    *,
+    source_confirmation_status: SourceConfirmationStatus | None = None,
+) -> str:
+    if trust_label == TrustLabel.HIGH:
+        return "Trust is high because confirmation and data-quality evidence are currently strong."
+    if trust_label == TrustLabel.MEDIUM:
+        if source_confirmation_status == SourceConfirmationStatus.CONFIRMED:
+            return (
+                "Trust is medium because unresolved or unknown outcomes still require caution "
+                "even with confirmed primary source records."
+            )
+        return "Trust is medium because some records are still pending Stay.ai confirmation."
+    if trust_label == TrustLabel.LOW:
+        return "Trust is low because Stay.ai final state confirmation is missing for one or more records."
+    return "Trust is untrusted because source confirmation and quality evidence are insufficient."
+
+
+def _source_authority_explanation(source_system: SourceSystem | str) -> str:
+    if source_system in {SourceSystem.STAY_AI, "stayai"}:
+        return "Stay.ai is the source of truth for final subscription state and outcome confirmation."
+    if source_system == SourceSystem.SYNTHFLOW:
+        return "Synthflow is authoritative for support journey events, not final subscription status."
+    if source_system == SourceSystem.SHOPIFY:
+        return "Shopify provides context only and never overrides Stay.ai outcome decisions."
+    return "Portal events indicate completion signals; link sent does not imply completion."
+
+
+def _comparison_label() -> str:
+    return "Comparison baseline unavailable in fixture preview"
+
+
+def _metric_presentation(
+    *,
+    display_label: str,
+    short_label: str,
+    executive_summary: str,
+    format_type: str,
+    unit: str,
+    metric_trust_label: TrustLabel,
+    source_confirmation_status: SourceConfirmationStatus,
+    freshness_status: FreshnessStatus | str,
+    drilldown_hint: str,
+) -> PresentationMetadata:
+    if metric_trust_label == TrustLabel.HIGH:
+        severity = MetricSeverity.SUCCESS
+        visual_tone = VisualTone.POSITIVE
+    elif metric_trust_label == TrustLabel.MEDIUM:
+        severity = MetricSeverity.WARNING
+        visual_tone = VisualTone.CAUTION
+    else:
+        severity = MetricSeverity.CRITICAL
+        visual_tone = VisualTone.CRITICAL
+
+    return PresentationMetadata(
+        display_label=display_label,
+        short_label=short_label,
+        executive_summary=executive_summary,
+        format_type=format_type,
+        unit=unit,
+        trend_direction=TrendDirection.UNKNOWN,
+        comparison_label=_comparison_label(),
+        comparison_value=None,
+        severity=severity,
+        visual_tone=visual_tone,
+        source_authority_explanation=_source_authority_explanation("stayai"),
+        trust_explanation=_trust_explanation(
+            metric_trust_label,
+            source_confirmation_status=source_confirmation_status,
+        ),
+        freshness_explanation=_freshness_explanation(freshness_status),
+        drilldown_hint=drilldown_hint,
+        empty_state_copy="No eligible records were available for this calculation window.",
+        blocked_state_copy="This metric is blocked until Stay.ai confirmation records are available.",
+    )
+
+
 def _is_confirmed_cancellation(record: SubscriptionOutcomeRecordFixture) -> bool:
     if (
         not record["action_requested"]
@@ -996,7 +1086,10 @@ def _source_health_fingerprint(
     payload = {
         "scenario": scenario,
         "formula_version": formula_version,
-        "sources": [source.model_dump(mode="json") for source in sources],
+        "sources": [
+            source.model_dump(mode="json", exclude={"presentation"})
+            for source in sources
+        ],
     }
     return sha256(dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
 
@@ -1023,7 +1116,7 @@ def get_subscription_summary() -> SubscriptionSummary:
             MetricCard(
                 key="subscription_action_completion_rate",
                 label="Subscription Action Completion Rate",
-                value="starter",
+                value="Preview baseline",
                 trust_label=TrustLabel.MEDIUM,
                 description="Stay.ai-confirmed subscription actions divided by eligible attempts.",
                 source_of_truth="Stay.ai",
@@ -1031,7 +1124,7 @@ def get_subscription_summary() -> SubscriptionSummary:
             MetricCard(
                 key="portal_completion_rate",
                 label="Portal Completion Rate",
-                value="starter",
+                value="Awaiting live source connection",
                 trust_label=TrustLabel.MEDIUM,
                 description="Confirmed portal completions only; sent links do not count as success.",
                 source_of_truth="Portal/Stay.ai",
@@ -1092,6 +1185,20 @@ def get_subscription_analytics(scenario: str = "baseline") -> SubscriptionAnalyt
         audit_reference=f"audit-subscriptions-{effective_scenario}-20260501",
         source_system="analytics_api",
         source_confirmation_status=source_confirmation_status,
+        presentation=_metric_presentation(
+            display_label="Subscription Analytics Overview",
+            short_label="Overview",
+            executive_summary=(
+                "Subscription outcome performance is shown with Stay.ai confirmation controls and "
+                "context-only Shopify attribution."
+            ),
+            format_type="count_and_rate_bundle",
+            unit="mixed",
+            metric_trust_label=trust_label,
+            source_confirmation_status=source_confirmation_status,
+            freshness_status=fixture["freshness"],
+            drilldown_hint="Open subscription outcomes to inspect confirmation gaps and portal completion states.",
+        ),
     )
     return SubscriptionAnalyticsResponse(
         final_subscription_state=fixture["final_subscription_state"],
@@ -1239,6 +1346,20 @@ def get_subscription_outcomes(scenario: str = "baseline") -> SubscriptionOutcome
         ),
         audit_reference=fixture["audit_reference"],
         source_confirmation_status=source_confirmation_status,
+        presentation=_metric_presentation(
+            display_label="Subscription Outcomes",
+            short_label="Outcomes",
+            executive_summary=(
+                "Outcome totals reflect confirmed Stay.ai final states, with pending and missing states "
+                "kept explicit for trust-safe reporting."
+            ),
+            format_type="count_and_rate_bundle",
+            unit="mixed",
+            metric_trust_label=trust_label,
+            source_confirmation_status=source_confirmation_status,
+            freshness_status=fixture["freshness_status"],
+            drilldown_hint="Review source health and record-level confirmations before interpreting final-state trends.",
+        ),
     )
 
     return SubscriptionOutcomesResponse(
@@ -1257,10 +1378,50 @@ def get_subscription_source_health(
         scenario if scenario in SUBSCRIPTION_SOURCE_HEALTH_FIXTURES else "baseline"
     )
     fixture = SUBSCRIPTION_SOURCE_HEALTH_FIXTURES[effective_scenario]
-    all_sources = [
-        SubscriptionSourceHealthSource(**source_fixture)
-        for source_fixture in fixture["sources"]
-    ]
+    all_sources = []
+    for source_fixture in fixture["sources"]:
+        source_system = source_fixture["source_system"]
+        source_confirmation_status = source_fixture["source_confirmation_status"]
+        freshness_status = source_fixture["freshness_status"]
+        if source_confirmation_status == SourceConfirmationStatus.CONFIRMED:
+            severity = MetricSeverity.SUCCESS
+            visual_tone = VisualTone.POSITIVE
+        elif source_confirmation_status == SourceConfirmationStatus.PENDING:
+            severity = MetricSeverity.WARNING
+            visual_tone = VisualTone.CAUTION
+        else:
+            severity = MetricSeverity.CRITICAL
+            visual_tone = VisualTone.CRITICAL
+
+        source_presentation = PresentationMetadata(
+            display_label=f"{str(source_system).replace('_', ' ').title()} Source Health",
+            short_label=str(source_system).replace("_", " ").title(),
+            executive_summary=(
+                f"{str(source_system).replace('_', ' ').title()} is monitored for freshness, "
+                "quality, and confirmation status without overriding Stay.ai authority."
+            ),
+            format_type="status_badge",
+            unit="status",
+            trend_direction=TrendDirection.UNKNOWN,
+            comparison_label=_comparison_label(),
+            comparison_value=None,
+            severity=severity,
+            visual_tone=visual_tone,
+            source_authority_explanation=_source_authority_explanation(source_system),
+            trust_explanation=_trust_explanation(
+                source_fixture["trust_label"],
+                source_confirmation_status=source_confirmation_status,
+            ),
+            freshness_explanation=_freshness_explanation(freshness_status),
+            drilldown_hint=f"Inspect lineage and missing fields for {source_system}.",
+            empty_state_copy=f"No {source_system} records were present in this filtered view.",
+            blocked_state_copy=(
+                "Source health is blocked when source extraction or confirmation telemetry is unavailable."
+            ),
+        )
+        all_sources.append(
+            SubscriptionSourceHealthSource(**source_fixture, presentation=source_presentation)
+        )
     filtered_sources = (
         [source for source in all_sources if source.source_system in source_systems]
         if source_systems
@@ -1310,18 +1471,54 @@ def get_subscription_source_health(
         sources=all_sources,
         formula_version=formula_version,
     )
+    overall_source_health = _overall_source_health(
+        sources=all_sources,
+        pending_or_unknown_final_outcome=pending_or_unknown_final_outcome,
+    )
+    if overall_source_health == "degraded":
+        metadata_severity = MetricSeverity.CRITICAL
+        metadata_visual_tone = VisualTone.CRITICAL
+    elif overall_source_health == "warning":
+        metadata_severity = MetricSeverity.WARNING
+        metadata_visual_tone = VisualTone.CAUTION
+    elif overall_source_health == "healthy":
+        metadata_severity = MetricSeverity.SUCCESS
+        metadata_visual_tone = VisualTone.POSITIVE
+    else:
+        metadata_severity = MetricSeverity.INFO
+        metadata_visual_tone = VisualTone.NEUTRAL
     metadata = SubscriptionSourceHealthMetadata(
         timestamp=fixture["timestamp"],
         fingerprint=fingerprint,
         formula_version=formula_version,
         owner=fixture["owner"],
         audit_reference=fixture["audit_reference"],
+        presentation=PresentationMetadata(
+            display_label="Subscription Source Health",
+            short_label="Source Health",
+            executive_summary=(
+                "Source authority and quality posture are shown per system so dashboards can signal risk "
+                "without inferring final outcomes from non-authoritative data."
+            ),
+            format_type="status_summary",
+            unit="status",
+            trend_direction=TrendDirection.UNKNOWN,
+            comparison_label=_comparison_label(),
+            comparison_value=None,
+            severity=metadata_severity,
+            visual_tone=metadata_visual_tone,
+            source_authority_explanation=_source_authority_explanation("stayai"),
+            trust_explanation=(
+                "Trust labels are system-calculated from confirmation and data-quality status and are not manual."
+            ),
+            freshness_explanation="Source freshness is evaluated independently per source system.",
+            drilldown_hint="Use the sources array to audit each upstream system before UI escalation.",
+            empty_state_copy="No source-health records matched the selected filters.",
+            blocked_state_copy="Source health is blocked while governed ingestion evidence is unavailable.",
+        ),
     )
     return SubscriptionSourceHealthResponse(
-        overall_source_health=_overall_source_health(
-            sources=all_sources,
-            pending_or_unknown_final_outcome=pending_or_unknown_final_outcome,
-        ),
+        overall_source_health=overall_source_health,
         conflict_status=conflict_status,
         pending_or_unknown_final_outcome=pending_or_unknown_final_outcome,
         missing_stay_ai_final_state_warning=missing_stay_ai_final_state_warning,

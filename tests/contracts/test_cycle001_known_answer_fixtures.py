@@ -45,6 +45,9 @@ def test_missing_source_data_lowers_trust_or_maps_to_pending_unknown():
     assert fixture["final_subscription_state"] in {"active", "retained", "saved", "cancelled", "pending", "unknown"}
     assert fixture["subscription_overview"]["pending_stayai_confirmation_count"] >= 0
     assert fixture["metric_metadata"]["trust_label"] in {"high", "medium", "low", "untrusted"}
+    assert fixture["metric_metadata"]["presentation"]["severity"] == "warning"
+    assert fixture["metric_metadata"]["presentation"]["visual_tone"] == "caution"
+    assert "medium" in fixture["metric_metadata"]["presentation"]["trust_explanation"].lower()
 
 
 def test_subscription_outcomes_fixture_keeps_stayai_as_source_of_truth():
@@ -58,6 +61,51 @@ def test_subscription_outcomes_fixture_keeps_stayai_as_source_of_truth():
     assert metrics["portal_completion_confirmed_total"] <= metrics["portal_link_sent_total"]
     assert metadata["source_confirmation_status"] in {"confirmed", "pending", "missing"}
     assert metadata["trust_label"] in {"high", "medium", "low", "untrusted"}
+    assert "presentation" in metadata
+
+
+def test_subscription_contract_examples_include_presentation_safe_metadata():
+    analytics_fixture = _read_json("subscription_analytics_response.example.json")
+    outcomes_fixture = _read_json("subscription_outcomes_response.example.json")
+    source_health_fixture = _read_json("subscription_source_health.example.json")
+
+    for fixture in [
+        analytics_fixture["metric_metadata"]["presentation"],
+        outcomes_fixture["metadata"]["presentation"],
+        source_health_fixture["metadata"]["presentation"],
+        source_health_fixture["sources"][0]["presentation"],
+    ]:
+        for field in [
+            "display_label",
+            "short_label",
+            "executive_summary",
+            "format_type",
+            "unit",
+            "trend_direction",
+            "comparison_label",
+            "severity",
+            "visual_tone",
+            "source_authority_explanation",
+            "trust_explanation",
+            "freshness_explanation",
+            "drilldown_hint",
+            "empty_state_copy",
+            "blocked_state_copy",
+        ]:
+            assert field in fixture
+
+
+def test_contract_examples_do_not_emit_skeleton_or_starter_copy():
+    combined = json.dumps(
+        {
+            "analytics": _read_json("subscription_analytics_response.example.json"),
+            "outcomes": _read_json("subscription_outcomes_response.example.json"),
+            "source_health": _read_json("subscription_source_health.example.json"),
+        }
+    ).lower()
+    assert "starter baseline" not in combined
+    assert "starter" not in combined
+    assert "skeleton" not in combined
 
 
 def test_abandoned_dropped_unresolved_transferred_excluded_from_successful_containment():

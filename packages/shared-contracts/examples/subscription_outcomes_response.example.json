@@ -41,6 +41,24 @@
     "timestamp": "2026-05-04T00:00:00Z",
     "fingerprint": "658631e58f0afe3e62115d5d8d9d40dce12ec1d06ddb9d14e6632f25f323f060",
     "audit_reference": "audit-subscription-outcomes-baseline-20260504",
-    "source_confirmation_status": "missing"
+    "source_confirmation_status": "missing",
+    "presentation": {
+      "display_label": "Subscription Outcomes",
+      "short_label": "Outcomes",
+      "executive_summary": "Preview baseline of subscription actions, confirmations, and unresolved outcomes governed by Stay.ai final-state authority.",
+      "format_type": "count_and_rate_bundle",
+      "unit": "mixed",
+      "trend_direction": "unknown",
+      "comparison_label": "Comparison baseline unavailable in fixture preview",
+      "comparison_value": null,
+      "severity": "critical",
+      "visual_tone": "critical",
+      "source_authority_explanation": "Stay.ai is the source of truth for final subscription state and outcome confirmation.",
+      "trust_explanation": "Trust is low because Stay.ai final state confirmation is missing for one or more records.",
+      "freshness_explanation": "Data freshness is within the expected update window.",
+      "drilldown_hint": "Inspect source health to identify missing confirmation paths and unresolved states.",
+      "empty_state_copy": "No eligible records were available for this calculation window.",
+      "blocked_state_copy": "This metric is blocked until Stay.ai confirmation records are available."
+    }
   }
 }
