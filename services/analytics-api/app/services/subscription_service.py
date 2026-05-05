@@ -922,10 +922,7 @@ def _trust_explanation(
     source_confirmation_status: SourceConfirmationStatus | None = None,
 ) -> str:
     if trust_label == TrustLabel.HIGH:
-        return (
-            "Trust is high because Stay.ai confirmation is present without pending or missing "
-            "final-state evidence."
-        )
+        return "Trust is high because confirmation and data-quality evidence are currently strong."
     if trust_label == TrustLabel.MEDIUM:
         if source_confirmation_status == SourceConfirmationStatus.CONFIRMED:
             return (

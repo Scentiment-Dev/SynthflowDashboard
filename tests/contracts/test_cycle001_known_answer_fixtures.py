@@ -45,6 +45,9 @@ def test_missing_source_data_lowers_trust_or_maps_to_pending_unknown():
     assert fixture["final_subscription_state"] in {"active", "retained", "saved", "cancelled", "pending", "unknown"}
     assert fixture["subscription_overview"]["pending_stayai_confirmation_count"] >= 0
     assert fixture["metric_metadata"]["trust_label"] in {"high", "medium", "low", "untrusted"}
+    assert fixture["metric_metadata"]["presentation"]["severity"] == "warning"
+    assert fixture["metric_metadata"]["presentation"]["visual_tone"] == "caution"
+    assert "medium" in fixture["metric_metadata"]["presentation"]["trust_explanation"].lower()
 
 
 def test_subscription_outcomes_fixture_keeps_stayai_as_source_of_truth():
