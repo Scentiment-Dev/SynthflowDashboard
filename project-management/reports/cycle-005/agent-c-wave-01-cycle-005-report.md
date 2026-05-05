@@ -6,7 +6,7 @@
 - Wave number: 01
 - Cycle number: 005
 - Branch name: `agent-c/wave-01/cycle-005-subscription-outcomes-quality-review`
-- PR URL: pending creation in this execution step
+- PR URL: https://github.com/Scentiment-Dev/SynthflowDashboard/pull/22
 
 ## Cycle 004 Baseline Verification Status
 
