@@ -1471,6 +1471,22 @@ def get_subscription_source_health(
         sources=all_sources,
         formula_version=formula_version,
     )
+    overall_source_health = _overall_source_health(
+        sources=all_sources,
+        pending_or_unknown_final_outcome=pending_or_unknown_final_outcome,
+    )
+    if overall_source_health == "degraded":
+        metadata_severity = MetricSeverity.CRITICAL
+        metadata_visual_tone = VisualTone.CRITICAL
+    elif overall_source_health == "warning":
+        metadata_severity = MetricSeverity.WARNING
+        metadata_visual_tone = VisualTone.CAUTION
+    elif overall_source_health == "healthy":
+        metadata_severity = MetricSeverity.SUCCESS
+        metadata_visual_tone = VisualTone.POSITIVE
+    else:
+        metadata_severity = MetricSeverity.INFO
+        metadata_visual_tone = VisualTone.NEUTRAL
     metadata = SubscriptionSourceHealthMetadata(
         timestamp=fixture["timestamp"],
         fingerprint=fingerprint,
@@ -1489,8 +1505,8 @@ def get_subscription_source_health(
             trend_direction=TrendDirection.UNKNOWN,
             comparison_label=_comparison_label(),
             comparison_value=None,
-            severity=MetricSeverity.INFO,
-            visual_tone=VisualTone.NEUTRAL,
+            severity=metadata_severity,
+            visual_tone=metadata_visual_tone,
             source_authority_explanation=_source_authority_explanation("stayai"),
             trust_explanation=(
                 "Trust labels are system-calculated from confirmation and data-quality status and are not manual."
@@ -1502,10 +1518,7 @@ def get_subscription_source_health(
         ),
     )
     return SubscriptionSourceHealthResponse(
-        overall_source_health=_overall_source_health(
-            sources=all_sources,
-            pending_or_unknown_final_outcome=pending_or_unknown_final_outcome,
-        ),
+        overall_source_health=overall_source_health,
         conflict_status=conflict_status,
         pending_or_unknown_final_outcome=pending_or_unknown_final_outcome,
         missing_stay_ai_final_state_warning=missing_stay_ai_final_state_warning,

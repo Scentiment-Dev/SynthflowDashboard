@@ -156,6 +156,8 @@ def test_subscription_source_health_missing_stay_ai_forces_pending_outcome(clien
     assert payload["conflict_status"] == "pending"
     assert payload["overall_source_health"] == "warning"
     assert payload["missing_stay_ai_final_state_warning"]
+    assert payload["metadata"]["presentation"]["severity"] == "warning"
+    assert payload["metadata"]["presentation"]["visual_tone"] == "caution"
     assert sources["stay_ai"]["source_confirmation_status"] == "missing"
     assert sources["stay_ai"]["freshness_status"] == "stale"
     assert sources["stay_ai"]["trust_label"] == "low"
@@ -173,6 +175,8 @@ def test_subscription_source_health_uses_degraded_for_failing_quality(client: Te
 
     assert payload["pending_or_unknown_final_outcome"] is True
     assert payload["overall_source_health"] == "degraded"
+    assert payload["metadata"]["presentation"]["severity"] == "critical"
+    assert payload["metadata"]["presentation"]["visual_tone"] == "critical"
     assert sources["synthflow"]["data_quality_status"] == "failing"
 
 
