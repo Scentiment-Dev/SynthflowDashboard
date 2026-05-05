@@ -78,6 +78,46 @@ class DataQualityStatus(StrEnum):
     FAILING = "failing"
 
 
+class TrendDirection(StrEnum):
+    UP = "up"
+    DOWN = "down"
+    FLAT = "flat"
+    UNKNOWN = "unknown"
+
+
+class MetricSeverity(StrEnum):
+    INFO = "info"
+    SUCCESS = "success"
+    WARNING = "warning"
+    CRITICAL = "critical"
+
+
+class VisualTone(StrEnum):
+    NEUTRAL = "neutral"
+    POSITIVE = "positive"
+    CAUTION = "caution"
+    CRITICAL = "critical"
+
+
+class PresentationMetadata(BaseModel):
+    display_label: str
+    short_label: str
+    executive_summary: str
+    format_type: str
+    unit: str
+    trend_direction: TrendDirection
+    comparison_label: str
+    comparison_value: float | None = None
+    severity: MetricSeverity
+    visual_tone: VisualTone
+    source_authority_explanation: str
+    trust_explanation: str
+    freshness_explanation: str
+    drilldown_hint: str
+    empty_state_copy: str
+    blocked_state_copy: str
+
+
 class SubscriptionOverviewMetrics(BaseModel):
     subscription_overview_count: int
     cancellation_requests_count: int
@@ -124,6 +164,7 @@ class SubscriptionAnalyticsMetricMetadata(BaseModel):
     audit_reference: str
     source_system: str
     source_confirmation_status: SourceConfirmationStatus
+    presentation: PresentationMetadata
 
 
 class SubscriptionAnalyticsResponse(BaseModel):
@@ -163,6 +204,7 @@ class SubscriptionOutcomeMetricMetadata(BaseModel):
     fingerprint: str
     audit_reference: str
     source_confirmation_status: SourceConfirmationStatus
+    presentation: PresentationMetadata
 
 
 class SubscriptionOutcomeMetrics(BaseModel):
@@ -211,6 +253,7 @@ class SubscriptionSourceHealthSource(BaseModel):
     formula_version: str
     audit_reference: str
     trust_label: TrustLabel
+    presentation: PresentationMetadata
 
 
 class SubscriptionSourceHealthMetadata(BaseModel):
@@ -219,6 +262,7 @@ class SubscriptionSourceHealthMetadata(BaseModel):
     formula_version: str
     owner: str
     audit_reference: str
+    presentation: PresentationMetadata
 
 
 class SubscriptionSourceHealthResponse(BaseModel):

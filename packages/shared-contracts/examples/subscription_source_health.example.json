@@ -23,7 +23,25 @@
       "owner": "analytics",
       "formula_version": "v0.5.0",
       "audit_reference": "audit-source-health-baseline-20260504",
-      "trust_label": "high"
+      "trust_label": "high",
+      "presentation": {
+        "display_label": "Stay Ai Source Health",
+        "short_label": "Stay Ai",
+        "executive_summary": "Stay Ai provides final-state authority and is monitored for confirmation, freshness, and quality.",
+        "format_type": "status_badge",
+        "unit": "status",
+        "trend_direction": "unknown",
+        "comparison_label": "Comparison baseline unavailable in fixture preview",
+        "comparison_value": null,
+        "severity": "success",
+        "visual_tone": "positive",
+        "source_authority_explanation": "Stay.ai is the source of truth for final subscription state and outcome confirmation.",
+        "trust_explanation": "Trust is high because Stay.ai confirmation is present for final state-sensitive paths.",
+        "freshness_explanation": "Data freshness is within the expected update window.",
+        "drilldown_hint": "Inspect lineage and missing fields for stay_ai.",
+        "empty_state_copy": "No stay_ai records were present in this filtered view.",
+        "blocked_state_copy": "Source health is blocked when source extraction or confirmation telemetry is unavailable."
+      }
     },
     {
       "source_system": "synthflow",
@@ -40,7 +58,25 @@
       "owner": "analytics",
       "formula_version": "v0.5.0",
       "audit_reference": "audit-source-health-baseline-20260504",
-      "trust_label": "high"
+      "trust_label": "high",
+      "presentation": {
+        "display_label": "Synthflow Source Health",
+        "short_label": "Synthflow",
+        "executive_summary": "Synthflow contributes journey evidence and quality signals without final-state authority.",
+        "format_type": "status_badge",
+        "unit": "status",
+        "trend_direction": "unknown",
+        "comparison_label": "Comparison baseline unavailable in fixture preview",
+        "comparison_value": null,
+        "severity": "success",
+        "visual_tone": "positive",
+        "source_authority_explanation": "Synthflow is authoritative for support journey events, not final subscription status.",
+        "trust_explanation": "Trust is high because Stay.ai confirmation is present for final state-sensitive paths.",
+        "freshness_explanation": "Data freshness is within the expected update window.",
+        "drilldown_hint": "Inspect lineage and missing fields for synthflow.",
+        "empty_state_copy": "No synthflow records were present in this filtered view.",
+        "blocked_state_copy": "Source health is blocked when source extraction or confirmation telemetry is unavailable."
+      }
     },
     {
       "source_system": "shopify",
@@ -57,7 +93,25 @@
       "owner": "analytics",
       "formula_version": "v0.5.0",
       "audit_reference": "audit-source-health-baseline-20260504",
-      "trust_label": "medium"
+      "trust_label": "medium",
+      "presentation": {
+        "display_label": "Shopify Source Health",
+        "short_label": "Shopify",
+        "executive_summary": "Shopify remains context-only for subscription analytics and does not finalize outcomes.",
+        "format_type": "status_badge",
+        "unit": "status",
+        "trend_direction": "unknown",
+        "comparison_label": "Comparison baseline unavailable in fixture preview",
+        "comparison_value": null,
+        "severity": "success",
+        "visual_tone": "positive",
+        "source_authority_explanation": "Shopify provides context only and never overrides Stay.ai outcome decisions.",
+        "trust_explanation": "Trust is high because Stay.ai confirmation is present for final state-sensitive paths.",
+        "freshness_explanation": "Data freshness is within the expected update window.",
+        "drilldown_hint": "Inspect lineage and missing fields for shopify.",
+        "empty_state_copy": "No shopify records were present in this filtered view.",
+        "blocked_state_copy": "Source health is blocked when source extraction or confirmation telemetry is unavailable."
+      }
     },
     {
       "source_system": "portal",
@@ -74,7 +128,25 @@
       "owner": "analytics",
       "formula_version": "v0.5.0",
       "audit_reference": "audit-source-health-baseline-20260504",
-      "trust_label": "medium"
+      "trust_label": "medium",
+      "presentation": {
+        "display_label": "Portal Source Health",
+        "short_label": "Portal",
+        "executive_summary": "Portal events are completion signals; sent links remain incomplete until completion is confirmed.",
+        "format_type": "status_badge",
+        "unit": "status",
+        "trend_direction": "unknown",
+        "comparison_label": "Comparison baseline unavailable in fixture preview",
+        "comparison_value": null,
+        "severity": "warning",
+        "visual_tone": "caution",
+        "source_authority_explanation": "Portal events indicate completion signals; link sent does not imply completion.",
+        "trust_explanation": "Trust is medium because some records are still pending Stay.ai confirmation.",
+        "freshness_explanation": "Data freshness is within the expected update window.",
+        "drilldown_hint": "Inspect lineage and missing fields for portal.",
+        "empty_state_copy": "No portal records were present in this filtered view.",
+        "blocked_state_copy": "Source health is blocked when source extraction or confirmation telemetry is unavailable."
+      }
     }
   ],
   "metadata": {
@@ -82,6 +154,24 @@
     "fingerprint": "2df86f4cb350c9e7106f45a6b8d4641e0e601af7840dbb57fe8e020b8abff91a",
     "formula_version": "v0.5.0",
     "owner": "analytics",
-    "audit_reference": "audit-source-health-baseline-20260504"
+    "audit_reference": "audit-source-health-baseline-20260504",
+    "presentation": {
+      "display_label": "Subscription Source Health",
+      "short_label": "Source Health",
+      "executive_summary": "Source authority and quality posture are shown per system without inferring final outcomes from non-authoritative data.",
+      "format_type": "status_summary",
+      "unit": "status",
+      "trend_direction": "unknown",
+      "comparison_label": "Comparison baseline unavailable in fixture preview",
+      "comparison_value": null,
+      "severity": "info",
+      "visual_tone": "neutral",
+      "source_authority_explanation": "Stay.ai is the source of truth for final subscription state and outcome confirmation.",
+      "trust_explanation": "Trust labels are system-calculated from confirmation and data-quality status and are not manual.",
+      "freshness_explanation": "Source freshness is evaluated independently per source system.",
+      "drilldown_hint": "Use the sources list for lineage and missing-field diagnostics per source.",
+      "empty_state_copy": "No source-health records matched the selected filters.",
+      "blocked_state_copy": "Source health is blocked while governed ingestion evidence is unavailable."
+    }
   }
 }

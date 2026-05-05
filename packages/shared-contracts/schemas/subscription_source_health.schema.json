@@ -42,7 +42,8 @@
           "owner",
           "formula_version",
           "audit_reference",
-          "trust_label"
+          "trust_label",
+          "presentation"
         ],
         "properties": {
           "source_system": { "type": "string", "enum": ["stay_ai", "synthflow", "shopify", "portal"] },
@@ -67,20 +68,100 @@
           "owner": { "type": "string" },
           "formula_version": { "type": "string" },
           "audit_reference": { "type": "string" },
-          "trust_label": { "type": "string", "enum": ["high", "medium", "low", "untrusted"] }
+          "trust_label": { "type": "string", "enum": ["high", "medium", "low", "untrusted"] },
+          "presentation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "display_label",
+              "short_label",
+              "executive_summary",
+              "format_type",
+              "unit",
+              "trend_direction",
+              "comparison_label",
+              "comparison_value",
+              "severity",
+              "visual_tone",
+              "source_authority_explanation",
+              "trust_explanation",
+              "freshness_explanation",
+              "drilldown_hint",
+              "empty_state_copy",
+              "blocked_state_copy"
+            ],
+            "properties": {
+              "display_label": { "type": "string" },
+              "short_label": { "type": "string" },
+              "executive_summary": { "type": "string" },
+              "format_type": { "type": "string" },
+              "unit": { "type": "string" },
+              "trend_direction": { "type": "string", "enum": ["up", "down", "flat", "unknown"] },
+              "comparison_label": { "type": "string" },
+              "comparison_value": { "type": ["number", "null"] },
+              "severity": { "type": "string", "enum": ["info", "success", "warning", "critical"] },
+              "visual_tone": { "type": "string", "enum": ["neutral", "positive", "caution", "critical"] },
+              "source_authority_explanation": { "type": "string" },
+              "trust_explanation": { "type": "string" },
+              "freshness_explanation": { "type": "string" },
+              "drilldown_hint": { "type": "string" },
+              "empty_state_copy": { "type": "string" },
+              "blocked_state_copy": { "type": "string" }
+            }
+          }
         }
       }
     },
     "metadata": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["timestamp", "fingerprint", "formula_version", "owner", "audit_reference"],
+      "required": ["timestamp", "fingerprint", "formula_version", "owner", "audit_reference", "presentation"],
       "properties": {
         "timestamp": { "type": "string", "format": "date-time" },
         "fingerprint": { "type": "string" },
         "formula_version": { "type": "string" },
         "owner": { "type": "string" },
-        "audit_reference": { "type": "string" }
+        "audit_reference": { "type": "string" },
+        "presentation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "display_label",
+            "short_label",
+            "executive_summary",
+            "format_type",
+            "unit",
+            "trend_direction",
+            "comparison_label",
+            "comparison_value",
+            "severity",
+            "visual_tone",
+            "source_authority_explanation",
+            "trust_explanation",
+            "freshness_explanation",
+            "drilldown_hint",
+            "empty_state_copy",
+            "blocked_state_copy"
+          ],
+          "properties": {
+            "display_label": { "type": "string" },
+            "short_label": { "type": "string" },
+            "executive_summary": { "type": "string" },
+            "format_type": { "type": "string" },
+            "unit": { "type": "string" },
+            "trend_direction": { "type": "string", "enum": ["up", "down", "flat", "unknown"] },
+            "comparison_label": { "type": "string" },
+            "comparison_value": { "type": ["number", "null"] },
+            "severity": { "type": "string", "enum": ["info", "success", "warning", "critical"] },
+            "visual_tone": { "type": "string", "enum": ["neutral", "positive", "caution", "critical"] },
+            "source_authority_explanation": { "type": "string" },
+            "trust_explanation": { "type": "string" },
+            "freshness_explanation": { "type": "string" },
+            "drilldown_hint": { "type": "string" },
+            "empty_state_copy": { "type": "string" },
+            "blocked_state_copy": { "type": "string" }
+          }
+        }
       }
     }
   }

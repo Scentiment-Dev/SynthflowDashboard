@@ -3,6 +3,26 @@ from __future__ import annotations
 from fastapi.testclient import TestClient
 
 
+PRESENTATION_FIELDS = [
+    "display_label",
+    "short_label",
+    "executive_summary",
+    "format_type",
+    "unit",
+    "trend_direction",
+    "comparison_label",
+    "comparison_value",
+    "severity",
+    "visual_tone",
+    "source_authority_explanation",
+    "trust_explanation",
+    "freshness_explanation",
+    "drilldown_hint",
+    "empty_state_copy",
+    "blocked_state_copy",
+]
+
+
 def test_subscription_outcomes_confirmed_cancellation(client: TestClient) -> None:
     response = client.get(
         "/subscriptions/outcomes",
@@ -151,8 +171,11 @@ def test_subscription_outcomes_metadata_contains_required_audit_fields(client: T
         "source_confirmation_status",
         "filters",
         "metric_definitions",
+        "presentation",
     ]:
         assert field in metadata
+    for field in PRESENTATION_FIELDS:
+        assert field in metadata["presentation"]
     for field in [
         "subscription_contacts_total",
         "subscription_action_requests_total",
