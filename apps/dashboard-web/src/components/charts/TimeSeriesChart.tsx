@@ -1,6 +1,6 @@
 import { useId } from 'react';
 import { CartesianGrid, Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { ArrowUpRight, LineChart as LineChartIcon } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, LineChart as LineChartIcon, Minus } from 'lucide-react';
 import type { MetricSeriesPoint } from '../../types/metrics';
 
 export default function TimeSeriesChart({
@@ -49,7 +49,13 @@ export default function TimeSeriesChart({
           <span
             className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${deltaTone}`}
           >
-            <ArrowUpRight className={`h-3 w-3 ${delta !== null && delta < 0 ? 'rotate-90' : ''}`} />
+            {delta === null ? (
+              <Minus className="h-3 w-3" />
+            ) : delta >= 0 ? (
+              <ArrowUpRight className="h-3 w-3" />
+            ) : (
+              <ArrowDownRight className="h-3 w-3" />
+            )}
             {deltaDisplay}
           </span>
         </div>

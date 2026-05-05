@@ -66,7 +66,7 @@ export default function SubscriptionOutcomeFunnel({
                   </span>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold leading-tight">
-                      {stage.label.replace(/^\d+\.\s*/, '')}
+                      {stage.label}
                     </p>
                     <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.18em] opacity-80">
                       Source authority: {stage.authority}
