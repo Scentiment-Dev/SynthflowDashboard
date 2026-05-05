@@ -12,7 +12,7 @@ export default function TimeSeriesChart({
   description?: string;
   data: MetricSeriesPoint[];
 }) {
-  const reactId = useId();
+  const reactId = useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const fillId = `trendFill-${reactId}`;
   const strokeId = `trendStroke-${reactId}`;
   const last = data[data.length - 1]?.value ?? null;
