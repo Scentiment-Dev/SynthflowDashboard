@@ -1,4 +1,4 @@
-import { ArrowUpRight, Minus, Sparkles, TrendingUp } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Minus, Sparkles, TrendingUp } from 'lucide-react';
 import type { MetricCardData } from '../../types/metrics';
 import { formatMetricValue } from '../../utils/formatters';
 import SourceBadge from '../status/SourceBadge';
@@ -7,10 +7,22 @@ import TrustBadge from '../status/TrustBadge';
 const RAW_DELTA = 'starter baseline';
 const POLISHED_DELTA = 'Awaiting first confirmed window';
 
+type DeltaDirection = 'positive' | 'negative' | 'neutral';
+
+function deriveDeltaDirection(deltaText: string): DeltaDirection {
+  const trimmed = deltaText.trim();
+  if (/^[-−–]/.test(trimmed) || /\bdown\b/i.test(trimmed)) return 'negative';
+  if (/^\+/.test(trimmed) || /\bup\b/i.test(trimmed)) return 'positive';
+  return 'neutral';
+}
+
 export default function MetricCard({ metric }: { metric: MetricCardData }) {
   const rawDelta = metric.delta ?? RAW_DELTA;
   const isPlaceholderDelta = rawDelta === RAW_DELTA;
   const deltaText = isPlaceholderDelta ? POLISHED_DELTA : rawDelta;
+  const deltaDirection: DeltaDirection = isPlaceholderDelta
+    ? 'neutral'
+    : deriveDeltaDirection(deltaText);
   const valueIsString = typeof metric.value === 'string';
   const isPreview = valueIsString && metric.value === 'starter';
 
@@ -49,10 +61,12 @@ export default function MetricCard({ metric }: { metric: MetricCardData }) {
 
       <div className="relative mt-auto flex items-center justify-between gap-2 border-t border-slate-100 pt-3 text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500">
         <span className="inline-flex items-center gap-1">
-          {isPlaceholderDelta ? (
-            <Minus className="h-3 w-3 text-slate-400" />
-          ) : (
+          {deltaDirection === 'positive' ? (
             <ArrowUpRight className="h-3 w-3 text-emerald-600" />
+          ) : deltaDirection === 'negative' ? (
+            <ArrowDownRight className="h-3 w-3 text-rose-600" />
+          ) : (
+            <Minus className="h-3 w-3 text-slate-400" />
           )}
           {deltaText}
         </span>

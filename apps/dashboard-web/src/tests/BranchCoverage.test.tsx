@@ -167,6 +167,28 @@ describe('branch coverage for dashboard UI helpers', () => {
     );
     expect(screen.queryByText(/Preview value/i)).not.toBeInTheDocument();
     expect(screen.getByText(/\+18% week over week/i)).toBeInTheDocument();
+
+    rerender(
+      <MetricCard
+        metric={{
+          ...baseMetric,
+          value: 1000,
+          delta: '-12% week over week',
+        }}
+      />,
+    );
+    expect(screen.getByText(/-12% week over week/i)).toBeInTheDocument();
+
+    rerender(
+      <MetricCard
+        metric={{
+          ...baseMetric,
+          value: 500,
+          delta: 'within tolerance',
+        }}
+      />,
+    );
+    expect(screen.getByText(/within tolerance/i)).toBeInTheDocument();
   });
 
   it('covers TimeSeriesChart description and delta tone branches', () => {
@@ -321,6 +343,36 @@ describe('branch coverage for dashboard UI helpers', () => {
 
     expect(screen.getByText(/^Live agent$/i)).toBeInTheDocument();
     expect(screen.getByText(/^Order status$/i)).toBeInTheDocument();
+  });
+
+  it('covers SubscriptionOutcomeKpiGrid hide-share branch for cards exceeding total', () => {
+    render(
+      <SubscriptionOutcomeKpiGrid
+        cards={[
+          {
+            id: 'subscription_contacts_total',
+            label: 'Subscription contacts',
+            value: 100,
+            tone: 'primary',
+            authority: 'Stay.ai',
+            isFinalAuthority: true,
+            helper: 'Total contacts.',
+          },
+          {
+            id: 'shopify_context_available_total',
+            label: 'Shopify context available',
+            value: 200,
+            tone: 'context',
+            authority: 'Shopify',
+            isFinalAuthority: false,
+            helper: 'Context-only counter that can exceed total subscription contacts.',
+          },
+        ]}
+        rateCards={[]}
+      />,
+    );
+
+    expect(screen.queryByText(/% of subscription contacts/i)).not.toBeInTheDocument();
   });
 
   it('covers SubscriptionOutcomeKpiGrid totalForShare fallback when subscription_contacts_total is missing', () => {

@@ -74,9 +74,13 @@ export default function SubscriptionOutcomeKpiGrid({
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {cards.map((card) => {
-          const share = totalForShare > 0 ? card.value / totalForShare : 0;
+          const rawShare = totalForShare > 0 ? card.value / totalForShare : 0;
+          const share = Math.min(1, rawShare);
           const sharePct = Math.min(100, Math.max(2, share * 100));
-          const showShare = card.id !== 'subscription_contacts_total' && totalForShare > 0;
+          const showShare =
+            card.id !== 'subscription_contacts_total' &&
+            totalForShare > 0 &&
+            card.value <= totalForShare;
           return (
             <article
               key={card.id}

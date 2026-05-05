@@ -1,3 +1,5 @@
+import { Check } from 'lucide-react';
+
 const required = [
   'Filters',
   'Definitions',
@@ -9,8 +11,6 @@ const required = [
   'Fingerprint',
   'Audit reference',
 ];
-
-import { Check } from 'lucide-react';
 
 export function ExportGovernanceChecklist() {
   return (
