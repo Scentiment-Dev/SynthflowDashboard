@@ -42,20 +42,18 @@ export default function SourceConfirmationPanel({
   ];
 
   return (
-    <section
-      data-testid="source-confirmation-panel"
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-    >
-      <header className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+    <section data-testid="source-confirmation-panel" className="surface-card p-5 sm:p-6">
+      <header className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
-          <h3 className="text-base font-semibold text-slate-950">Source confirmation (Stay.ai)</h3>
-          <p className="mt-1 text-sm leading-6 text-slate-600">
+          <p className="eyebrow">Source confirmation</p>
+          <h3 className="display-title mt-1 text-base sm:text-lg">Source confirmation (Stay.ai)</h3>
+          <p className="mt-1.5 text-sm leading-6 text-slate-600">
             Stay.ai owns subscription source-of-truth. Pending and missing records cannot be treated
             as confirmed cancellation, save, or retained outcomes.
           </p>
         </div>
         <span
-          className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ${statusBadgeClasses(tone)}`}
+          className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-[11px] font-semibold ring-1 ${statusBadgeClasses(tone)}`}
         >
           Status: {sourceConfirmation.source_confirmation_status}
         </span>

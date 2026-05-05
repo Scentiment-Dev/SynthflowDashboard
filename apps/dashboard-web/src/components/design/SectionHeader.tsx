@@ -1,0 +1,43 @@
+import type { ReactNode } from 'react';
+
+type SectionHeaderProps = {
+  eyebrow?: ReactNode;
+  title: string;
+  description?: ReactNode;
+  actions?: ReactNode;
+  align?: 'left' | 'split';
+  className?: string;
+  titleClassName?: string;
+  id?: string;
+};
+
+export default function SectionHeader({
+  eyebrow,
+  title,
+  description,
+  actions,
+  align = 'split',
+  className = '',
+  titleClassName = '',
+  id,
+}: SectionHeaderProps) {
+  return (
+    <header
+      className={`flex ${align === 'split' ? 'flex-col gap-4 lg:flex-row lg:items-end lg:justify-between' : 'flex-col gap-2'} ${className}`.trim()}
+    >
+      <div className="max-w-3xl">
+        {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
+        <h2
+          id={id}
+          className={`display-title mt-2 text-xl tracking-tight text-slate-950 sm:text-2xl ${titleClassName}`.trim()}
+        >
+          {title}
+        </h2>
+        {description ? (
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{description}</p>
+        ) : null}
+      </div>
+      {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
+    </header>
+  );
+}

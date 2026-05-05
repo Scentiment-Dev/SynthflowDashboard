@@ -45,35 +45,46 @@ export default function SubscriptionAnalyticsView() {
     <div className="space-y-6">
       <section
         data-testid="subscription-analytics-status-bar"
-        className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between"
+        className="surface-card flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between"
       >
         <div className="flex items-center gap-3 text-sm text-slate-700">
           {state.loading ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin text-slate-500" aria-hidden />
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-50 ring-1 ring-slate-200">
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-500" aria-hidden />
+              </span>
               <span>Loading subscription analytics contract from analytics-api…</span>
             </>
           ) : state.source === 'api' ? (
             <>
-              <Wifi className="h-4 w-4 text-emerald-600" aria-hidden />
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 ring-1 ring-emerald-200">
+                <Wifi className="h-3.5 w-3.5 text-emerald-700" aria-hidden />
+              </span>
               <span>
-                Live API contract loaded. Stay.ai source confirmation:{' '}
-                <strong>{state.data.source_confirmation_status}</strong>.
+                <strong>Live API contract loaded.</strong> Stay.ai source confirmation:{' '}
+                <span className="font-semibold text-slate-900">
+                  {state.data.source_confirmation_status}
+                </span>
+                .
               </span>
             </>
           ) : state.permissionDenied ? (
             <>
-              <ServerCrash className="h-4 w-4 text-rose-600" aria-hidden />
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-rose-50 ring-1 ring-rose-200">
+                <ServerCrash className="h-3.5 w-3.5 text-rose-700" aria-hidden />
+              </span>
               <span>
-                Permission denied by server: rendering shared-contract preview only. UI does not
-                bypass server-side authorization.
+                <strong>Permission denied by server</strong>: rendering shared-contract preview
+                only. UI does not bypass server-side authorization.
               </span>
             </>
           ) : (
             <>
-              <WifiOff className="h-4 w-4 text-amber-600" aria-hidden />
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-50 ring-1 ring-amber-200">
+                <WifiOff className="h-3.5 w-3.5 text-amber-700" aria-hidden />
+              </span>
               <span>
-                Contract preview from fixture (analytics-api unreachable
+                <strong>Contract preview from fixture</strong> (analytics-api unreachable
                 {state.error ? `: ${state.error}` : ''}). Values are non-production.
               </span>
             </>

@@ -7,19 +7,29 @@ const rows = [
 
 export function AuditEvidenceTable() {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <h3 className="text-base font-semibold text-slate-900">Audit Evidence Surfaces</h3>
-      <div className="mt-4 overflow-x-auto">
+    <section className="surface-card p-5 sm:p-6">
+      <header>
+        <p className="eyebrow">Audit</p>
+        <h3 className="display-title mt-1 text-base sm:text-lg">Audit Evidence Surfaces</h3>
+        <p className="mt-1.5 text-sm leading-6 text-slate-600">
+          Audit evidence and accountability surfaces tracked outside of the dashboard layer.
+        </p>
+      </header>
+      <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200/70">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
-            <tr><th className="px-3 py-2">Evidence</th><th className="px-3 py-2">Owner</th><th className="px-3 py-2">Status</th></tr>
+          <thead className="bg-slate-50/80">
+            <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <th className="px-4 py-2.5">Evidence</th>
+              <th className="px-4 py-2.5">Owner</th>
+              <th className="px-4 py-2.5">Status</th>
+            </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {rows.map((row) => (
-              <tr key={row.evidence}>
-                <td className="px-3 py-2 font-medium text-slate-900">{row.evidence}</td>
-                <td className="px-3 py-2 text-slate-700">{row.owner}</td>
-                <td className="px-3 py-2 text-slate-600">{row.status}</td>
+              <tr key={row.evidence} className="transition-colors hover:bg-slate-50/60">
+                <td className="px-4 py-2.5 font-semibold text-slate-900">{row.evidence}</td>
+                <td className="px-4 py-2.5 text-slate-700">{row.owner}</td>
+                <td className="px-4 py-2.5 text-slate-600">{row.status}</td>
               </tr>
             ))}
           </tbody>

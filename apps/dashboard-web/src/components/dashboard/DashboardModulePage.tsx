@@ -25,8 +25,14 @@ export default function DashboardModulePage({ module }: { module: DashboardModul
     <div className="space-y-6">
       <ApiStateBanner loading={loading} error={error} source={source} />
       {isPermissionDenied && (
-        <section className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm leading-6 text-rose-900 shadow-sm">
-          Permission denied from analytics API. Frontend shell remains in blocked mode until server-side RBAC confirmation is available.
+        <section className="surface-card flex items-center gap-3 border-rose-200 bg-rose-50/70 p-4 text-sm leading-6 text-rose-900">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose-100 ring-1 ring-rose-200">
+            <span className="text-base">⛔</span>
+          </span>
+          <span>
+            <strong>Permission denied from analytics API.</strong> Frontend shell remains in blocked
+            mode until server-side RBAC confirmation is available.
+          </span>
         </section>
       )}
       <ModuleHeader eyebrow={data.eyebrow} title={data.title} description={data.description} />
@@ -36,14 +42,27 @@ export default function DashboardModulePage({ module }: { module: DashboardModul
         {hasSummaryRows ? (
           summary.cards.map((metric) => <MetricCard key={metric.key} metric={metric} />)
         ) : (
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-sm md:col-span-3">
-            No eligible metrics returned for current filters. This empty-state placeholder is shown until contract-backed rows are available.
+          <div className="surface-card flex items-center justify-center px-6 py-10 text-center text-sm text-slate-600 md:col-span-3">
+            <div>
+              <p className="display-title text-slate-900">No eligible metrics returned for current filters</p>
+              <p className="mt-1.5 max-w-md text-sm leading-6 text-slate-600">
+                Empty-state placeholder shown until contract-backed rows are available.
+              </p>
+            </div>
           </div>
         )}
       </section>
       <section className="grid gap-4 xl:grid-cols-2">
-        <TimeSeriesChart title="Outcome trend" description="Fixture trend until Agent A connects live metric series endpoints." data={data.trend} />
-        <FunnelChart title="Source confirmation funnel" description="Each step shows the controlling source and calculated trust label." steps={data.funnel} />
+        <TimeSeriesChart
+          title="Outcome trend"
+          description="Trend window will switch to live metric series as soon as the analytics-api endpoint is connected."
+          data={data.trend}
+        />
+        <FunnelChart
+          title="Source confirmation funnel"
+          description="Each step shows the controlling source and calculated trust label."
+          steps={data.funnel}
+        />
       </section>
       <JourneyFlowChart title="Locked measurement journey" description="Required flow from source event to trusted dashboard metric." nodes={data.journey} />
       <section className="grid gap-4 xl:grid-cols-2">

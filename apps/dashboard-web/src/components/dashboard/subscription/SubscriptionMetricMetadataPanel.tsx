@@ -11,12 +11,15 @@ export default function SubscriptionMetricMetadataPanel({
   return (
     <section
       data-testid="subscription-metric-metadata-panel"
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+      className="surface-card p-5 sm:p-6"
     >
       <header className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
-          <h3 className="text-base font-semibold text-slate-950">Metric metadata and audit trail</h3>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
+          <p className="eyebrow">Metric metadata · audit trail</p>
+          <h3 className="display-title mt-1 text-base sm:text-lg">
+            Metric metadata and audit trail
+          </h3>
+          <p className="mt-1.5 max-w-2xl text-sm leading-6 text-slate-600">
             Required by export governance: filters, definitions, trust label, freshness, formula
             version, owner, timestamp, fingerprint, and audit reference must all accompany this
             metric before export is unblocked.

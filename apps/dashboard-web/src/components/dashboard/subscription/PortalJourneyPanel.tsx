@@ -10,15 +10,15 @@ export default function PortalJourneyPanel({ portal }: { portal: PortalJourneyMe
   const linkOnly = Math.max(0, sent - completed);
 
   return (
-    <section
-      data-testid="portal-journey-panel"
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-    >
+    <section data-testid="portal-journey-panel" className="surface-card p-5 sm:p-6">
       <header>
-        <h3 className="text-base font-semibold text-slate-950">Portal journey</h3>
-        <p className="mt-1 text-sm leading-6 text-slate-600">
-          Portal link delivery is diagnostic only. Portal completion requires confirmed completion
-          events, not link delivery.
+        <p className="eyebrow flex items-center gap-1.5">
+          <Link2 className="h-3 w-3" /> Portal journey
+        </p>
+        <h3 className="display-title mt-1 text-base sm:text-lg">Portal link vs confirmed completion</h3>
+        <p className="mt-1.5 text-sm leading-6 text-slate-600">
+          Portal link delivery is diagnostic only. Portal completion requires a confirmed
+          completion event — link delivery never counts toward completion.
         </p>
       </header>
       <div className="mt-4 grid gap-3 md:grid-cols-2">

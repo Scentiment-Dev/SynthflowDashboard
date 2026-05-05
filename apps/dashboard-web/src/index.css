@@ -1,16 +1,237 @@
 @import "tailwindcss";
 
 :root {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #0f172a;
-  background: #f8fafc;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', ui-monospace, Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --surface-canvas: #f4f5fb;
+  --surface-canvas-strong: #eceefb;
+  --surface-card: #ffffff;
+  --surface-elevated: #ffffff;
+  --surface-ink: #0b0f1f;
+
+  --ink-primary: #0b1220;
+  --ink-secondary: #475569;
+  --ink-muted: #64748b;
+  --ink-soft: #94a3b8;
+
+  --brand-violet: #5b51d8;
+  --brand-violet-soft: #ede9fe;
+  --brand-indigo: #4338ca;
+  --brand-cyan: #0ea5e9;
+  --brand-amber: #d97706;
+  --brand-rose: #e11d48;
+  --brand-emerald: #047857;
+
+  --hairline: rgba(15, 23, 42, 0.08);
+  --hairline-strong: rgba(15, 23, 42, 0.14);
+
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -12px rgba(15, 23, 42, 0.12);
+  --shadow-elevated: 0 1px 2px rgba(15, 23, 42, 0.06), 0 24px 48px -24px rgba(15, 23, 42, 0.32);
+  --shadow-floating: 0 1px 2px rgba(15, 23, 42, 0.06), 0 32px 64px -28px rgba(15, 23, 42, 0.4);
+
+  font-family: var(--font-sans);
+  color: var(--ink-primary);
+  background: var(--surface-canvas);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
 }
 
-* { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; }
-button, select { font: inherit; }
-::selection { background: #cbd5e1; }
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(1100px 620px at 14% -8%, rgba(99, 102, 241, 0.12), transparent 60%),
+    radial-gradient(900px 540px at 110% 8%, rgba(14, 165, 233, 0.1), transparent 55%),
+    radial-gradient(900px 700px at 50% 110%, rgba(217, 70, 239, 0.06), transparent 55%),
+    var(--surface-canvas);
+  background-attachment: fixed;
+}
+
+button,
+select,
+input,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(91, 81, 216, 0.22);
+  color: var(--ink-primary);
+}
+
+/* Premium scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.18);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.32);
+  background-clip: padding-box;
+}
+
+/* ---------- Premium design system primitives ---------- */
+
+.surface-card {
+  background-color: var(--surface-card);
+  border: 1px solid var(--hairline);
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  position: relative;
+}
+
+.surface-card-elevated {
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--hairline);
+  border-radius: 24px;
+  box-shadow: var(--shadow-elevated);
+  position: relative;
+}
+
+.surface-card::after,
+.surface-card-elevated::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.surface-ink {
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(99, 102, 241, 0.45), transparent 55%),
+    radial-gradient(140% 140% at 100% 100%, rgba(14, 165, 233, 0.4), transparent 55%),
+    linear-gradient(135deg, #0b0f1f 0%, #131a36 60%, #1f2553 100%);
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.surface-ink::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(60% 50% at 80% 0%, rgba(255, 255, 255, 0.15), transparent 60%);
+  mix-blend-mode: screen;
+}
+
+.surface-grid-overlay {
+  position: relative;
+  isolation: isolate;
+}
+
+.surface-grid-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%);
+  z-index: 0;
+}
+
+.surface-grid-overlay > * {
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.display-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--display-title-color, var(--ink-primary));
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+}
+
+.surface-ink .display-title,
+.surface-ink .metric-value,
+.surface-ink .eyebrow {
+  --display-title-color: #f8fafc;
+  color: inherit;
+}
+
+.metric-value {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--display-title-color, var(--ink-primary));
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.005em;
+}
+
+/* Subtle hover lift used on premium cards */
+.lift-on-hover {
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+.lift-on-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevated);
+}
+
+/* Fine pulsing dot used in status pills */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+.pulse-dot {
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+/* Ambient glow used in executive hero band */
+@keyframes drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(20px, -12px, 0); }
+}
+@layer components {
+  .ambient-glow {
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    border-radius: 999px;
+    filter: blur(72px);
+    opacity: 0.55;
+    animation: drift 14s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
+

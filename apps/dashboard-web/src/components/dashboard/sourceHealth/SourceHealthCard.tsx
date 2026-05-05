@@ -54,7 +54,7 @@ export default function SourceHealthCard({ source }: { source: SourceHealthEntry
   return (
     <article
       data-testid={`source-health-card-${source.source_system}`}
-      className={`flex h-full flex-col gap-4 rounded-2xl border-l-8 ${SYSTEM_ACCENT[source.source_system]} border-y border-r border-slate-200 bg-white p-5 shadow-sm`}
+      className={`lift-on-hover flex h-full flex-col gap-4 rounded-2xl border-l-8 ${SYSTEM_ACCENT[source.source_system]} border-y border-r border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_-12px_rgba(15,23,42,0.12)]`}
     >
       <header className="flex items-start justify-between gap-3">
         <div>
