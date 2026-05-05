@@ -9,6 +9,7 @@ from app.schemas.source_truth import (
     SubscriptionOutcomeValidationRequest,
 )
 from app.schemas.subscription import (
+    BusinessValueState,
     DataQualityStatus,
     FreshnessStatus,
     MetricSeverity,
@@ -25,6 +26,9 @@ from app.schemas.subscription import (
     SubscriptionActionConfirmationResponse,
     SubscriptionAnalyticsMetricMetadata,
     SubscriptionAnalyticsResponse,
+    SubscriptionBusinessValueMetadata,
+    SubscriptionBusinessValueMetric,
+    SubscriptionBusinessValueResponse,
     SubscriptionOverviewMetrics,
     SubscriptionSourceHealthMetadata,
     SubscriptionSourceHealthResponse,
@@ -125,6 +129,29 @@ class SubscriptionOutcomeRecordFixture(TypedDict):
 
 class SubscriptionOutcomeScenarioFixture(TypedDict):
     records: list[SubscriptionOutcomeRecordFixture]
+    freshness_status: FreshnessStatus
+    timestamp: str
+    filters: dict[str, object]
+    formula_version: str
+    owner: str
+    audit_reference: str
+
+
+class SubscriptionBusinessValueMetricFixture(TypedDict):
+    metric_key: str
+    display_name: str
+    value: float | int | None
+    unit: str
+    state: BusinessValueState
+    formula: str
+    source_of_truth: str
+    data_dependencies: list[str]
+    notes: str | None
+
+
+class SubscriptionBusinessValueScenarioFixture(TypedDict):
+    source_confirmation_status: SourceConfirmationStatus
+    metrics: list[SubscriptionBusinessValueMetricFixture]
     freshness_status: FreshnessStatus
     timestamp: str
     filters: dict[str, object]
@@ -888,6 +915,373 @@ SUBSCRIPTION_OUTCOME_FIXTURES: dict[str, SubscriptionOutcomeScenarioFixture] = {
 }
 
 
+SUBSCRIPTION_BUSINESS_VALUE_FIXTURES: dict[str, SubscriptionBusinessValueScenarioFixture] = {
+    "baseline": {
+        "source_confirmation_status": SourceConfirmationStatus.PENDING,
+        "metrics": [
+            {
+                "metric_key": "net_business_value_impact",
+                "display_name": "Net Business Value Impact",
+                "value": 86540.0,
+                "unit": "usd",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "gross_value_protected - offer_cost - discount_cost - free_shipping_cost + support_cost_avoided",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["stayai_final_state", "shopify_order_value", "offer_costs"],
+                "notes": "Estimated until closed-loop finance attribution is complete.",
+            },
+            {
+                "metric_key": "gross_value_protected",
+                "display_name": "Gross Value Protected",
+                "value": 124300.0,
+                "unit": "usd",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "sum(expected_revenue_saved_before_costs)",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["subscription_ltv_model", "stayai_confirmation"],
+                "notes": None,
+            },
+            {
+                "metric_key": "net_retained_recovered_value",
+                "display_name": "Net Retained / Recovered Value",
+                "value": 80120.0,
+                "unit": "usd",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "confirmed_saved_revenue + estimated_saved_revenue - revenue_leakage_after_save - total_offer_cost",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["retained_subscriptions", "offer_costs", "post_save_churn_window"],
+                "notes": None,
+            },
+            {
+                "metric_key": "confirmed_business_value_impact",
+                "display_name": "Confirmed Business Value Impact",
+                "value": 31890.0,
+                "unit": "usd",
+                "state": BusinessValueState.CONFIRMED,
+                "formula": "confirmed_saved_revenue - confirmed_offer_cost + confirmed_support_cost_avoided",
+                "source_of_truth": "stayai_plus_finance_join",
+                "data_dependencies": ["stayai_final_state", "posted_credit_memo", "support_cost_model"],
+                "notes": None,
+            },
+            {
+                "metric_key": "estimated_business_value_impact",
+                "display_name": "Estimated Business Value Impact",
+                "value": 54650.0,
+                "unit": "usd",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "estimated_saved_revenue - estimated_offer_cost + estimated_support_cost_avoided",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["pending_stayai_confirmation", "ltv_model"],
+                "notes": None,
+            },
+            {
+                "metric_key": "revenue_saved_estimate",
+                "display_name": "Revenue Saved Estimate",
+                "value": 97850.0,
+                "unit": "usd",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "sum(estimated_retained_revenue)",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["retention_model", "subscription_term_projection"],
+                "notes": None,
+            },
+            {
+                "metric_key": "gross_saved_value",
+                "display_name": "Gross Saved Value",
+                "value": 103200.0,
+                "unit": "usd",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "confirmed_saved_revenue + estimated_saved_revenue",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["stayai_final_state", "pending_stayai_confirmation"],
+                "notes": None,
+            },
+            {
+                "metric_key": "confirmed_saved_revenue",
+                "display_name": "Confirmed Saved Revenue",
+                "value": 38950.0,
+                "unit": "usd",
+                "state": BusinessValueState.CONFIRMED,
+                "formula": "sum(saved_revenue where stayai_confirmation_status='confirmed')",
+                "source_of_truth": "stayai_plus_finance_join",
+                "data_dependencies": ["stayai_final_state", "invoice_revenue"],
+                "notes": None,
+            },
+            {
+                "metric_key": "net_saved_revenue",
+                "display_name": "Net Saved Revenue",
+                "value": 74210.0,
+                "unit": "usd",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "gross_saved_value - offer_cost - discount_cost - free_shipping_cost",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["offer_costs"],
+                "notes": None,
+            },
+            {
+                "metric_key": "offer_cost",
+                "display_name": "Offer Cost",
+                "value": 18840.0,
+                "unit": "usd",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "discount_cost + free_shipping_cost + incentive_cost",
+                "source_of_truth": "offer_redemption_ledger",
+                "data_dependencies": ["offer_type", "offer_version", "redemption_events"],
+                "notes": None,
+            },
+            {
+                "metric_key": "discount_cost",
+                "display_name": "Discount Cost",
+                "value": 14600.0,
+                "unit": "usd",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "sum(discount_value_applied)",
+                "source_of_truth": "offer_redemption_ledger",
+                "data_dependencies": ["offer_code_redemption"],
+                "notes": None,
+            },
+            {
+                "metric_key": "free_shipping_cost",
+                "display_name": "Free Shipping Cost",
+                "value": 4240.0,
+                "unit": "usd",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "sum(shipping_subsidy)",
+                "source_of_truth": "shopify_shipping_ledger",
+                "data_dependencies": ["shipping_method", "shipping_charge_override"],
+                "notes": None,
+            },
+            {
+                "metric_key": "revenue_at_risk",
+                "display_name": "Revenue At Risk",
+                "value": 59230.0,
+                "unit": "usd",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "sum(predicted_revenue_for_high_churn_probability)",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["churn_risk_score", "subscription_mrr"],
+                "notes": None,
+            },
+            {
+                "metric_key": "support_cost_avoided",
+                "display_name": "Support Cost Avoided",
+                "value": 12180.0,
+                "unit": "usd",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "contained_calls * cost_per_contained_call",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["containment_events", "cost_model_version"],
+                "notes": None,
+            },
+            {
+                "metric_key": "cost_per_contained_call",
+                "display_name": "Cost per Contained Call",
+                "value": 4.6,
+                "unit": "usd",
+                "state": BusinessValueState.CONFIRMED,
+                "formula": "support_cost_avoided / contained_call_count",
+                "source_of_truth": "finance_ops_model",
+                "data_dependencies": ["contained_call_count", "agent_cost_baseline"],
+                "notes": None,
+            },
+            {
+                "metric_key": "net_value_per_contained_call",
+                "display_name": "Net Value per Contained Call",
+                "value": 27.2,
+                "unit": "usd",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "(net_saved_revenue + support_cost_avoided) / contained_call_count",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["contained_call_count", "offer_costs"],
+                "notes": None,
+            },
+            {
+                "metric_key": "automation_roi",
+                "display_name": "Automation ROI",
+                "value": 2.14,
+                "unit": "ratio",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "(net_saved_revenue + support_cost_avoided) / automation_operating_cost",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["operating_cost", "saved_revenue", "support_cost_avoided"],
+                "notes": None,
+            },
+            {
+                "metric_key": "retention_roi_estimate",
+                "display_name": "Retention ROI Estimate",
+                "value": 1.73,
+                "unit": "ratio",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "net_retained_recovered_value / total_retention_program_cost",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["retention_program_cost", "net_retained_recovered_value"],
+                "notes": None,
+            },
+            {
+                "metric_key": "estimated_churn_prevented_count",
+                "display_name": "Estimated Churn Prevented Count",
+                "value": 372,
+                "unit": "count",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "sum(predicted_saved_subscriptions)",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["churn_model", "save_attempts"],
+                "notes": None,
+            },
+            {
+                "metric_key": "confirmed_churn_prevented_count",
+                "display_name": "Confirmed Churn Prevented Count",
+                "value": 149,
+                "unit": "count",
+                "state": BusinessValueState.CONFIRMED,
+                "formula": "count(stayai_final_state in ['retained','saved','active'])",
+                "source_of_truth": "stayai",
+                "data_dependencies": ["stayai_final_state", "stayai_confirmation_status"],
+                "notes": None,
+            },
+            {
+                "metric_key": "revenue_leakage_after_save",
+                "display_name": "Revenue Leakage After Save",
+                "value": 7620.0,
+                "unit": "usd",
+                "state": BusinessValueState.PENDING,
+                "formula": "sum(saved_then_cancelled_within_window_revenue_loss)",
+                "source_of_truth": "stayai_plus_billing_join",
+                "data_dependencies": ["post_save_window", "billing_events"],
+                "notes": "Pending because the full post-save churn window has not closed.",
+            },
+            {
+                "metric_key": "high_value_churn_risk",
+                "display_name": "High-Value Churn Risk",
+                "value": 67,
+                "unit": "count",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "count(subscriptions where churn_risk_score >= threshold and mrr >= high_value_cutoff)",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["churn_risk_score", "subscription_mrr"],
+                "notes": None,
+            },
+            {
+                "metric_key": "cost_too_high_funnel_sequence_metrics",
+                "display_name": "Cost Too High Funnel Sequence Metrics",
+                "value": None,
+                "unit": "json_bundle",
+                "state": BusinessValueState.BLOCKED_BY_DATA,
+                "formula": "requires ordered frequency_change -> discount_offer -> final_outcome sequence",
+                "source_of_truth": "synthflow_plus_stayai_sequence_join",
+                "data_dependencies": ["offer_type", "offer_version", "sequence_event_order"],
+                "notes": "Bundle metric blocked until offer version joins are complete.",
+            },
+            {
+                "metric_key": "frequency_change_completion_rate",
+                "display_name": "Frequency Change Completion Rate",
+                "value": 0.42,
+                "unit": "rate",
+                "state": BusinessValueState.PENDING,
+                "formula": "completed_frequency_change / requested_frequency_change",
+                "source_of_truth": "stayai",
+                "data_dependencies": ["action_type=frequency_change", "stayai_confirmation_status"],
+                "notes": "Pending while confirmation coverage is below policy threshold.",
+            },
+            {
+                "metric_key": "skip_completion_rate",
+                "display_name": "Skip Completion Rate",
+                "value": 0.47,
+                "unit": "rate",
+                "state": BusinessValueState.PENDING,
+                "formula": "completed_skip / requested_skip",
+                "source_of_truth": "stayai",
+                "data_dependencies": ["action_type=skip", "stayai_confirmation_status"],
+                "notes": None,
+            },
+            {
+                "metric_key": "pause_completion_rate",
+                "display_name": "Pause Completion Rate",
+                "value": 0.38,
+                "unit": "rate",
+                "state": BusinessValueState.PENDING,
+                "formula": "completed_pause / requested_pause",
+                "source_of_truth": "stayai",
+                "data_dependencies": ["action_type=pause", "stayai_confirmation_status"],
+                "notes": None,
+            },
+            {
+                "metric_key": "portal_completion_rate",
+                "display_name": "Portal Completion Rate",
+                "value": 0.61,
+                "unit": "rate",
+                "state": BusinessValueState.PENDING,
+                "formula": "portal_completion_confirmed_total / portal_link_sent_total",
+                "source_of_truth": "portal_and_stayai",
+                "data_dependencies": ["portal_completion_event", "confirmed_completion_event_id"],
+                "notes": None,
+            },
+            {
+                "metric_key": "true_subscription_containment_rate",
+                "display_name": "True Subscription Containment Rate",
+                "value": 0.58,
+                "unit": "rate",
+                "state": BusinessValueState.ESTIMATED,
+                "formula": "contained_without_repeat_contact / eligible_subscription_contacts",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["repeat_contact_flag", "final_outcome_confirmation"],
+                "notes": None,
+            },
+            {
+                "metric_key": "stay_ai_confirmation_coverage",
+                "display_name": "Stay.ai Confirmation Coverage",
+                "value": 0.71,
+                "unit": "rate",
+                "state": BusinessValueState.CONFIRMED,
+                "formula": "confirmed_records / records_requiring_confirmation",
+                "source_of_truth": "stayai",
+                "data_dependencies": ["stayai_confirmation_status"],
+                "notes": None,
+            },
+        ],
+        "freshness_status": FreshnessStatus.STALE,
+        "timestamp": "2026-05-05T21:00:00Z",
+        "filters": {"date_range": "last_30_days", "module": "subscriptions"},
+        "formula_version": "v0.7.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-business-value-baseline-20260505",
+    },
+    "missing_source_confirmations": {
+        "source_confirmation_status": SourceConfirmationStatus.MISSING,
+        "metrics": [
+            {
+                "metric_key": "net_business_value_impact",
+                "display_name": "Net Business Value Impact",
+                "value": None,
+                "unit": "usd",
+                "state": BusinessValueState.BLOCKED_BY_DATA,
+                "formula": "gross_value_protected - total_offer_cost + support_cost_avoided",
+                "source_of_truth": "warehouse_analytics",
+                "data_dependencies": ["stayai_final_state", "offer_costs"],
+                "notes": "Blocked because Stay.ai final-state confirmations are missing.",
+            },
+            {
+                "metric_key": "stay_ai_confirmation_coverage",
+                "display_name": "Stay.ai Confirmation Coverage",
+                "value": 0.0,
+                "unit": "rate",
+                "state": BusinessValueState.UNKNOWN,
+                "formula": "confirmed_records / records_requiring_confirmation",
+                "source_of_truth": "stayai",
+                "data_dependencies": ["stayai_confirmation_status"],
+                "notes": "Coverage collapsed in this fixture to exercise blocked reporting paths.",
+            },
+        ],
+        "freshness_status": FreshnessStatus.STALE,
+        "timestamp": "2026-05-05T21:00:00Z",
+        "filters": {"date_range": "last_30_days", "module": "subscriptions"},
+        "formula_version": "v0.7.0",
+        "owner": "analytics",
+        "audit_reference": "audit-subscription-business-value-missing-confirmation-20260505",
+    },
+}
+
+
 def _calculate_trust_label(source_confirmation: SourceConfirmationMetrics) -> TrustLabel:
     if (
         source_confirmation.source_confirmation_status == SourceConfirmationStatus.MISSING
@@ -1090,6 +1484,20 @@ def _source_health_fingerprint(
             source.model_dump(mode="json", exclude={"presentation"})
             for source in sources
         ],
+    }
+    return sha256(dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
+
+
+def _business_value_fingerprint(
+    *,
+    scenario: str,
+    metrics: list[SubscriptionBusinessValueMetric],
+    formula_version: str,
+) -> str:
+    payload = {
+        "scenario": scenario,
+        "formula_version": formula_version,
+        "metrics": [metric.model_dump(mode="json") for metric in metrics],
     }
     return sha256(dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
 
@@ -1366,6 +1774,67 @@ def get_subscription_outcomes(scenario: str = "baseline") -> SubscriptionOutcome
         source_confirmation_status=source_confirmation_status,
         scenario=effective_scenario,
         metrics=metrics,
+        metadata=metadata,
+    )
+
+
+def get_subscription_business_value(
+    scenario: str = "baseline",
+) -> SubscriptionBusinessValueResponse:
+    effective_scenario = (
+        scenario if scenario in SUBSCRIPTION_BUSINESS_VALUE_FIXTURES else "baseline"
+    )
+    fixture = SUBSCRIPTION_BUSINESS_VALUE_FIXTURES[effective_scenario]
+    metric_models = [
+        SubscriptionBusinessValueMetric(**metric) for metric in fixture["metrics"]
+    ]
+    blocked_metrics_count = sum(
+        1
+        for metric in metric_models
+        if metric.state in {BusinessValueState.BLOCKED_BY_DATA, BusinessValueState.UNKNOWN}
+    )
+    source_confirmation_status = fixture["source_confirmation_status"]
+    if source_confirmation_status == SourceConfirmationStatus.MISSING:
+        trust_label = TrustLabel.LOW
+    elif blocked_metrics_count > 0 or source_confirmation_status == SourceConfirmationStatus.PENDING:
+        trust_label = TrustLabel.MEDIUM
+    else:
+        trust_label = TrustLabel.HIGH
+    metadata = SubscriptionBusinessValueMetadata(
+        metric_id="subscription_business_value_summary",
+        filters=fixture["filters"],
+        trust_label=trust_label,
+        freshness_status=fixture["freshness_status"],
+        formula_version=fixture["formula_version"],
+        owner=fixture["owner"],
+        timestamp=fixture["timestamp"],
+        fingerprint=_business_value_fingerprint(
+            scenario=effective_scenario,
+            metrics=metric_models,
+            formula_version=fixture["formula_version"],
+        ),
+        audit_reference=fixture["audit_reference"],
+        blocked_metrics_count=blocked_metrics_count,
+        source_confirmation_status=source_confirmation_status,
+        presentation=_metric_presentation(
+            display_label="Subscription Business Value",
+            short_label="Business Value",
+            executive_summary=(
+                "Business-value metrics separate confirmed, estimated, pending, unknown, and blocked states "
+                "to avoid overstating financial impact."
+            ),
+            format_type="metric_list",
+            unit="mixed",
+            metric_trust_label=trust_label,
+            source_confirmation_status=source_confirmation_status,
+            freshness_status=fixture["freshness_status"],
+            drilldown_hint="Review metric states and notes before aggregating into executive ROI claims.",
+        ),
+    )
+    return SubscriptionBusinessValueResponse(
+        source_confirmation_status=source_confirmation_status,
+        scenario=effective_scenario,
+        metrics=metric_models,
         metadata=metadata,
     )
 

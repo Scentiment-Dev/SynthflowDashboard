@@ -22,6 +22,7 @@ EXAMPLE_BY_SCHEMA = {
     "portal_completion_event.schema.json": "portal_completion_event.example.json",
     "subscription_analytics_response.schema.json": "subscription_analytics_response.example.json",
     "subscription_outcomes_response.schema.json": "subscription_outcomes_response.example.json",
+    "subscription_business_value_response.schema.json": "subscription_business_value_response.example.json",
     "subscription_source_health.schema.json": "subscription_source_health.example.json",
 }
 

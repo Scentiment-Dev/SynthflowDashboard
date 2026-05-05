@@ -1,0 +1,76 @@
+{
+  "module": "subscriptions",
+  "generated_from_fixture": true,
+  "source_of_truth_system": "stayai",
+  "source_confirmation_status": "pending",
+  "scenario": "baseline",
+  "metrics": [
+    {
+      "metric_key": "net_business_value_impact",
+      "display_name": "Net Business Value Impact",
+      "value": 86540.0,
+      "unit": "usd",
+      "state": "estimated",
+      "formula": "gross_value_protected - offer_cost - discount_cost - free_shipping_cost + support_cost_avoided",
+      "source_of_truth": "warehouse_analytics",
+      "data_dependencies": ["stayai_final_state", "shopify_order_value", "offer_costs"],
+      "notes": "Estimated until closed-loop finance attribution is complete."
+    },
+    {
+      "metric_key": "confirmed_business_value_impact",
+      "display_name": "Confirmed Business Value Impact",
+      "value": 31890.0,
+      "unit": "usd",
+      "state": "confirmed",
+      "formula": "confirmed_saved_revenue - confirmed_offer_cost + confirmed_support_cost_avoided",
+      "source_of_truth": "stayai_plus_finance_join",
+      "data_dependencies": ["stayai_final_state", "posted_credit_memo", "support_cost_model"],
+      "notes": null
+    },
+    {
+      "metric_key": "cost_too_high_funnel_sequence_metrics",
+      "display_name": "Cost Too High Funnel Sequence Metrics",
+      "value": null,
+      "unit": "json_bundle",
+      "state": "blocked_by_data",
+      "formula": "requires ordered frequency_change -> discount_offer -> final_outcome sequence",
+      "source_of_truth": "synthflow_plus_stayai_sequence_join",
+      "data_dependencies": ["offer_type", "offer_version", "sequence_event_order"],
+      "notes": "Bundle metric blocked until offer version joins are complete."
+    }
+  ],
+  "metadata": {
+    "metric_id": "subscription_business_value_summary",
+    "filters": {
+      "date_range": "last_30_days",
+      "module": "subscriptions"
+    },
+    "trust_label": "medium",
+    "freshness_status": "stale",
+    "formula_version": "v0.7.0",
+    "owner": "analytics",
+    "timestamp": "2026-05-05T21:00:00Z",
+    "fingerprint": "example-fingerprint-subscription-business-value",
+    "audit_reference": "audit-subscription-business-value-baseline-20260505",
+    "blocked_metrics_count": 1,
+    "source_confirmation_status": "pending",
+    "presentation": {
+      "display_label": "Subscription Business Value",
+      "short_label": "Business Value",
+      "executive_summary": "Business-value metrics separate confirmed, estimated, pending, unknown, and blocked states to avoid overstating financial impact.",
+      "format_type": "metric_list",
+      "unit": "mixed",
+      "trend_direction": "unknown",
+      "comparison_label": "Comparison baseline unavailable in fixture preview",
+      "comparison_value": null,
+      "severity": "warning",
+      "visual_tone": "caution",
+      "source_authority_explanation": "Stay.ai is the source of truth for final subscription state and outcome confirmation.",
+      "trust_explanation": "Trust is medium because some records are still pending Stay.ai confirmation.",
+      "freshness_explanation": "Data is stale and may lag behind recent subscription changes.",
+      "drilldown_hint": "Review metric states and notes before aggregating into executive ROI claims.",
+      "empty_state_copy": "No eligible records were available for this calculation window.",
+      "blocked_state_copy": "This metric is blocked until Stay.ai confirmation records are available."
+    }
+  }
+}
