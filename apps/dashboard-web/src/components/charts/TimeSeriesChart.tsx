@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { CartesianGrid, Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { ArrowUpRight, LineChart as LineChartIcon } from 'lucide-react';
 import type { MetricSeriesPoint } from '../../types/metrics';
@@ -11,6 +12,9 @@ export default function TimeSeriesChart({
   description?: string;
   data: MetricSeriesPoint[];
 }) {
+  const reactId = useId();
+  const fillId = `trendFill-${reactId}`;
+  const strokeId = `trendStroke-${reactId}`;
   const last = data[data.length - 1]?.value ?? null;
   const first = data[0]?.value ?? null;
   const delta =
@@ -54,11 +58,11 @@ export default function TimeSeriesChart({
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
             <defs>
-              <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#7c3aed" stopOpacity={0.35} />
                 <stop offset="100%" stopColor="#7c3aed" stopOpacity={0.02} />
               </linearGradient>
-              <linearGradient id="trendStroke" x1="0" y1="0" x2="1" y2="0">
+              <linearGradient id={strokeId} x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="#7c3aed" />
                 <stop offset="100%" stopColor="#06b6d4" />
               </linearGradient>
@@ -94,9 +98,9 @@ export default function TimeSeriesChart({
             <Area
               type="monotone"
               dataKey="value"
-              stroke="url(#trendStroke)"
+              stroke={`url(#${strokeId})`}
               strokeWidth={2.5}
-              fill="url(#trendFill)"
+              fill={`url(#${fillId})`}
               dot={{ r: 2.5, stroke: '#7c3aed', strokeWidth: 2, fill: '#fff' }}
               activeDot={{ r: 5, stroke: '#7c3aed', strokeWidth: 2, fill: '#fff' }}
             />

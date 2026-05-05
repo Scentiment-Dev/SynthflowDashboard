@@ -13,7 +13,7 @@ export default function FunnelChart({
   description?: string;
   steps: FunnelStep[];
 }) {
-  const topCount = steps.reduce((acc, step) => Math.max(acc, step.count), 0);
+  const topCount = steps.length > 0 ? steps[0].count : 0;
   const headlineRate = steps.length > 0 ? steps[steps.length - 1].rate : 0;
 
   return (
