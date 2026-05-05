@@ -84,7 +84,7 @@ export default function TimeSeriesChart({
                 color: '#0f172a',
               }}
               labelStyle={{ color: '#475569', fontSize: 11, fontWeight: 600 }}
-              formatter={(value) => [`${Number(value ?? 0).toLocaleString()}`, 'Value']}
+              formatter={(value) => [`${Number(value).toLocaleString()}`, 'Value']}
             />
             <Area
               type="monotone"

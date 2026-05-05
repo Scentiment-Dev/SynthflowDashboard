@@ -38,7 +38,6 @@ export default function Sidebar() {
       <nav aria-label="Primary" className="mt-6 flex-1 space-y-5 overflow-y-auto pr-1">
         {NAV_GROUPS.map((group) => {
           const items = NAV_ITEMS.filter((item) => group.modules.includes(item.module));
-          if (items.length === 0) return null;
           return (
             <div key={group.label}>
               <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-400">

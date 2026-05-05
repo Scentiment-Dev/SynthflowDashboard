@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import FunnelChart from '../components/charts/FunnelChart';
 import JourneyFlowChart from '../components/charts/JourneyFlowChart';
@@ -7,9 +7,14 @@ import TimeSeriesChart from '../components/charts/TimeSeriesChart';
 import ModuleHeader from '../components/dashboard/ModuleHeader';
 import ExportReadinessPanel from '../components/dashboard/ExportReadinessPanel';
 import MetricDefinitionPanel from '../components/dashboard/MetricDefinitionPanel';
+import SubscriptionOutcomeKpiGrid from '../components/dashboard/subscriptionOutcomes/SubscriptionOutcomeKpiGrid';
 import SectionHeader from '../components/design/SectionHeader';
+import Sidebar from '../components/navigation/Sidebar';
 import Topbar from '../components/navigation/Topbar';
-import { DashboardFilterProvider } from '../context/DashboardFilterContext';
+import {
+  DashboardFilterProvider,
+  useDashboardFilters,
+} from '../context/DashboardFilterContext';
 import {
   formatMetricValue,
   formatPercent,
@@ -261,5 +266,82 @@ describe('branch coverage for dashboard UI helpers', () => {
     const { unmount: unmount2 } = renderRoute('/some-unknown-route');
     expect(screen.getByRole('heading', { name: /Phone Support Analytics/i })).toBeInTheDocument();
     unmount2();
+  });
+
+  it('covers Topbar filter-label fallbacks for live_agent platform and order_status segment', () => {
+    let setPlatform: ((value: 'live_agent') => void) | null = null;
+    let setSegment: ((value: 'order_status') => void) | null = null;
+
+    function FilterDriver() {
+      const filters = useDashboardFilters();
+      setPlatform = (value) => filters.setPlatform(value);
+      setSegment = (value) => filters.setSegment(value);
+      return null;
+    }
+
+    render(
+      <DashboardFilterProvider>
+        <MemoryRouter initialEntries={['/overview']}>
+          <Routes>
+            <Route
+              path="*"
+              element={
+                <>
+                  <FilterDriver />
+                  <Topbar />
+                </>
+              }
+            />
+          </Routes>
+        </MemoryRouter>
+      </DashboardFilterProvider>,
+    );
+
+    act(() => {
+      setPlatform?.('live_agent');
+      setSegment?.('order_status');
+    });
+
+    expect(screen.getByText(/^live_agent$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^order_status$/i)).toBeInTheDocument();
+  });
+
+  it('covers SubscriptionOutcomeKpiGrid totalForShare fallback when subscription_contacts_total is missing', () => {
+    render(
+      <SubscriptionOutcomeKpiGrid
+        cards={[
+          {
+            id: 'subscription_contacts_cancellation',
+            label: 'Cancellation contacts',
+            value: 0,
+            tone: 'cancellation',
+            authority: 'Stay.ai',
+            isFinalAuthority: true,
+            helper: 'Confirmed cancellation outcomes only.',
+          },
+        ]}
+        rateCards={[]}
+      />,
+    );
+
+    expect(screen.getByTestId('outcome-kpi-subscription_contacts_cancellation')).toBeInTheDocument();
+    expect(screen.queryByText(/of subscription contacts/i)).not.toBeInTheDocument();
+  });
+
+  it('renders Sidebar with priority badge active and inactive states', () => {
+    const { unmount } = render(
+      <MemoryRouter initialEntries={['/subscriptions']}>
+        <Sidebar />
+      </MemoryRouter>,
+    );
+    expect(screen.getAllByText(/Priority/i).length).toBeGreaterThan(0);
+    unmount();
+
+    render(
+      <MemoryRouter initialEntries={['/overview']}>
+        <Sidebar />
+      </MemoryRouter>,
+    );
+    expect(screen.getAllByText(/Priority/i).length).toBeGreaterThan(0);
   });
 });
