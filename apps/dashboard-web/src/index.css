@@ -222,15 +222,16 @@ textarea {
   0%, 100% { transform: translate3d(0, 0, 0); }
   50% { transform: translate3d(20px, -12px, 0); }
 }
-.ambient-glow {
-  position: absolute;
-  inset: auto;
-  width: 380px;
-  height: 380px;
-  border-radius: 999px;
-  filter: blur(72px);
-  opacity: 0.55;
-  animation: drift 14s ease-in-out infinite;
-  pointer-events: none;
+@layer components {
+  .ambient-glow {
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    border-radius: 999px;
+    filter: blur(72px);
+    opacity: 0.55;
+    animation: drift 14s ease-in-out infinite;
+    pointer-events: none;
+  }
 }
 

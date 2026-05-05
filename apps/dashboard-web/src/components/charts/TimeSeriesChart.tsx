@@ -19,11 +19,11 @@ export default function TimeSeriesChart({
   const first = data[0]?.value ?? null;
   const delta =
     last !== null && first !== null && first !== 0 ? ((last - first) / first) * 100 : null;
-  const deltaDisplay = delta !== null ? `${delta >= 0 ? '+' : ''}${delta.toFixed(1)}%` : '—';
+  const deltaDisplay = delta !== null ? `${delta > 0 ? '+' : ''}${delta.toFixed(1)}%` : '—';
   const deltaTone =
-    delta === null
+    delta === null || delta === 0
       ? 'text-slate-600 bg-slate-50 ring-slate-200'
-      : delta >= 0
+      : delta > 0
         ? 'text-emerald-700 bg-emerald-50 ring-emerald-200'
         : 'text-rose-700 bg-rose-50 ring-rose-200';
 
@@ -49,9 +49,9 @@ export default function TimeSeriesChart({
           <span
             className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${deltaTone}`}
           >
-            {delta === null ? (
+            {delta === null || delta === 0 ? (
               <Minus className="h-3 w-3" />
-            ) : delta >= 0 ? (
+            ) : delta > 0 ? (
               <ArrowUpRight className="h-3 w-3" />
             ) : (
               <ArrowDownRight className="h-3 w-3" />
