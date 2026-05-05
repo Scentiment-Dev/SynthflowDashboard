@@ -118,6 +118,10 @@
 
 ## PR / Check Status
 
+- Agent C governance PR:
+  - PR `#22` `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/22`
+  - state: `OPEN`
+  - required checks: all pass (`Cursor Bugbot`, `Coverage and Codecov Upload`, `backend-tests / backend`, `frontend-tests / frontend`, and supporting CI checks)
 - Reviewed implementation PRs:
   - PR `#20` `[Wave 01][Cycle 005][Agent A] Subscription outcome metrics backend`:
     - state: `MERGED`
