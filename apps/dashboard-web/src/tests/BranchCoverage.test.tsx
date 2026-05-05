@@ -311,7 +311,7 @@ describe('branch coverage for dashboard UI helpers', () => {
       <SubscriptionOutcomeKpiGrid
         cards={[
           {
-            id: 'subscription_contacts_cancellation',
+            id: 'cancellation_requests_total',
             label: 'Cancellation contacts',
             value: 0,
             tone: 'cancellation',
@@ -324,7 +324,7 @@ describe('branch coverage for dashboard UI helpers', () => {
       />,
     );
 
-    expect(screen.getByTestId('outcome-kpi-subscription_contacts_cancellation')).toBeInTheDocument();
+    expect(screen.getByTestId('outcome-kpi-cancellation_requests_total')).toBeInTheDocument();
     expect(screen.queryByText(/of subscription contacts/i)).not.toBeInTheDocument();
   });
 
