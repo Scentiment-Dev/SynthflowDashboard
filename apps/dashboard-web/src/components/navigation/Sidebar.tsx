@@ -1,8 +1,9 @@
 import { NavLink } from 'react-router-dom';
 import { Activity, ShieldCheck, Sparkles } from 'lucide-react';
 import { NAV_ITEMS } from '../../constants/navigation';
+import type { DashboardModule } from '../../types/metrics';
 
-const NAV_GROUPS: Array<{ label: string; modules: string[] }> = [
+const NAV_GROUPS: Array<{ label: string; modules: DashboardModule[] }> = [
   { label: 'Customer outcomes', modules: ['overview', 'subscriptions', 'cancellations', 'retention'] },
   { label: 'Operations', modules: ['order_status', 'escalations'] },
   { label: 'Trust & governance', modules: ['data_quality', 'governance'] },
@@ -10,7 +11,7 @@ const NAV_GROUPS: Array<{ label: string; modules: string[] }> = [
 
 export default function Sidebar() {
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-slate-200/80 bg-white/80 px-4 py-5 backdrop-blur-xl md:flex md:flex-col">
+    <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-slate-200/80 bg-white/80 px-4 py-5 backdrop-blur-xl lg:flex lg:flex-col">
       <div className="surface-ink relative px-5 py-5">
         <span className="ambient-glow -left-12 -top-16 bg-violet-500/40" />
         <span className="ambient-glow -bottom-20 -right-10 bg-cyan-400/30" style={{ animationDelay: '-6s' }} />
