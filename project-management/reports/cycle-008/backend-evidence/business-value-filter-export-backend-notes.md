@@ -36,4 +36,4 @@
 
 ## Remaining blockers
 
-- None for Agent A backend lane; Codecov is passing and Bugbot is non-blocking (`skipping`) on PR #30.
+- None for Agent A backend lane; Bugbot and Codecov are passing on PR #30.
