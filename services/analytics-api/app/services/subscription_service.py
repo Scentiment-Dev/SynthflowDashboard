@@ -2366,7 +2366,8 @@ def get_subscription_export_preflight(
     role_permissions: dict[str, set[SubscriptionExportScope]] = {
         "admin": set(SubscriptionExportScope),
         "analyst": set(SubscriptionExportScope),
-        "compliance_manager": set(SubscriptionExportScope),
+        # Compliance manager cannot reach this route without READ_SUBSCRIPTIONS.
+        "compliance_manager": set(),
         "support_lead": {
             SubscriptionExportScope.EXPORT_TABLE_ROWS,
             SubscriptionExportScope.EXPORT_FILTERED_CSV,
