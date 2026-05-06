@@ -26,6 +26,7 @@ def test_cycle001_foundation_routes_and_permissions(client: TestClient) -> None:
     assert client.get("/metrics/modules").status_code == 200
     assert client.get("/metrics/subscription_save_rate/series").status_code == 200
     assert client.get("/subscriptions/summary").status_code == 200
+    assert client.get("/subscriptions/business-value").status_code == 200
     assert client.get("/cancellations/summary").status_code == 200
     assert client.get("/retention/summary").status_code == 200
     assert client.get("/order-status/summary").status_code == 200

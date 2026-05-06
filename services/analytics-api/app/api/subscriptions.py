@@ -4,6 +4,7 @@ from app.api.dependencies import require_api_permission
 from app.core.security import Permission, UserContext
 from app.schemas.source_truth import PortalSuccessValidationRequest, SourceTruthDecision
 from app.schemas.subscription import (
+    SubscriptionBusinessValueResponse,
     SourceSystem,
     SubscriptionActionConfirmationRequest,
     SubscriptionActionConfirmationResponse,
@@ -14,6 +15,7 @@ from app.schemas.subscription import (
 )
 from app.services.subscription_service import (
     confirm_subscription_action,
+    get_subscription_business_value,
     get_subscription_analytics,
     get_subscription_outcomes,
     get_subscription_source_health,
@@ -45,6 +47,14 @@ def outcomes(
     _: UserContext = Depends(require_api_permission(Permission.READ_SUBSCRIPTIONS)),
 ) -> SubscriptionOutcomesResponse:
     return get_subscription_outcomes(scenario)
+
+
+@router.get("/business-value", response_model=SubscriptionBusinessValueResponse)
+def business_value(
+    scenario: str = "baseline",
+    _: UserContext = Depends(require_api_permission(Permission.READ_SUBSCRIPTIONS)),
+) -> SubscriptionBusinessValueResponse:
+    return get_subscription_business_value(scenario)
 
 
 @router.get("/source-health", response_model=SubscriptionSourceHealthResponse)

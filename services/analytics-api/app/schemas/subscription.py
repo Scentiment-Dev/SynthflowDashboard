@@ -192,6 +192,51 @@ class SubscriptionOutcomeActionType(StrEnum):
     OTHER = "other"
 
 
+class BusinessValueState(StrEnum):
+    CONFIRMED = "confirmed"
+    ESTIMATED = "estimated"
+    UNKNOWN = "unknown"
+    PENDING = "pending"
+    BLOCKED_BY_DATA = "blocked_by_data"
+
+
+class SubscriptionBusinessValueMetric(BaseModel):
+    metric_key: str
+    display_name: str
+    value: float | int | None
+    unit: str
+    state: BusinessValueState
+    formula: str
+    source_of_truth: str
+    data_dependencies: list[str] = Field(default_factory=list)
+    notes: str | None = None
+
+
+class SubscriptionBusinessValueMetadata(BaseModel):
+    metric_id: str
+    filters: dict[str, object]
+    trust_label: TrustLabel
+    freshness_status: FreshnessStatus
+    formula_version: str
+    owner: str
+    timestamp: str
+    fingerprint: str
+    audit_reference: str
+    blocked_metrics_count: int
+    source_confirmation_status: SourceConfirmationStatus
+    presentation: PresentationMetadata
+
+
+class SubscriptionBusinessValueResponse(BaseModel):
+    module: str = "subscriptions"
+    generated_from_fixture: bool = True
+    source_of_truth_system: str = "stayai"
+    source_confirmation_status: SourceConfirmationStatus
+    scenario: str
+    metrics: list[SubscriptionBusinessValueMetric]
+    metadata: SubscriptionBusinessValueMetadata
+
+
 class SubscriptionOutcomeMetricMetadata(BaseModel):
     metric_id: str
     filters: dict[str, object]

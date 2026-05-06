@@ -13,3 +13,7 @@ Cycle 002 expands the subscription analytics response contract to support a dash
 vertical slice with deterministic overview counts, source confirmation status, synthflow journey
 status breakdown, and export/audit metadata fields (filters, metric definitions, trust/freshness,
 formula version, owner, timestamp, fingerprint, and audit reference).
+
+Cycle 007 adds a fixture-backed `subscription_business_value_response` contract for
+`GET /subscriptions/business-value`, explicitly distinguishing confirmed, estimated, pending,
+unknown, and blocked-by-data business-value states.

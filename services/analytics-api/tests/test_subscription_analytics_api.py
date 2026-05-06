@@ -245,6 +245,51 @@ def test_subscription_source_health_source_rows_include_presentation_metadata(cl
             assert field in source["presentation"]
 
 
+def test_subscription_business_value_contract_exposes_stateful_metrics(client: TestClient) -> None:
+    response = client.get("/subscriptions/business-value")
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["module"] == "subscriptions"
+    assert payload["source_of_truth_system"] == "stayai"
+    assert payload["scenario"] == "baseline"
+    assert payload["source_confirmation_status"] == "pending"
+    assert payload["metadata"]["metric_id"] == "subscription_business_value_summary"
+    assert payload["metadata"]["blocked_metrics_count"] == 1
+    assert payload["metadata"]["trust_label"] == "medium"
+    assert payload["metrics"]
+    states = {metric["state"] for metric in payload["metrics"]}
+    assert {"confirmed", "estimated", "pending", "blocked_by_data"}.issubset(states)
+
+
+def test_subscription_business_value_missing_confirmation_degrades_trust(client: TestClient) -> None:
+    response = client.get(
+        "/subscriptions/business-value",
+        params={"scenario": "missing_source_confirmations"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["source_confirmation_status"] == "missing"
+    assert payload["metadata"]["source_confirmation_status"] == "missing"
+    assert payload["metadata"]["trust_label"] == "low"
+    assert payload["metadata"]["blocked_metrics_count"] == 1
+    net_business_value = next(
+        metric for metric in payload["metrics"] if metric["metric_key"] == "net_business_value_impact"
+    )
+    assert net_business_value["value"] is None
+    assert net_business_value["state"] == "blocked_by_data"
+
+
+def test_subscription_business_value_requires_subscription_permission(client: TestClient) -> None:
+    response = client.get(
+        "/subscriptions/business-value",
+        headers={"x-scentiment-roles": "viewer"},
+    )
+    assert response.status_code == 403
+    assert "Explicit deny" in response.json()["detail"]
+
+
 def test_source_health_fingerprint_is_stable_under_presentation_copy_change(
     client: TestClient,
     monkeypatch,
