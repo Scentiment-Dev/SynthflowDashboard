@@ -336,6 +336,25 @@ def test_subscription_business_value_confirmed_and_estimated_and_pending_and_blo
     assert {"confirmed", "estimated", "pending", "blocked_by_data"}.issubset(states)
 
 
+def test_subscription_business_value_source_confirmation_status_derived_per_metric(
+    client: TestClient,
+) -> None:
+    response = client.get("/subscriptions/business-value")
+    assert response.status_code == 200
+    metrics = {
+        metric["metric_id"]: metric
+        for metric in response.json()["metrics"]
+    }
+    assert (
+        metrics["confirmed_business_value_impact"]["source_confirmation_status"]
+        == "confirmed"
+    )
+    assert (
+        metrics["cost_too_high_funnel_sequence_metrics"]["source_confirmation_status"]
+        == "missing"
+    )
+
+
 def test_subscription_business_value_revenue_metrics_not_confirmed_without_confirmed_source(
     client: TestClient,
 ) -> None:

@@ -2185,6 +2185,13 @@ def get_subscription_business_value(
             if metric_state in {BusinessValueState.UNKNOWN, BusinessValueState.BLOCKED_BY_DATA}
             else TrustLabel.MEDIUM
         )
+        metric_source_confirmation_status = (
+            SourceConfirmationStatus.CONFIRMED
+            if metric_state == BusinessValueState.CONFIRMED
+            else SourceConfirmationStatus.PENDING
+            if metric_state in {BusinessValueState.ESTIMATED, BusinessValueState.PENDING}
+            else SourceConfirmationStatus.MISSING
+        )
         next_action_hint = (
             "Wait for Stay.ai confirmation and refresh this page."
             if metric_state in {BusinessValueState.PENDING, BusinessValueState.UNKNOWN}
@@ -2201,7 +2208,7 @@ def get_subscription_business_value(
                 value_state=metric_state,
                 format="currency" if metric["unit"] == "usd" else metric["unit"],
                 formula_version=fixture["formula_version"],
-                source_confirmation_status=fixture["source_confirmation_status"],
+                source_confirmation_status=metric_source_confirmation_status,
                 trust_label=metric_trust_label,
                 freshness_status=fixture["freshness_status"],
                 owner=fixture["owner"],
