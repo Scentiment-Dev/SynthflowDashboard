@@ -31,7 +31,6 @@ from app.schemas.subscription import (
     SubscriptionBusinessValueMetadata,
     SubscriptionBusinessValueMetric,
     SubscriptionBusinessValueResponse,
-    SubscriptionExportFormat,
     SubscriptionExportPreflightRequest,
     SubscriptionExportPreflightResponse,
     SubscriptionExportScope,
