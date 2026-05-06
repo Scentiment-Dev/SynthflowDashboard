@@ -145,11 +145,12 @@ def test_cycle001_foundation_mutating_routes(client: TestClient) -> None:
         json={
             "requested_scope": "export_current_page",
             "requested_format": "pdf",
-            "requester_role": "viewer",
+            "requester_role": "admin",
             "filters": {"date_preset": "last_30_days"},
             "comparison_period": "none",
             "included_widgets": ["outcome_funnel"],
         },
+        headers={"x-scentiment-roles": "support_lead"},
     )
     assert export_preflight.status_code == 200
     assert export_preflight.json()["permission_decision"] == "explicit_deny"

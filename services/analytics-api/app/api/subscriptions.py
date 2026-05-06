@@ -75,9 +75,9 @@ def advanced_filters(
 @router.post("/export/preflight", response_model=SubscriptionExportPreflightResponse)
 def export_preflight(
     request: SubscriptionExportPreflightRequest,
-    _: UserContext = Depends(require_api_permission(Permission.READ_SUBSCRIPTIONS)),
+    user: UserContext = Depends(require_api_permission(Permission.READ_SUBSCRIPTIONS)),
 ) -> SubscriptionExportPreflightResponse:
-    return get_subscription_export_preflight(request)
+    return get_subscription_export_preflight(request, authenticated_roles=user.roles)
 
 
 @router.get("/follow-up", response_model=SubscriptionFollowUpResponse)

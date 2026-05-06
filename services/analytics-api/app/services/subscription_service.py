@@ -3,6 +3,7 @@ from json import dumps
 from typing import TypedDict
 from uuid import uuid4
 
+from app.core.security import Role
 from app.schemas.metric import MetricCard, TrustLabel
 from app.schemas.source_truth import (
     PortalSuccessValidationRequest,
@@ -2331,8 +2332,27 @@ def get_subscription_filter_options(
 
 def get_subscription_export_preflight(
     request: SubscriptionExportPreflightRequest,
+    authenticated_roles: list[Role] | None = None,
 ) -> SubscriptionExportPreflightResponse:
-    role = (request.requester_role or "unknown").strip().lower()
+    role_precedence = [
+        Role.ADMIN.value,
+        Role.COMPLIANCE_MANAGER.value,
+        Role.ANALYST.value,
+        Role.SUPPORT_LEAD.value,
+        Role.VIEWER.value,
+    ]
+    normalized_authenticated_roles = [
+        role.value if isinstance(role, Role) else str(role).strip().lower()
+        for role in (authenticated_roles or [])
+    ]
+    role = next(
+        (
+            role_name
+            for role_name in role_precedence
+            if role_name in normalized_authenticated_roles
+        ),
+        "unknown",
+    )
     role_permissions: dict[str, set[SubscriptionExportScope]] = {
         "admin": set(SubscriptionExportScope),
         "analyst": set(SubscriptionExportScope),
@@ -2363,7 +2383,11 @@ def get_subscription_export_preflight(
     trust_labels = ["high", "medium", "low"]
     freshness = "stale"
     formula_versions = ["subscription_outcomes:v0.5.0", "business_value:v0.7.0"]
-    included_widgets = request.included_widgets or ["outcome_funnel", "business_value_headline"]
+    included_widgets = (
+        request.included_widgets
+        if "included_widgets" in request.model_fields_set
+        else ["outcome_funnel", "business_value_headline"]
+    )
     excluded_widgets = [] if export_allowed else included_widgets
     missing_required_metadata: list[str] = []
     if not request.filters:

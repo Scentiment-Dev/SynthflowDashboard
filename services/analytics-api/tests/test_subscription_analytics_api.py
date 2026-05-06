@@ -402,16 +402,18 @@ def test_subscription_export_preflight_denies_unauthorized_role(client: TestClie
         json={
             "requested_scope": "export_current_page",
             "requested_format": "pdf",
-            "requester_role": "viewer",
+            "requester_role": "admin",
             "filters": {"date_preset": "last_30_days"},
             "comparison_period": "previous_period",
             "included_widgets": ["outcome_funnel"],
         },
+        headers={"x-scentiment-roles": "support_lead"},
     )
     assert response.status_code == 200
     payload = response.json()
     assert payload["export_allowed"] is False
     assert payload["permission_decision"] == "explicit_deny"
+    assert payload["requester_role"] == "support_lead"
     assert "cannot export this scope" in payload["blocked_reason"].lower()
 
 
@@ -425,10 +427,11 @@ def test_subscription_export_preflight_denies_missing_role(client: TestClient) -
             "comparison_period": "none",
             "included_widgets": ["outcome_funnel"],
         },
+        headers={"x-scentiment-roles": "support_lead"},
     )
     assert response.status_code == 200
     payload = response.json()
-    assert payload["requester_role"] == "unknown"
+    assert payload["requester_role"] == "support_lead"
     assert payload["permission_decision"] == "explicit_deny"
     assert payload["export_allowed"] is False
 
@@ -444,6 +447,7 @@ def test_subscription_export_preflight_includes_required_manifest_metadata(clien
             "comparison_period": "none",
             "included_widgets": ["follow_up_table"],
         },
+        headers={"x-scentiment-roles": "support_lead"},
     )
     assert response.status_code == 200
     payload = response.json()
@@ -471,6 +475,27 @@ def test_subscription_export_preflight_includes_required_manifest_metadata(clien
     ]
     for field in required_fields:
         assert field in payload
+
+
+def test_subscription_export_preflight_preserves_explicit_empty_included_widgets(
+    client: TestClient,
+) -> None:
+    response = client.post(
+        "/subscriptions/export/preflight",
+        json={
+            "requested_scope": "export_table_rows",
+            "requested_format": "csv",
+            "filters": {"date_preset": "last_30_days"},
+            "comparison_period": "none",
+            "included_widgets": [],
+        },
+        headers={"x-scentiment-roles": "support_lead"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["export_allowed"] is True
+    assert payload["included_widgets"] == []
+    assert payload["excluded_widgets"] == []
 
 
 def test_subscription_follow_up_contract_exposes_actionability_fields(client: TestClient) -> None:
