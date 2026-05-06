@@ -2377,11 +2377,13 @@ def get_subscription_export_preflight(
         "viewer": set(),
         "unknown": set(),
     }
-    allowed_scopes = role_permissions.get(role, set())
+    allowed_scopes: set[SubscriptionExportScope] = set()
+    for authenticated_role in normalized_authenticated_roles:
+        allowed_scopes.update(role_permissions.get(authenticated_role, set()))
     export_allowed = request.requested_scope in allowed_scopes
     blocked_reason = None
     permission_decision = "allow"
-    if requested_role is not None and requested_role != role:
+    if requested_role is not None and requested_role not in normalized_authenticated_roles:
         export_allowed = False
         blocked_reason = (
             "Export blocked: requester_role does not match authenticated role context."

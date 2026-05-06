@@ -530,6 +530,27 @@ def test_subscription_export_preflight_preserves_explicit_empty_included_widgets
     assert payload["excluded_widgets"] == []
 
 
+def test_subscription_export_preflight_uses_union_of_authenticated_role_scopes(
+    client: TestClient,
+) -> None:
+    response = client.post(
+        "/subscriptions/export/preflight",
+        json={
+            "requested_scope": "export_table_rows",
+            "requested_format": "csv",
+            "requester_role": "support_lead",
+            "filters": {"date_preset": "last_30_days"},
+            "comparison_period": "none",
+            "included_widgets": ["follow_up_table"],
+        },
+        headers={"x-scentiment-roles": "compliance_manager,support_lead"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["export_allowed"] is True
+    assert payload["permission_decision"] == "allow"
+
+
 def test_subscription_follow_up_contract_exposes_actionability_fields(client: TestClient) -> None:
     response = client.get("/subscriptions/follow-up")
     assert response.status_code == 200
