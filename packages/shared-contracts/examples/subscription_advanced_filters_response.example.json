@@ -34,6 +34,41 @@
     "saved_view": "default"
   },
   "metadata": {
-    "metric_id": "subscription_advanced_filter_contract"
+    "metric_id": "subscription_advanced_filter_contract",
+    "filters": {
+      "date_preset": "last_30_days",
+      "saved_view": "default"
+    },
+    "metric_definitions": [
+      "Filter options are governed by source-of-truth and data-dependency rules.",
+      "Disabled filters include explicit reasons and never silently disappear.",
+      "Shopify is context-only and does not finalize subscription outcome truth."
+    ],
+    "trust_label": "high",
+    "freshness_status": "fresh",
+    "formula_version": "v1.0.0",
+    "owner": "analytics",
+    "timestamp": "2026-05-06T12:00:00Z",
+    "fingerprint": "2b9fe4a106d38cbec4dcfcbb5535e8fecc8326f904fd4f1a8dc3d95c87af0303",
+    "audit_reference": "audit-subscription-advanced-filters-baseline-20260506",
+    "source_confirmation_status": "confirmed",
+    "presentation": {
+      "display_label": "Subscription Advanced Filters",
+      "short_label": "Advanced Filters",
+      "executive_summary": "Advanced filters expose required subscription dimensions and include disabled reasons where data dependencies are not yet available.",
+      "format_type": "filter_option_catalog",
+      "unit": "n/a",
+      "trend_direction": "unknown",
+      "comparison_label": "Comparison baseline unavailable in fixture preview",
+      "comparison_value": null,
+      "severity": "success",
+      "visual_tone": "positive",
+      "source_authority_explanation": "Stay.ai is the authoritative source for final subscription outcomes.",
+      "trust_explanation": "Trust is high because the required source-of-truth confirmation rules are satisfied.",
+      "freshness_explanation": "Data is fresh and within expected recency.",
+      "drilldown_hint": "Use filter_id values to bind UI controls and export manifests.",
+      "empty_state_copy": "No eligible records were available for this calculation window.",
+      "blocked_state_copy": "This metric is blocked until Stay.ai confirmation records are available."
+    }
   }
 }
