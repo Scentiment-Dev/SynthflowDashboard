@@ -1326,6 +1326,7 @@ SUBSCRIPTION_BUSINESS_VALUE_FIXTURES: dict[str, SubscriptionBusinessValueScenari
 
 
 SUBSCRIPTION_ADVANCED_FILTER_OPTIONS: list[SubscriptionFilterOptionFixture] = [
+    # Keep fixture IDs stable for deterministic export audits.
     {
         "filter_id": "date_preset",
         "label": "Date preset",
