@@ -4,6 +4,7 @@
 - Model: Codex 5.3
 - Date: 2026-05-06
 - Branch: `agent-a/wave-01/cycle-008-business-value-filter-export-backend`
+- PR: [PR #30](https://github.com/Scentiment-Dev/SynthflowDashboard/pull/30)
 
 ## Scope delivered
 
@@ -35,5 +36,4 @@
 
 ## Remaining blockers
 
-- Bugbot/Codecov status for this branch is blocked until a PR is opened and checks execute.
-- `gh pr checks --watch` returns no PR for current branch, so merge-readiness checks are pending.
+- None for Agent A backend lane; Bugbot and Codecov are passing on PR #30.
