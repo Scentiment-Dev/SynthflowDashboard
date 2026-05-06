@@ -22,6 +22,7 @@
 - PR #26 (Agent A): merged; Cursor Bugbot `SUCCESS`; Codecov patch `SUCCESS`.
 - PR #27 (Agent B): merged; Cursor Bugbot `SUCCESS`; Codecov patch `SUCCESS`.
 - PR #28 (Agent C): merged; Cursor Bugbot `SUCCESS`; docs-only, Codecov patch `SUCCESS`.
+- PR #29 (Agent D): open; Codecov patch `SUCCESS`; Cursor Bugbot `IN_PROGRESS` (awaiting completion).
 
 ## Coverage gate
 

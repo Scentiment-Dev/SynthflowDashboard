@@ -144,9 +144,16 @@ Both files summarize hard gates, review outcomes, and auditable evidence referen
 - Bugbot: `SUCCESS`
 - Codecov patch: `SUCCESS` (docs-only PR; no gate regression)
 
+### Agent D PR #29
+
+- PR URL: `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/29`
+- State: OPEN, mergeable
+- Codecov patch: `SUCCESS`
+- Cursor Bugbot: `IN_PROGRESS` at time of this report update
+
 ### Required-gate result
 
-- Bugbot hard gate: PASS
+- Bugbot hard gate: PASS for dependency PRs #26/#27/#28; pending final completion on Agent D PR #29
 - Codecov hard gate (when code changed): PASS
 - Coverage >=95%: PASS
 - Model routing hard gate: PASS
