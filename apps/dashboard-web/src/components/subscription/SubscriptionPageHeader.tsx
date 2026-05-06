@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import SectionHeader from '../design/SectionHeader';
 
 type SubscriptionPageHeaderProps = {
   eyebrow: string;
@@ -9,6 +10,14 @@ type SubscriptionPageHeaderProps = {
   id?: string;
 };
 
+/**
+ * Cycle 007 IA v2 — per-subpage hero. Thin wrapper around the shared
+ * `SectionHeader` design primitive that adds the `surface-card` styling and
+ * sets `aria-labelledby` on the outer `<header>` to the page title id. The
+ * structural rendering (eyebrow / title / description / meta / actions) lives
+ * inside `SectionHeader` so the design system has a single canonical
+ * implementation of the header pattern.
+ */
 export default function SubscriptionPageHeader({
   eyebrow,
   title,
@@ -18,23 +27,16 @@ export default function SubscriptionPageHeader({
   id,
 }: SubscriptionPageHeaderProps) {
   return (
-    <header
-      aria-labelledby={id}
-      className="surface-card flex flex-col gap-4 px-5 py-5 sm:px-6 sm:py-6 lg:flex-row lg:items-end lg:justify-between"
-    >
-      <div className="max-w-3xl">
-        <p className="eyebrow">{eyebrow}</p>
-        <h2 id={id} className="display-title mt-2 text-xl tracking-tight text-slate-950 sm:text-2xl">
-          {title}
-        </h2>
-        {description ? (
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{description}</p>
-        ) : null}
-        {meta ? <div className="mt-3 flex flex-wrap items-center gap-2">{meta}</div> : null}
-      </div>
-      {actions ? (
-        <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>
-      ) : null}
-    </header>
+    <SectionHeader
+      eyebrow={eyebrow}
+      title={title}
+      description={description}
+      meta={meta}
+      actions={actions}
+      align="split"
+      id={id}
+      ariaLabelledBy={id}
+      className="surface-card px-5 py-5 sm:px-6 sm:py-6"
+    />
   );
 }

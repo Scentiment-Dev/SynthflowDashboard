@@ -242,11 +242,12 @@ No new screenshots are captured in this Cycle 007 PR. The prototype is intended 
 
 This report covers local validation. PR-side gates run automatically once the PR opens:
 
-- Codecov 95% gate (every dimension): satisfied locally at 99.24% / 96.47% / 99.62% / 99.75%.
+- Codecov 95% gate (every dimension): satisfied locally and on PR (`codecov/patch` SUCCESS, project coverage 99.35% statements / 96.85% branches / 99.62% functions / 99.87% lines).
 - `fail_ci_if_error` in `codecov.yml`: untouched.
 - Vitest coverage thresholds in `vite.config.ts`: untouched (still 95% on every dimension).
 - No CI workflows modified, no `.github/**` change, no `codecov.yml` change.
-- Cursor Bugbot will run on the new files; the prototype intentionally avoids any non-additive change to existing surfaces, so the blast radius for Bugbot findings is limited to the three new TSX/TS files and the additive page edit.
+- Cursor Bugbot: completed with NEUTRAL conclusion. The one bug it raised (SubscriptionPageHeader duplicates SectionHeader) was addressed by extending `SectionHeader` with optional `meta` and `ariaLabelledBy` props and refactoring `SubscriptionPageHeader` into a thin wrapper.
+- Codex review: raised one P2 accessibility finding ("incomplete tab semantics" in SubscriptionSubnav). Addressed by switching from misleading `role="tab"` / `role="tablist"` ARIA to standard `<nav>` semantics with `aria-current="page"` and `aria-disabled` on each `<button>`. Tabs in this UI are route navigators, not in-DOM tab panels, so plain navigation semantics are the correct pattern.
 
 ---
 

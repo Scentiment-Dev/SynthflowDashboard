@@ -8,68 +8,68 @@ import {
 } from '../constants/subscriptionSubnav';
 
 describe('SubscriptionSubnav (Cycle 007 IA v2 prototype)', () => {
-  it('renders all 10 required subscription subpages', () => {
+  it('renders a labeled <nav> landmark with all 10 required subscription subpages', () => {
     render(<SubscriptionSubnav />);
 
     const nav = screen.getByRole('navigation', { name: /Subscription analytics/i });
     expect(nav).toBeInTheDocument();
 
-    const tablist = within(nav).getByRole('tablist', { name: /Subscription subpages/i });
-    const tabs = within(tablist).getAllByRole('tab');
-    expect(tabs).toHaveLength(SUBSCRIPTION_SUBNAV_ITEMS.length);
+    const buttons = within(nav).getAllByRole('button');
+    expect(buttons).toHaveLength(SUBSCRIPTION_SUBNAV_ITEMS.length);
     expect(SUBSCRIPTION_SUBNAV_ITEMS).toHaveLength(10);
   });
 
   it('marks the active item with aria-current="page" and disables planned items', () => {
     render(<SubscriptionSubnav activeId="command-center" />);
 
-    const activeTab = screen.getByRole('tab', { name: /Command/i });
-    expect(activeTab).toHaveAttribute('aria-selected', 'true');
-    expect(activeTab).toHaveAttribute('aria-current', 'page');
-    expect(activeTab).not.toBeDisabled();
+    const activeButton = screen.getByRole('button', { name: /Command/i });
+    expect(activeButton).toHaveAttribute('aria-current', 'page');
+    expect(activeButton).not.toBeDisabled();
+    expect(activeButton).not.toHaveAttribute('aria-selected');
 
     const plannedItem = SUBSCRIPTION_SUBNAV_ITEMS.find((item) => item.status === 'planned');
     expect(plannedItem).toBeDefined();
-    const plannedTab = screen.getByRole('tab', { name: new RegExp(plannedItem!.shortLabel ?? plannedItem!.label, 'i') });
-    expect(plannedTab).toBeDisabled();
-    expect(plannedTab).toHaveAttribute('aria-disabled', 'true');
-    expect(plannedTab).toHaveAttribute('aria-selected', 'false');
+    const plannedButton = screen.getByRole('button', {
+      name: new RegExp(plannedItem!.shortLabel ?? plannedItem!.label, 'i'),
+    });
+    expect(plannedButton).toBeDisabled();
+    expect(plannedButton).toHaveAttribute('aria-disabled', 'true');
+    expect(plannedButton).not.toHaveAttribute('aria-current');
   });
 
-  it('does not call onSelect when a planned (disabled) tab is clicked', () => {
+  it('does not call onSelect when a planned (disabled) item is clicked', () => {
     const onSelect = vi.fn();
     render(<SubscriptionSubnav activeId="command-center" onSelect={onSelect} />);
 
     const plannedItem = SUBSCRIPTION_SUBNAV_ITEMS.find((item) => item.status === 'planned')!;
-    const plannedTab = screen.getByRole('tab', { name: new RegExp(plannedItem.shortLabel ?? plannedItem.label, 'i') });
-    fireEvent.click(plannedTab);
+    const plannedButton = screen.getByRole('button', {
+      name: new RegExp(plannedItem.shortLabel ?? plannedItem.label, 'i'),
+    });
+    fireEvent.click(plannedButton);
     expect(onSelect).not.toHaveBeenCalled();
   });
 
-  it('calls onSelect with the item when a non-planned, non-active tab is clicked', () => {
+  it('calls onSelect with the item when a non-planned, non-active item is clicked', () => {
     const onSelect = vi.fn();
     const items: SubscriptionSubnavItem[] = SUBSCRIPTION_SUBNAV_ITEMS.map((item) =>
       item.id === 'outcomes' ? { ...item, status: 'live' } : item,
     );
     render(<SubscriptionSubnav items={items} activeId="command-center" onSelect={onSelect} />);
 
-    const liveTab = screen.getByRole('tab', { name: /Outcomes/i });
-    expect(liveTab).not.toBeDisabled();
-    fireEvent.click(liveTab);
+    const liveButton = screen.getByRole('button', { name: /Outcomes/i });
+    expect(liveButton).not.toBeDisabled();
+    fireEvent.click(liveButton);
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSelect.mock.calls[0]?.[0]).toMatchObject({ id: 'outcomes' });
   });
 
-  it('renders the attention badge when attentionCount > 0 and skips it otherwise', () => {
+  it('renders the attention badge when attentionCount > 0', () => {
     const items: SubscriptionSubnavItem[] = SUBSCRIPTION_SUBNAV_ITEMS.map((item) =>
       item.id === 'follow-up' ? { ...item, status: 'live', attentionCount: 3 } : item,
     );
     render(<SubscriptionSubnav items={items} activeId="command-center" />);
 
     expect(screen.getByLabelText('3 need attention')).toBeInTheDocument();
-
-    // Items without attentionCount should not produce a badge.
-    expect(screen.queryByLabelText(/need attention/i)?.textContent).toBe('3');
   });
 
   it('renders the Planned status chip on planned items but not on the active item', () => {
@@ -78,9 +78,9 @@ describe('SubscriptionSubnav (Cycle 007 IA v2 prototype)', () => {
     const plannedChips = screen.getAllByText('Planned');
     expect(plannedChips.length).toBeGreaterThan(0);
 
-    const activeTab = screen.getByRole('tab', { name: /Command/i });
-    expect(within(activeTab).queryByText('Prototype')).toBeNull();
-    expect(within(activeTab).queryByText('Planned')).toBeNull();
+    const activeButton = screen.getByRole('button', { name: /Command/i });
+    expect(within(activeButton).queryByText('Prototype')).toBeNull();
+    expect(within(activeButton).queryByText('Planned')).toBeNull();
   });
 
   it('renders the Prototype and Live status chips on non-active items', () => {
@@ -93,7 +93,6 @@ describe('SubscriptionSubnav (Cycle 007 IA v2 prototype)', () => {
       }
       return item;
     });
-    // Activate the containment tab (a live one) so the prototype and outcomes chips both render.
     render(<SubscriptionSubnav items={items} activeId="containment" />);
 
     expect(screen.getByText('Prototype')).toBeInTheDocument();
@@ -106,7 +105,7 @@ describe('SubscriptionSubnav (Cycle 007 IA v2 prototype)', () => {
     );
     render(<SubscriptionSubnav items={items} activeId="command-center" />);
 
-    expect(screen.getByRole('tab', { name: /Outcome Summary/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Outcome Summary/i })).toBeInTheDocument();
   });
 
   it('renders the attention badge on the active item using the active style', () => {

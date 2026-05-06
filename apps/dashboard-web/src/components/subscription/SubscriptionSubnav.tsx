@@ -44,11 +44,7 @@ export default function SubscriptionSubnav({
         </span>
       </div>
 
-      <ul
-        role="tablist"
-        aria-label="Subscription subpages"
-        className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
+      <ul className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {items.map((item) => {
           const isActive = item.id === activeId;
           const isDisabled = item.status === 'planned';
@@ -65,11 +61,9 @@ export default function SubscriptionSubnav({
           };
 
           return (
-            <li key={item.id} role="presentation" className="snap-start">
+            <li key={item.id} className="snap-start">
               <button
                 type="button"
-                role="tab"
-                aria-selected={isActive}
                 aria-current={isActive ? 'page' : undefined}
                 aria-disabled={isDisabled || undefined}
                 disabled={isDisabled}

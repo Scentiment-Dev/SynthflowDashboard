@@ -254,6 +254,18 @@ describe('branch coverage for dashboard UI helpers', () => {
     );
     expect(screen.getByText(/With description/i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Section action/i })).not.toBeInTheDocument();
+
+    rerender(
+      <SectionHeader
+        id="hdr-meta-x"
+        ariaLabelledBy="hdr-meta-x"
+        title="Title with meta"
+        meta={<span data-testid="section-header-meta">meta-chip</span>}
+      />,
+    );
+    const titledHeader = screen.getByRole('heading', { name: /Title with meta/i });
+    expect(titledHeader).toHaveAttribute('id', 'hdr-meta-x');
+    expect(screen.getByTestId('section-header-meta')).toBeInTheDocument();
   });
 
   it('covers MetricDefinitionPanel formula version fallback branch', () => {
