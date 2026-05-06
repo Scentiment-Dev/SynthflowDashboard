@@ -305,7 +305,7 @@ Recopying the §8 of the acceptance criteria so this report stands alone:
 
 **97.5% confidence** that:
 
-1. The 75 logged issues capture the major reasons the Cycle 006 / live Cycle 007 dashboard is confusing and disorganized for a non-technical customer-support agent.
+1. The 77 logged issues (30 P0 / 34 P1 / 12 P2 / 1 P3) capture the major reasons the Cycle 006 / live Cycle 007 dashboard is confusing and disorganized for a non-technical customer-support agent.
 2. The eight workflows describe the operator's path-to-answer end-to-end and are testable.
 3. The plain-language copy system is normative and complete enough to drive Cycle 008 string-level edits.
 4. The acceptance criteria checklist is sufficient to gate Cycle 008 (P0 gates close every Cycle 006 rejection point).
@@ -327,6 +327,39 @@ This satisfies the cycle prompt's completion rule of "≥97% confident the UX au
 - **Agent B (Frontend / IA / UI / UX):** use `project-management/reports/cycle-007/review-checklists/uiux_second_designer_acceptance_criteria.md` §1–§6 as the build checklist and §8 as the migration-risk playbook. Honour the plain-language copy guide for every production-visible string; honour the universal page contract (§2 of the workflows doc) on every subpage. Three minor IA disagreements with your spec are documented as PM open questions in §8.8 — flag them in the Cycle 008 PR description.
 - **Agent C (Data / dbt) — separate role:** confirm dimensional joins for offer version, repeat contact, post-save leakage, true containment, and high-value churn risk so the IA v2 subpages can render their headline metrics from canonical tables. (This is the Cycle 007 Agent A data-side hand-off, not this audit.)
 - **Agent D (QA / Release / Bugbot / Codecov):** treat the acceptance criteria checklist as the formal QA gate. Add e2e + DOM-level coverage for: (1) every P0 acceptance check; (2) the universal page contract; (3) the eight workflow journeys' DOM-level acceptance items; (4) the banned-string regex (§A4.01); (5) the manifest-mismatch reject path; (6) the hard-fail banner replacement state; (7) the disabled-filter-tooltip behaviour. Maintain the ≥95% Codecov gate on every dimension and ensure Cursor Bugbot remains green.
+
+---
+
+## PR and CI verification
+
+- PR: [#28 — `[Wave 01][Cycle 007][Agent C] Subscription UX second design audit`](https://github.com/Scentiment-Dev/SynthflowDashboard/pull/28)
+- Branch: `agent-c/wave-01/cycle-007-subscription-ux-second-design-audit` → base `main`
+- Head commit on PR: `f39f35f` (docs-only; 6 files changed; +2,672 / −0)
+- Files in PR: exactly the six deliverables listed in §C1–§C4 and this report. No code, tests, fixtures, contracts, metric definitions, `codecov.yml`, or `.github/**` changes.
+- Mergeability: `MERGEABLE`, mergeStateStatus `CLEAN`, no blocking review decision.
+
+CI rollup at completion (all 14 checks green):
+
+| Check | Result |
+|---|---|
+| Repo validation and no-drift gates | SUCCESS |
+| lint-typecheck (backend) | SUCCESS |
+| lint-typecheck (frontend) | SUCCESS |
+| lint-typecheck (ingestion) | SUCCESS |
+| backend-tests / backend | SUCCESS |
+| frontend-tests / frontend | SUCCESS |
+| ingestion-tests / ingestion | SUCCESS |
+| dbt-tests / dbt | SUCCESS |
+| contract-tests / contracts | SUCCESS |
+| smoke-tests / smoke | SUCCESS |
+| Coverage and Codecov Upload | SUCCESS |
+| codecov/patch | SUCCESS |
+| release-readiness | SUCCESS |
+| Cursor Bugbot | SUCCESS |
+
+- **Cursor Bugbot:** completed `SUCCESS`. Zero inline review comments and zero blocking findings on this PR. Coordination rule (no implementation file edits) eliminates the most common Bugbot triggers for this kind of work; the audit, workflow, copy, and acceptance documents are pure docs.
+- **Codecov:** PR comment posted: "All modified and coverable lines are covered by tests." (`codecov/patch` SUCCESS). The repo-wide ≥95% gate carries from the head of `main` (Cycle 007 Agent A backend 99.12% / Cycle 007 Agent B frontend 99.24% statements / 96.47% branches / 99.62% functions / 99.75% lines, both inherited via merged PRs #26 and #27) and is not regressed by this docs-only PR.
+- **Markdown lint (final, on PR head):** `markdownlint-cli@0.48.0` exits 0 across all five new docs (issue register, workflows, copy guide, acceptance criteria, this report). Disabled rules and rationale are documented in the §C1–§C4 sub-sections above.
 
 ---
 
