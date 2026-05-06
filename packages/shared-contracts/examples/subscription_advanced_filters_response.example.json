@@ -1,0 +1,39 @@
+{
+  "module": "subscriptions",
+  "generated_from_fixture": true,
+  "scenario": "baseline",
+  "options": [
+    {
+      "filter_id": "date_preset",
+      "label": "Date preset",
+      "plain_language_help": "Quickly switch to common date windows like last 7 or last 30 days.",
+      "allowed_values": ["today", "last_7_days", "last_30_days", "last_90_days", "custom"],
+      "is_enabled": true,
+      "is_disabled_reason": null,
+      "data_dependency": "event_timestamp",
+      "source_system": "analytics_api",
+      "trust_impact": "Changes denominator and comparison context for all subscription metrics.",
+      "applies_to_pages": ["all_subscription_pages"]
+    },
+    {
+      "filter_id": "current_vs_future_flow_state",
+      "label": "Current vs future flow state",
+      "plain_language_help": "Compare production flow with planned future flow behavior.",
+      "allowed_values": ["current", "future", "compare"],
+      "is_enabled": false,
+      "is_disabled_reason": "Future-flow simulation feed is not available in fixture mode.",
+      "data_dependency": "future_flow_simulation_dataset",
+      "source_system": "analytics_api",
+      "trust_impact": "Disabled dimensions are excluded from export manifest filters.",
+      "applies_to_pages": ["outcomes", "business_value"]
+    }
+  ],
+  "applied_filters": {
+    "date_preset": "last_30_days",
+    "comparison_period": "none",
+    "saved_view": "default"
+  },
+  "metadata": {
+    "metric_id": "subscription_advanced_filter_contract"
+  }
+}

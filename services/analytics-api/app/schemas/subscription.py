@@ -6,6 +6,23 @@ from app.schemas.metric import MetricCard, TrustLabel
 from app.schemas.source_truth import OutcomeEvidence, SourceTruthDecision
 
 
+class SubscriptionExportScope(StrEnum):
+    EXPORT_CURRENT_PAGE = "export_current_page"
+    EXPORT_WIDGET = "export_widget"
+    EXPORT_TABLE_ROWS = "export_table_rows"
+    EXPORT_FILTERED_CSV = "export_filtered_csv"
+    EXPORT_PDF_SNAPSHOT = "export_pdf_snapshot"
+    EXPORT_AUDIT_MANIFEST = "export_audit_manifest"
+
+
+class SubscriptionExportFormat(StrEnum):
+    CSV = "csv"
+    PDF = "pdf"
+    MANIFEST = "manifest"
+    CSV_PDF_BUNDLE = "csv_pdf_bundle"
+    JSON = "json"
+
+
 class SubscriptionAction(StrEnum):
     SKIP = "skip"
     PAUSE = "pause"
@@ -201,6 +218,26 @@ class BusinessValueState(StrEnum):
 
 
 class SubscriptionBusinessValueMetric(BaseModel):
+    metric_id: str
+    display_label: str
+    plain_language_summary: str
+    value_state: BusinessValueState
+    format: str
+    formula_version: str
+    source_confirmation_status: SourceConfirmationStatus
+    trust_label: TrustLabel
+    freshness_status: FreshnessStatus
+    owner: str
+    timestamp: str
+    fingerprint: str
+    audit_reference: str
+    missing_data_reason: str | None = None
+    next_action_hint: str
+    support_label: str
+    support_summary: str
+    why_it_matters: str
+    what_to_do_next: str
+    blocked_reason_plain_language: str | None = None
     metric_key: str
     display_name: str
     value: float | int | None
@@ -235,6 +272,91 @@ class SubscriptionBusinessValueResponse(BaseModel):
     scenario: str
     metrics: list[SubscriptionBusinessValueMetric]
     metadata: SubscriptionBusinessValueMetadata
+
+
+class SubscriptionFilterOption(BaseModel):
+    filter_id: str
+    label: str
+    plain_language_help: str
+    allowed_values: list[str] = Field(default_factory=list)
+    is_enabled: bool
+    is_disabled_reason: str | None = None
+    data_dependency: str
+    source_system: str
+    trust_impact: str
+    applies_to_pages: list[str] = Field(default_factory=list)
+
+
+class SubscriptionAdvancedFilterResponse(BaseModel):
+    module: str = "subscriptions"
+    generated_from_fixture: bool = True
+    scenario: str
+    options: list[SubscriptionFilterOption]
+    applied_filters: dict[str, object]
+    metadata: "SubscriptionOutcomeMetricMetadata"
+
+
+class SubscriptionExportPreflightRequest(BaseModel):
+    requested_scope: SubscriptionExportScope
+    requested_format: SubscriptionExportFormat
+    requester_role: str | None = None
+    filters: dict[str, object] = Field(default_factory=dict)
+    comparison_period: str = "none"
+    included_widgets: list[str] = Field(default_factory=list)
+
+
+class SubscriptionExportPreflightResponse(BaseModel):
+    module: str = "subscriptions"
+    export_allowed: bool
+    blocked_reason: str | None = None
+    requested_scope: SubscriptionExportScope
+    requested_format: SubscriptionExportFormat
+    filters: dict[str, object]
+    comparison_period: str
+    metric_definitions: list[str]
+    trust_labels: list[str]
+    freshness: str
+    formula_versions: list[str]
+    owner: str
+    timestamp: str
+    fingerprint: str
+    audit_reference: str
+    requester_role: str
+    permission_decision: str
+    source_confirmation_status: SourceConfirmationStatus
+    included_widgets: list[str]
+    excluded_widgets: list[str]
+    missing_required_metadata: list[str]
+
+
+class SubscriptionFollowUpRecord(BaseModel):
+    customer_or_case_id: str
+    recommended_action: str
+    reason: str
+    priority: str
+    status: str
+    source_system: str
+    blocking_data_gap: str | None = None
+    stayai_confirmation_status: SourceConfirmationStatus
+    portal_completion_status: str
+    estimated_value_at_risk: float | None = None
+    last_event_at: str
+    owner_queue: str
+    sla_status: str
+    audit_reference: str
+    support_label: str
+    support_summary: str
+    why_it_matters: str
+    what_to_do_next: str
+    blocked_reason_plain_language: str | None = None
+
+
+class SubscriptionFollowUpResponse(BaseModel):
+    module: str = "subscriptions"
+    generated_from_fixture: bool = True
+    scenario: str
+    records: list[SubscriptionFollowUpRecord]
+    metadata: "SubscriptionOutcomeMetricMetadata"
 
 
 class SubscriptionOutcomeMetricMetadata(BaseModel):

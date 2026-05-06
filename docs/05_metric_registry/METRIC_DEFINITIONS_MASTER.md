@@ -26,3 +26,32 @@
 | order_status_resolution_rate | Order Status Resolution Rate | order_status | resolved_order_status_calls / eligible_order_status_calls | Synthflow + Shopify | Shopify provides official order context. |
 | high_trust_metric_rate | High Trust Metric Rate | data_quality | high_trust_metrics / major_metrics | Warehouse | Trust labels are calculated only. |
 | export_audit_compliance_rate | Export Audit Compliance Rate | governance | compliant_exports / all_exports | Analytics API | Fingerprint and audit reference required. |
+
+## Cycle 008 subscription business-value P0 metrics
+
+| Metric Key | Display Name | Module | Formula | Source of Truth | Trust Rule |
+| --- | --- | --- | --- | --- | --- |
+| net_business_value_impact | Net Business Value Impact | subscriptions | gross_value_protected - offer_cost + support_cost_avoided | Stay.ai + warehouse | Never confirmed without confirmed Stay.ai source confirmation status. |
+| gross_value_protected | Gross Value Protected | subscriptions | sum(expected_revenue_saved_before_costs) | Warehouse | Report as estimated when confirmations are pending. |
+| net_retained_recovered_value | Net Retained / Recovered Value | subscriptions | confirmed_saved + estimated_saved - leakage - offer_cost | Stay.ai + warehouse | Confirmed and estimated states must remain distinct. |
+| confirmed_business_value_impact | Confirmed Business Value Impact | subscriptions | confirmed_saved_revenue - confirmed_offer_cost + confirmed_support_cost_avoided | Stay.ai + finance | Requires confirmed Stay.ai final state and official completion path rules. |
+| estimated_business_value_impact | Estimated Business Value Impact | subscriptions | estimated_saved - estimated_cost + estimated_support_avoided | Warehouse | Explicitly marked estimated until confirmed data arrives. |
+| revenue_saved_estimate | Revenue Saved Estimate | subscriptions | sum(estimated_retained_revenue) | Warehouse | Estimated-only unless source confirmation status is confirmed. |
+| gross_saved_value | Gross Saved Value | subscriptions | confirmed_saved_revenue + estimated_saved_revenue | Warehouse | Must preserve confirmed vs estimated composition. |
+| confirmed_saved_revenue | Confirmed Saved Revenue | subscriptions | sum(saved_revenue where stayai confirmed) | Stay.ai + billing | Confirmed only when Stay.ai confirmation is confirmed. |
+| net_saved_revenue | Net Saved Revenue | subscriptions | gross_saved_value - offer_cost | Warehouse | Estimated when cost joins or confirmations are incomplete. |
+| offer_cost | Offer Cost | subscriptions | discount_cost + free_shipping_cost + incentive_cost | Offer ledger | State follows offer-cost lineage completeness. |
+| discount_cost | Discount Cost | subscriptions | sum(discount value applied) | Offer ledger | Unknown or blocked when discount joins are missing. |
+| free_shipping_cost | Free Shipping Cost | subscriptions | sum(shipping subsidy) | Shopify context | Shopify remains context-only for final outcome truth. |
+| revenue_at_risk | Revenue At Risk | subscriptions | sum(predicted_revenue_for_high_churn_probability) | Warehouse | Estimated until full confirmation windows close. |
+| support_cost_avoided | Support Cost Avoided | subscriptions | contained_calls * cost_per_contained_call | Warehouse + finance | Cannot be manually elevated; trust is system-calculated. |
+| cost_per_contained_call | Cost per Contained Call | subscriptions | support_cost_avoided / contained_call_count | Finance ops | Confirmed with finance baseline model. |
+| net_value_per_contained_call | Net Value per Contained Call | subscriptions | (net_saved_revenue + support_cost_avoided) / contained_call_count | Warehouse | Estimated when net_saved_revenue remains estimated. |
+| automation_roi | Automation ROI | subscriptions | (net_saved_revenue + support_cost_avoided) / automation_operating_cost | Warehouse | Requires explicit formula version in export manifest. |
+| retention_roi_estimate | Retention ROI Estimate | subscriptions | net_retained_recovered_value / retention_program_cost | Warehouse | Estimated unless all cost allocations are confirmed. |
+| estimated_churn_prevented_count | Estimated Churn Prevented Count | subscriptions | sum(predicted_saved_subscriptions) | Warehouse | Estimated by definition. |
+| confirmed_churn_prevented_count | Confirmed Churn Prevented Count | subscriptions | count(stayai final retained/saved/active) | Stay.ai | Confirmed only from Stay.ai final state. |
+| revenue_leakage_after_save | Revenue Leakage After Save | subscriptions | sum(saved_then_cancelled_revenue_loss) | Stay.ai + billing | Pending when post-save window has not closed. |
+| high_value_churn_risk | High-Value Churn Risk | subscriptions | count(churn_risk>=threshold and mrr>=cutoff) | Warehouse | Estimated if risk model freshness is stale. |
+| stay_ai_confirmation_coverage | Stay.ai Confirmation Coverage | subscriptions | confirmed_records / records_requiring_confirmation | Stay.ai | Source confirmation metric; governs trust chips. |
+| true_subscription_containment_rate | True Subscription Containment Rate | subscriptions | contained_without_repeat_contact / eligible_subscription_contacts | Warehouse + Stay.ai | Blocked when repeat-contact join is unavailable. |

@@ -1,0 +1,31 @@
+{
+  "module": "subscriptions",
+  "generated_from_fixture": true,
+  "scenario": "baseline",
+  "records": [
+    {
+      "customer_or_case_id": "case-1001",
+      "recommended_action": "Confirm in Stay.ai",
+      "reason": "Missing Stay.ai final state for cancel request",
+      "priority": "high",
+      "status": "open",
+      "source_system": "stayai",
+      "blocking_data_gap": "stayai_final_state",
+      "stayai_confirmation_status": "pending",
+      "portal_completion_status": "completion_unknown",
+      "estimated_value_at_risk": 540.0,
+      "last_event_at": "2026-05-05T20:30:00Z",
+      "owner_queue": "support_lead",
+      "sla_status": "due_soon",
+      "audit_reference": "audit-follow-up-case-1001-20260505",
+      "support_label": "Awaiting official confirmation",
+      "support_summary": "This case still needs Stay.ai final state confirmation.",
+      "why_it_matters": "Final save/cancel reporting is blocked until official confirmation arrives.",
+      "what_to_do_next": "Open Stay.ai and verify the final subscription outcome.",
+      "blocked_reason_plain_language": "We cannot finalize this outcome without Stay.ai confirmation."
+    }
+  ],
+  "metadata": {
+    "metric_id": "subscription_follow_up_queue"
+  }
+}

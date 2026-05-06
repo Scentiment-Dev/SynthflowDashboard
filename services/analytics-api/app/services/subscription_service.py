@@ -1,6 +1,7 @@
 from hashlib import sha256
 from json import dumps
 from typing import TypedDict
+from uuid import uuid4
 
 from app.schemas.metric import MetricCard, TrustLabel
 from app.schemas.source_truth import (
@@ -9,6 +10,7 @@ from app.schemas.source_truth import (
     SubscriptionOutcomeValidationRequest,
 )
 from app.schemas.subscription import (
+    SubscriptionAdvancedFilterResponse,
     BusinessValueState,
     DataQualityStatus,
     FreshnessStatus,
@@ -29,6 +31,13 @@ from app.schemas.subscription import (
     SubscriptionBusinessValueMetadata,
     SubscriptionBusinessValueMetric,
     SubscriptionBusinessValueResponse,
+    SubscriptionExportFormat,
+    SubscriptionExportPreflightRequest,
+    SubscriptionExportPreflightResponse,
+    SubscriptionExportScope,
+    SubscriptionFilterOption,
+    SubscriptionFollowUpRecord,
+    SubscriptionFollowUpResponse,
     SubscriptionOverviewMetrics,
     SubscriptionSourceHealthMetadata,
     SubscriptionSourceHealthResponse,
@@ -158,6 +167,41 @@ class SubscriptionBusinessValueScenarioFixture(TypedDict):
     formula_version: str
     owner: str
     audit_reference: str
+
+
+class SubscriptionFilterOptionFixture(TypedDict):
+    filter_id: str
+    label: str
+    plain_language_help: str
+    allowed_values: list[str]
+    is_enabled: bool
+    is_disabled_reason: str | None
+    data_dependency: str
+    source_system: str
+    trust_impact: str
+    applies_to_pages: list[str]
+
+
+class SubscriptionFollowUpRecordFixture(TypedDict):
+    customer_or_case_id: str
+    recommended_action: str
+    reason: str
+    priority: str
+    status: str
+    source_system: str
+    blocking_data_gap: str | None
+    stayai_confirmation_status: SourceConfirmationStatus
+    portal_completion_status: str
+    estimated_value_at_risk: float | None
+    last_event_at: str
+    owner_queue: str
+    sla_status: str
+    audit_reference: str
+    support_label: str
+    support_summary: str
+    why_it_matters: str
+    what_to_do_next: str
+    blocked_reason_plain_language: str | None
 
 
 SUBSCRIPTION_ANALYTICS_FIXTURES: dict[str, SubscriptionAnalyticsFixture] = {
@@ -1282,6 +1326,343 @@ SUBSCRIPTION_BUSINESS_VALUE_FIXTURES: dict[str, SubscriptionBusinessValueScenari
 }
 
 
+SUBSCRIPTION_ADVANCED_FILTER_OPTIONS: list[SubscriptionFilterOptionFixture] = [
+    {
+        "filter_id": "date_preset",
+        "label": "Date preset",
+        "plain_language_help": "Quickly switch to common date windows like last 7 or last 30 days.",
+        "allowed_values": ["today", "last_7_days", "last_30_days", "last_90_days", "custom"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "event_timestamp",
+        "source_system": "analytics_api",
+        "trust_impact": "Changes denominator and comparison context for all subscription metrics.",
+        "applies_to_pages": ["all_subscription_pages"],
+    },
+    {
+        "filter_id": "custom_date_range",
+        "label": "Custom date range",
+        "plain_language_help": "Set an explicit start and end date for detailed analysis.",
+        "allowed_values": ["from_date", "to_date"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "event_timestamp",
+        "source_system": "analytics_api",
+        "trust_impact": "Narrow custom windows can increase volatility and pending-state density.",
+        "applies_to_pages": ["all_subscription_pages"],
+    },
+    {
+        "filter_id": "comparison_period",
+        "label": "Comparison period",
+        "plain_language_help": "Compare current period against previous period or previous year.",
+        "allowed_values": ["none", "previous_period", "previous_year"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "time_series_aggregates",
+        "source_system": "analytics_api",
+        "trust_impact": "Comparison rows are estimated when source freshness is stale.",
+        "applies_to_pages": ["all_subscription_pages"],
+    },
+    {
+        "filter_id": "cancellation_reason",
+        "label": "Cancellation reason",
+        "plain_language_help": "Filter to a specific cancellation reason like Cost too high.",
+        "allowed_values": ["cost_too_high", "dont_need_now", "product_issue", "switching_brand", "service_issue", "other", "unknown"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "stayai_cancel_reason",
+        "source_system": "stayai",
+        "trust_impact": "Unknown reasons lower trust on reason-based rates.",
+        "applies_to_pages": ["outcomes", "cancellation_intake", "cost_too_high", "follow_up"],
+    },
+    {
+        "filter_id": "offer_type",
+        "label": "Offer type",
+        "plain_language_help": "Slice by offer category like frequency-change or discount.",
+        "allowed_values": ["frequency_change", "discount", "free_shipping", "bundle", "none"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "offer_redemption_ledger",
+        "source_system": "stayai",
+        "trust_impact": "Missing offer mappings mark related metrics estimated.",
+        "applies_to_pages": ["business_value", "cost_too_high"],
+    },
+    {
+        "filter_id": "offer_version",
+        "label": "Offer version",
+        "plain_language_help": "Compare different offer versions for retention performance.",
+        "allowed_values": ["v3.3", "v3.4", "v3.5", "unknown"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "offer_version_join",
+        "source_system": "stayai",
+        "trust_impact": "Unknown versions can block sequence metrics.",
+        "applies_to_pages": ["cost_too_high", "business_value"],
+    },
+    {
+        "filter_id": "subscription_status",
+        "label": "Subscription status",
+        "plain_language_help": "Filter to retained, cancelled, pending, or active outcomes.",
+        "allowed_values": ["retained", "saved", "cancelled", "active", "pending", "unknown"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "stayai_final_state",
+        "source_system": "stayai",
+        "trust_impact": "Pending and unknown states reduce trust confidence.",
+        "applies_to_pages": ["outcomes", "follow_up", "business_value"],
+    },
+    {
+        "filter_id": "product_sku",
+        "label": "Product / SKU",
+        "plain_language_help": "Filter by subscription SKU for product-level trends.",
+        "allowed_values": ["sku_a", "sku_b", "sku_c", "unknown"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "shopify_context_sku",
+        "source_system": "shopify",
+        "trust_impact": "Shopify is context-only; SKU filters never finalize outcomes.",
+        "applies_to_pages": ["business_value", "outcomes", "follow_up"],
+    },
+    {
+        "filter_id": "match_confidence",
+        "label": "Match confidence",
+        "plain_language_help": "Focus on low-confidence record matches that need review.",
+        "allowed_values": ["high", "medium", "low"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "identity_match_score",
+        "source_system": "analytics_api",
+        "trust_impact": "Low confidence rows can downgrade trust labels.",
+        "applies_to_pages": ["follow_up", "outcomes"],
+    },
+    {
+        "filter_id": "portal_state",
+        "label": "Portal state",
+        "plain_language_help": "Separate link sent from confirmed completion to avoid overcounting.",
+        "allowed_values": ["link_sent", "link_opened", "portal_started", "portal_completed", "completion_unknown"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "portal_events",
+        "source_system": "portal",
+        "trust_impact": "Completion unknown rows stay pending until confirmed.",
+        "applies_to_pages": ["portal_handoff", "follow_up", "outcomes"],
+    },
+    {
+        "filter_id": "outcome",
+        "label": "Outcome",
+        "plain_language_help": "Filter by save, cancel, pending, non-cancel, or unknown outcomes.",
+        "allowed_values": ["save", "cancel", "pending", "non_cancel", "unknown"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "stayai_final_state",
+        "source_system": "stayai",
+        "trust_impact": "Pending and unknown outcomes lower confidence for final metrics.",
+        "applies_to_pages": ["outcomes", "follow_up", "business_value"],
+    },
+    {
+        "filter_id": "escalation_state",
+        "label": "Escalation state",
+        "plain_language_help": "Show only escalated, open, or resolved follow-up items.",
+        "allowed_values": ["none", "open", "escalated", "resolved"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "escalation_events",
+        "source_system": "synthflow",
+        "trust_impact": "Open escalations highlight unresolved customer risk.",
+        "applies_to_pages": ["follow_up"],
+    },
+    {
+        "filter_id": "repeat_contact",
+        "label": "Repeat contact",
+        "plain_language_help": "Filter customers who contacted support repeatedly.",
+        "allowed_values": ["none", "within_1_day", "within_7_days", "within_30_days"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "repeat_contact_join",
+        "source_system": "warehouse",
+        "trust_impact": "Required for true containment and follow-up prioritization.",
+        "applies_to_pages": ["containment", "follow_up", "business_value"],
+    },
+    {
+        "filter_id": "value_range",
+        "label": "Value range",
+        "plain_language_help": "Limit to a saved-revenue range for high-value triage.",
+        "allowed_values": ["0_100", "100_500", "500_1000", "1000_plus"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "revenue_value_bucket",
+        "source_system": "warehouse",
+        "trust_impact": "Estimated revenue buckets are marked with medium trust.",
+        "applies_to_pages": ["business_value", "follow_up"],
+    },
+    {
+        "filter_id": "trust_label",
+        "label": "Trust label",
+        "plain_language_help": "Filter metrics or rows by high, medium, low, or untrusted labels.",
+        "allowed_values": ["high", "medium", "low", "untrusted"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "system_calculated_trust_label",
+        "source_system": "analytics_api",
+        "trust_impact": "Directly controls which confidence strata are included.",
+        "applies_to_pages": ["all_subscription_pages"],
+    },
+    {
+        "filter_id": "synthflow_flow_version",
+        "label": "Synthflow flow version",
+        "plain_language_help": "Compare results across Synthflow flow versions.",
+        "allowed_values": ["v3.3", "v3.4", "v3.5"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "synthflow_flow_version",
+        "source_system": "synthflow",
+        "trust_impact": "Flow migrations can shift request mix and completion rates.",
+        "applies_to_pages": ["outcomes", "follow_up", "business_value"],
+    },
+    {
+        "filter_id": "stayai_action_type",
+        "label": "Stay.ai action type",
+        "plain_language_help": "Filter by Stay.ai action type such as cancel or save.",
+        "allowed_values": ["cancel", "save", "pause", "skip", "frequency_change", "other"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "stayai_action_type",
+        "source_system": "stayai",
+        "trust_impact": "Action type controls final-state denominator composition.",
+        "applies_to_pages": ["outcomes", "follow_up", "business_value"],
+    },
+    {
+        "filter_id": "stayai_offer_version",
+        "label": "Stay.ai offer version",
+        "plain_language_help": "Filter by Stay.ai offer version to compare save performance.",
+        "allowed_values": ["v1", "v2", "v3", "unknown"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "stayai_offer_version",
+        "source_system": "stayai",
+        "trust_impact": "Unknown versions can block ROI-attribution metrics.",
+        "applies_to_pages": ["business_value", "cost_too_high"],
+    },
+    {
+        "filter_id": "stayai_freshness_api_state",
+        "label": "Stay.ai freshness / API state",
+        "plain_language_help": "Filter by source freshness and API health from Stay.ai.",
+        "allowed_values": ["fresh", "stale", "unknown", "degraded_api"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "stayai_source_health",
+        "source_system": "stayai",
+        "trust_impact": "Stale data automatically lowers confidence.",
+        "applies_to_pages": ["all_subscription_pages"],
+    },
+    {
+        "filter_id": "current_vs_future_flow_state",
+        "label": "Current vs future flow state",
+        "plain_language_help": "Compare production flow with planned future flow behavior.",
+        "allowed_values": ["current", "future", "compare"],
+        "is_enabled": False,
+        "is_disabled_reason": "Future-flow simulation feed is not available in fixture mode.",
+        "data_dependency": "future_flow_simulation_dataset",
+        "source_system": "analytics_api",
+        "trust_impact": "Disabled dimensions are excluded from export manifest filters.",
+        "applies_to_pages": ["outcomes", "business_value"],
+    },
+    {
+        "filter_id": "saved_view_id",
+        "label": "Saved view ID",
+        "plain_language_help": "Apply a saved view by identifier.",
+        "allowed_values": ["view_default", "view_triage_pending", "view_cost_too_high_watch"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "saved_view_store",
+        "source_system": "analytics_api",
+        "trust_impact": "Saved views are replayed exactly into the manifest filter set.",
+        "applies_to_pages": ["all_subscription_pages"],
+    },
+    {
+        "filter_id": "saved_view_name",
+        "label": "Saved view name",
+        "plain_language_help": "Apply a saved view by display name.",
+        "allowed_values": ["default", "triage_pending", "cost_too_high_watch"],
+        "is_enabled": True,
+        "is_disabled_reason": None,
+        "data_dependency": "saved_view_store",
+        "source_system": "analytics_api",
+        "trust_impact": "Saved views are replayed exactly into the manifest filter set.",
+        "applies_to_pages": ["all_subscription_pages"],
+    },
+]
+
+
+SUBSCRIPTION_FOLLOW_UP_FIXTURES: dict[str, list[SubscriptionFollowUpRecordFixture]] = {
+    "baseline": [
+        {
+            "customer_or_case_id": "case-1001",
+            "recommended_action": "Confirm in Stay.ai",
+            "reason": "Missing Stay.ai final state for cancel request",
+            "priority": "high",
+            "status": "open",
+            "source_system": "stayai",
+            "blocking_data_gap": "stayai_final_state",
+            "stayai_confirmation_status": SourceConfirmationStatus.PENDING,
+            "portal_completion_status": "completion_unknown",
+            "estimated_value_at_risk": 540.0,
+            "last_event_at": "2026-05-05T20:30:00Z",
+            "owner_queue": "support_lead",
+            "sla_status": "due_soon",
+            "audit_reference": "audit-follow-up-case-1001-20260505",
+            "support_label": "Awaiting official confirmation",
+            "support_summary": "This case still needs Stay.ai final state confirmation.",
+            "why_it_matters": "Final save/cancel reporting is blocked until official confirmation arrives.",
+            "what_to_do_next": "Open Stay.ai and verify the final subscription outcome.",
+            "blocked_reason_plain_language": "We cannot finalize this outcome without Stay.ai confirmation.",
+        },
+        {
+            "customer_or_case_id": "case-1002",
+            "recommended_action": "Resend portal link",
+            "reason": "Portal link sent but completion not confirmed",
+            "priority": "medium",
+            "status": "open",
+            "source_system": "portal",
+            "blocking_data_gap": "confirmed_completion_event_id",
+            "stayai_confirmation_status": SourceConfirmationStatus.CONFIRMED,
+            "portal_completion_status": "completion_unknown",
+            "estimated_value_at_risk": 220.0,
+            "last_event_at": "2026-05-05T19:10:00Z",
+            "owner_queue": "support_agent",
+            "sla_status": "within_sla",
+            "audit_reference": "audit-follow-up-case-1002-20260505",
+            "support_label": "Portal completion unconfirmed",
+            "support_summary": "The customer received a portal link but completion is unknown.",
+            "why_it_matters": "Portal link sent does not count as a completed subscription action.",
+            "what_to_do_next": "Reach out to the customer and resend the portal link if needed.",
+            "blocked_reason_plain_language": "Completion is not confirmed yet.",
+        },
+        {
+            "customer_or_case_id": "case-1003",
+            "recommended_action": "Review low-confidence match",
+            "reason": "Low match confidence on customer-to-subscription join",
+            "priority": "high",
+            "status": "open",
+            "source_system": "synthflow",
+            "blocking_data_gap": "identity_match_score",
+            "stayai_confirmation_status": SourceConfirmationStatus.PENDING,
+            "portal_completion_status": "link_sent",
+            "estimated_value_at_risk": 910.0,
+            "last_event_at": "2026-05-05T18:05:00Z",
+            "owner_queue": "support_lead",
+            "sla_status": "breached",
+            "audit_reference": "audit-follow-up-case-1003-20260505",
+            "support_label": "Low-confidence match",
+            "support_summary": "The system could not confidently match this call to a subscription.",
+            "why_it_matters": "Low-confidence joins can misstate save and cancellation metrics.",
+            "what_to_do_next": "Manually verify identity before using this case in reporting.",
+            "blocked_reason_plain_language": "Identity confirmation is required before final analytics inclusion.",
+        },
+    ],
+}
+
+
 def _calculate_trust_label(source_confirmation: SourceConfirmationMetrics) -> TrustLabel:
     if (
         source_confirmation.source_confirmation_status == SourceConfirmationStatus.MISSING
@@ -1785,13 +2166,75 @@ def get_subscription_business_value(
         scenario if scenario in SUBSCRIPTION_BUSINESS_VALUE_FIXTURES else "baseline"
     )
     fixture = SUBSCRIPTION_BUSINESS_VALUE_FIXTURES[effective_scenario]
-    metric_models = [
-        SubscriptionBusinessValueMetric(**metric) for metric in fixture["metrics"]
-    ]
+    metric_models: list[SubscriptionBusinessValueMetric] = []
+    for metric in fixture["metrics"]:
+        metric_state = metric["state"]
+        metric_id = metric["metric_key"]
+        metric_display_label = metric["display_name"]
+        missing_data_reason = metric["notes"] if metric_state != BusinessValueState.CONFIRMED else None
+        blocked_reason_plain_language = (
+            "Required source data is missing; this metric cannot be finalized yet."
+            if metric_state == BusinessValueState.BLOCKED_BY_DATA
+            else None
+        )
+        metric_trust_label = (
+            TrustLabel.HIGH
+            if metric_state == BusinessValueState.CONFIRMED
+            else TrustLabel.LOW
+            if metric_state in {BusinessValueState.UNKNOWN, BusinessValueState.BLOCKED_BY_DATA}
+            else TrustLabel.MEDIUM
+        )
+        next_action_hint = (
+            "Wait for Stay.ai confirmation and refresh this page."
+            if metric_state in {BusinessValueState.PENDING, BusinessValueState.UNKNOWN}
+            else "Use this metric in governed exports with manifest metadata."
+        )
+        metric_models.append(
+            SubscriptionBusinessValueMetric(
+                metric_id=metric_id,
+                display_label=metric_display_label,
+                plain_language_summary=(
+                    f"{metric_display_label} is reported with explicit state labels so "
+                    "confirmed and estimated values are never mixed."
+                ),
+                value_state=metric_state,
+                format="currency" if metric["unit"] == "usd" else metric["unit"],
+                formula_version=fixture["formula_version"],
+                source_confirmation_status=fixture["source_confirmation_status"],
+                trust_label=metric_trust_label,
+                freshness_status=fixture["freshness_status"],
+                owner=fixture["owner"],
+                timestamp=fixture["timestamp"],
+                fingerprint=sha256(
+                    dumps(
+                        {
+                            "scenario": effective_scenario,
+                            "metric_id": metric_id,
+                            "formula_version": fixture["formula_version"],
+                            "value": metric["value"],
+                        },
+                        sort_keys=True,
+                    ).encode("utf-8")
+                ).hexdigest(),
+                audit_reference=fixture["audit_reference"],
+                missing_data_reason=missing_data_reason,
+                next_action_hint=next_action_hint,
+                support_label=metric_display_label,
+                support_summary=(
+                    "This metric uses source-truth-safe rules and cannot finalize from Shopify context alone."
+                ),
+                why_it_matters=(
+                    "Support and retention users need a reliable business-value signal to prioritize actions."
+                ),
+                what_to_do_next=next_action_hint,
+                blocked_reason_plain_language=blocked_reason_plain_language,
+                **metric,
+            )
+        )
     blocked_metrics_count = sum(
         1
         for metric in metric_models
-        if metric.state == BusinessValueState.BLOCKED_BY_DATA
+        if metric.value_state == BusinessValueState.BLOCKED_BY_DATA
     )
     source_confirmation_status = fixture["source_confirmation_status"]
     if source_confirmation_status == SourceConfirmationStatus.MISSING:
@@ -1837,6 +2280,170 @@ def get_subscription_business_value(
         metrics=metric_models,
         metadata=metadata,
     )
+
+
+def get_subscription_filter_options(
+    scenario: str = "baseline",
+) -> SubscriptionAdvancedFilterResponse:
+    options = [SubscriptionFilterOption(**option) for option in SUBSCRIPTION_ADVANCED_FILTER_OPTIONS]
+    metadata = SubscriptionOutcomeMetricMetadata(
+        metric_id="subscription_advanced_filter_contract",
+        filters={"date_preset": "last_30_days", "saved_view": "default"},
+        metric_definitions=[
+            "Filter options are governed by source-of-truth and data-dependency rules.",
+            "Disabled filters include explicit reasons and never silently disappear.",
+            "Shopify is context-only and does not finalize subscription outcome truth.",
+        ],
+        trust_label=TrustLabel.HIGH,
+        freshness_status=FreshnessStatus.FRESH,
+        formula_version="v1.0.0",
+        owner="analytics",
+        timestamp="2026-05-06T12:00:00Z",
+        fingerprint=sha256(
+            dumps({"scenario": scenario, "options": [option.model_dump(mode="json") for option in options]}, sort_keys=True).encode(
+                "utf-8"
+            )
+        ).hexdigest(),
+        audit_reference=f"audit-subscription-advanced-filters-{scenario}-20260506",
+        source_confirmation_status=SourceConfirmationStatus.CONFIRMED,
+        presentation=_metric_presentation(
+            display_label="Subscription Advanced Filters",
+            short_label="Advanced Filters",
+            executive_summary=(
+                "Advanced filters expose required subscription dimensions and include disabled reasons "
+                "where data dependencies are not yet available."
+            ),
+            format_type="filter_option_catalog",
+            unit="n/a",
+            metric_trust_label=TrustLabel.HIGH,
+            source_confirmation_status=SourceConfirmationStatus.CONFIRMED,
+            freshness_status=FreshnessStatus.FRESH,
+            drilldown_hint="Use filter_id values to bind UI controls and export manifests.",
+        ),
+    )
+    return SubscriptionAdvancedFilterResponse(
+        scenario=scenario,
+        options=options,
+        applied_filters={"date_preset": "last_30_days", "comparison_period": "none", "saved_view": "default"},
+        metadata=metadata,
+    )
+
+
+def get_subscription_export_preflight(
+    request: SubscriptionExportPreflightRequest,
+) -> SubscriptionExportPreflightResponse:
+    role = (request.requester_role or "unknown").strip().lower()
+    role_permissions: dict[str, set[SubscriptionExportScope]] = {
+        "admin": set(SubscriptionExportScope),
+        "analyst": set(SubscriptionExportScope),
+        "compliance_manager": set(SubscriptionExportScope),
+        "support_lead": {
+            SubscriptionExportScope.EXPORT_TABLE_ROWS,
+            SubscriptionExportScope.EXPORT_FILTERED_CSV,
+            SubscriptionExportScope.EXPORT_AUDIT_MANIFEST,
+        },
+        "viewer": set(),
+        "unknown": set(),
+    }
+    allowed_scopes = role_permissions.get(role, set())
+    export_allowed = request.requested_scope in allowed_scopes
+    blocked_reason = None
+    permission_decision = "allow"
+    if not export_allowed:
+        blocked_reason = (
+            "Export blocked: your role cannot export this scope. Audit reference logged."
+        )
+        permission_decision = "explicit_deny"
+
+    metric_definitions = [
+        "confirmed_cancellations_total requires Stay.ai cancelled final state or approved official path",
+        "confirmed_retained_total requires Stay.ai retained/saved/active confirmed final state",
+        "portal link sent is not portal completion",
+    ]
+    trust_labels = ["high", "medium", "low"]
+    freshness = "stale"
+    formula_versions = ["subscription_outcomes:v0.5.0", "business_value:v0.7.0"]
+    included_widgets = request.included_widgets or ["outcome_funnel", "business_value_headline"]
+    excluded_widgets = [] if export_allowed else included_widgets
+    missing_required_metadata: list[str] = []
+    if not request.filters:
+        missing_required_metadata.append("filters")
+    if request.comparison_period == "":
+        missing_required_metadata.append("comparison_period")
+
+    payload = {
+        "requested_scope": request.requested_scope,
+        "requested_format": request.requested_format,
+        "filters": request.filters,
+        "comparison_period": request.comparison_period,
+        "role": role,
+    }
+    return SubscriptionExportPreflightResponse(
+        export_allowed=export_allowed,
+        blocked_reason=blocked_reason,
+        requested_scope=request.requested_scope,
+        requested_format=request.requested_format,
+        filters=request.filters,
+        comparison_period=request.comparison_period,
+        metric_definitions=metric_definitions,
+        trust_labels=trust_labels,
+        freshness=freshness,
+        formula_versions=formula_versions,
+        owner="analytics",
+        timestamp="2026-05-06T12:00:00Z",
+        fingerprint=sha256(dumps(payload, sort_keys=True).encode("utf-8")).hexdigest(),
+        audit_reference=f"audit-subscription-export-preflight-{uuid4().hex[:10]}",
+        requester_role=role,
+        permission_decision=permission_decision,
+        source_confirmation_status=SourceConfirmationStatus.PENDING,
+        included_widgets=included_widgets if export_allowed else [],
+        excluded_widgets=excluded_widgets,
+        missing_required_metadata=missing_required_metadata,
+    )
+
+
+def get_subscription_follow_up(
+    scenario: str = "baseline",
+) -> SubscriptionFollowUpResponse:
+    records = [
+        SubscriptionFollowUpRecord(**record)
+        for record in SUBSCRIPTION_FOLLOW_UP_FIXTURES.get(scenario, SUBSCRIPTION_FOLLOW_UP_FIXTURES["baseline"])
+    ]
+    metadata = SubscriptionOutcomeMetricMetadata(
+        metric_id="subscription_follow_up_queue",
+        filters={"queue": "open", "priority": "high_or_medium"},
+        metric_definitions=[
+            "Follow-up queue includes records with pending confirmation, portal completion unknown, or low trust.",
+            "Stay.ai confirmation is required for final save/cancel truth.",
+            "Portal link sent does not imply portal completion.",
+        ],
+        trust_label=TrustLabel.MEDIUM,
+        freshness_status=FreshnessStatus.FRESH,
+        formula_version="v1.0.0",
+        owner="support_ops",
+        timestamp="2026-05-06T12:00:00Z",
+        fingerprint=sha256(
+            dumps({"scenario": scenario, "records": [record.model_dump(mode="json") for record in records]}, sort_keys=True).encode(
+                "utf-8"
+            )
+        ).hexdigest(),
+        audit_reference=f"audit-subscription-follow-up-{scenario}-20260506",
+        source_confirmation_status=SourceConfirmationStatus.PENDING,
+        presentation=_metric_presentation(
+            display_label="Subscription Follow-up Queue",
+            short_label="Follow-up",
+            executive_summary=(
+                "Follow-up queue prioritizes cases needing human action with source-truth-safe status fields."
+            ),
+            format_type="action_queue",
+            unit="count",
+            metric_trust_label=TrustLabel.MEDIUM,
+            source_confirmation_status=SourceConfirmationStatus.PENDING,
+            freshness_status=FreshnessStatus.FRESH,
+            drilldown_hint="Use recommended_action and blocking_data_gap to route work quickly.",
+        ),
+    )
+    return SubscriptionFollowUpResponse(scenario=scenario, records=records, metadata=metadata)
 
 
 def get_subscription_source_health(

@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Subscription Follow-up Response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["module", "generated_from_fixture", "scenario", "records", "metadata"],
+  "properties": {
+    "module": { "type": "string", "const": "subscriptions" },
+    "generated_from_fixture": { "type": "boolean", "const": true },
+    "scenario": { "type": "string" },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "customer_or_case_id",
+          "recommended_action",
+          "reason",
+          "priority",
+          "status",
+          "source_system",
+          "blocking_data_gap",
+          "stayai_confirmation_status",
+          "portal_completion_status",
+          "estimated_value_at_risk",
+          "last_event_at",
+          "owner_queue",
+          "sla_status",
+          "audit_reference",
+          "support_label",
+          "support_summary",
+          "why_it_matters",
+          "what_to_do_next",
+          "blocked_reason_plain_language"
+        ],
+        "properties": {
+          "customer_or_case_id": { "type": "string" },
+          "recommended_action": { "type": "string" },
+          "reason": { "type": "string" },
+          "priority": { "type": "string" },
+          "status": { "type": "string" },
+          "source_system": { "type": "string" },
+          "blocking_data_gap": { "type": ["string", "null"] },
+          "stayai_confirmation_status": { "type": "string", "enum": ["confirmed", "pending", "missing"] },
+          "portal_completion_status": { "type": "string" },
+          "estimated_value_at_risk": { "type": ["number", "null"] },
+          "last_event_at": { "type": "string", "format": "date-time" },
+          "owner_queue": { "type": "string" },
+          "sla_status": { "type": "string" },
+          "audit_reference": { "type": "string" },
+          "support_label": { "type": "string" },
+          "support_summary": { "type": "string" },
+          "why_it_matters": { "type": "string" },
+          "what_to_do_next": { "type": "string" },
+          "blocked_reason_plain_language": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "metadata": { "type": "object" }
+  }
+}

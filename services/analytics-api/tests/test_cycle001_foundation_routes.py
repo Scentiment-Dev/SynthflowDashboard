@@ -27,6 +27,8 @@ def test_cycle001_foundation_routes_and_permissions(client: TestClient) -> None:
     assert client.get("/metrics/subscription_save_rate/series").status_code == 200
     assert client.get("/subscriptions/summary").status_code == 200
     assert client.get("/subscriptions/business-value").status_code == 200
+    assert client.get("/subscriptions/advanced-filters").status_code == 200
+    assert client.get("/subscriptions/follow-up").status_code == 200
     assert client.get("/cancellations/summary").status_code == 200
     assert client.get("/retention/summary").status_code == 200
     assert client.get("/order-status/summary").status_code == 200
@@ -137,6 +139,20 @@ def test_cycle001_foundation_mutating_routes(client: TestClient) -> None:
     )
     assert export_policy.status_code == 200
     assert export_policy.json()["compliant"] is False
+
+    export_preflight = client.post(
+        "/subscriptions/export/preflight",
+        json={
+            "requested_scope": "export_current_page",
+            "requested_format": "pdf",
+            "requester_role": "viewer",
+            "filters": {"date_preset": "last_30_days"},
+            "comparison_period": "none",
+            "included_widgets": ["outcome_funnel"],
+        },
+    )
+    assert export_preflight.status_code == 200
+    assert export_preflight.json()["permission_decision"] == "explicit_deny"
 
     audit_event = client.post(
         "/audit/events",

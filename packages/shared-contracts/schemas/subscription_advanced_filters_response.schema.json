@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Subscription Advanced Filters Response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["module", "generated_from_fixture", "scenario", "options", "applied_filters", "metadata"],
+  "properties": {
+    "module": { "type": "string", "const": "subscriptions" },
+    "generated_from_fixture": { "type": "boolean", "const": true },
+    "scenario": { "type": "string" },
+    "options": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "filter_id",
+          "label",
+          "plain_language_help",
+          "allowed_values",
+          "is_enabled",
+          "is_disabled_reason",
+          "data_dependency",
+          "source_system",
+          "trust_impact",
+          "applies_to_pages"
+        ],
+        "properties": {
+          "filter_id": { "type": "string" },
+          "label": { "type": "string" },
+          "plain_language_help": { "type": "string" },
+          "allowed_values": { "type": "array", "items": { "type": "string" } },
+          "is_enabled": { "type": "boolean" },
+          "is_disabled_reason": { "type": ["string", "null"] },
+          "data_dependency": { "type": "string" },
+          "source_system": { "type": "string" },
+          "trust_impact": { "type": "string" },
+          "applies_to_pages": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "applied_filters": { "type": "object" },
+    "metadata": { "type": "object" }
+  }
+}
