@@ -1791,7 +1791,7 @@ def get_subscription_business_value(
     blocked_metrics_count = sum(
         1
         for metric in metric_models
-        if metric.state in {BusinessValueState.BLOCKED_BY_DATA, BusinessValueState.UNKNOWN}
+        if metric.state == BusinessValueState.BLOCKED_BY_DATA
     )
     source_confirmation_status = fixture["source_confirmation_status"]
     if source_confirmation_status == SourceConfirmationStatus.MISSING:

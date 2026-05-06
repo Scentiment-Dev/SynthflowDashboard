@@ -255,7 +255,7 @@ def test_subscription_business_value_contract_exposes_stateful_metrics(client: T
     assert payload["scenario"] == "baseline"
     assert payload["source_confirmation_status"] == "pending"
     assert payload["metadata"]["metric_id"] == "subscription_business_value_summary"
-    assert payload["metadata"]["blocked_metrics_count"] >= 1
+    assert payload["metadata"]["blocked_metrics_count"] == 1
     assert payload["metadata"]["trust_label"] == "medium"
     assert payload["metrics"]
     states = {metric["state"] for metric in payload["metrics"]}
@@ -273,7 +273,7 @@ def test_subscription_business_value_missing_confirmation_degrades_trust(client:
     assert payload["source_confirmation_status"] == "missing"
     assert payload["metadata"]["source_confirmation_status"] == "missing"
     assert payload["metadata"]["trust_label"] == "low"
-    assert payload["metadata"]["blocked_metrics_count"] >= 1
+    assert payload["metadata"]["blocked_metrics_count"] == 1
     net_business_value = next(
         metric for metric in payload["metrics"] if metric["metric_key"] == "net_business_value_impact"
     )
