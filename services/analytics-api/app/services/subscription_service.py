@@ -2343,6 +2343,7 @@ def get_subscription_export_preflight(
     request: SubscriptionExportPreflightRequest,
     authenticated_roles: list[Role] | None = None,
 ) -> SubscriptionExportPreflightResponse:
+    # Precedence determines which authenticated role is surfaced in preflight metadata.
     role_precedence = [
         Role.ADMIN.value,
         Role.COMPLIANCE_MANAGER.value,
