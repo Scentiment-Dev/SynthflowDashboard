@@ -88,8 +88,10 @@ Executed commands:
 
 ## Bugbot / Codecov status
 
-- Bugbot: required, pending for this branch until PR is opened and CI runs.
-- Codecov: required, pending for this branch until PR is opened and CI runs.
+- PR: `https://github.com/Scentiment-Dev/SynthflowDashboard/pull/26`
+- Codecov: `codecov/patch` is `SUCCESS` and posted a passing coverage comment on PR #26.
+- Cursor Bugbot: completed with `skipping` conclusion (no blocking findings emitted on current head).
+- Codex review comments: reviewed and resolved (1 suggestion, fixed in commit `724480f` and thread resolved).
 - Coverage threshold policy: maintained at 95% minimum, local gate passed at 99.12%.
 
 ## Blockers / risks
