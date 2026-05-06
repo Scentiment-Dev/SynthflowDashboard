@@ -925,7 +925,7 @@ SUBSCRIPTION_BUSINESS_VALUE_FIXTURES: dict[str, SubscriptionBusinessValueScenari
                 "value": 86540.0,
                 "unit": "usd",
                 "state": BusinessValueState.ESTIMATED,
-                "formula": "gross_value_protected - offer_cost - discount_cost - free_shipping_cost + support_cost_avoided",
+                "formula": "gross_value_protected - offer_cost + support_cost_avoided",
                 "source_of_truth": "warehouse_analytics",
                 "data_dependencies": ["stayai_final_state", "shopify_order_value", "offer_costs"],
                 "notes": "Estimated until closed-loop finance attribution is complete.",
