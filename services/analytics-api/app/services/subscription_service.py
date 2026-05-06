@@ -2360,6 +2360,7 @@ def get_subscription_export_preflight(
         ),
         "unknown",
     )
+    requested_role = (request.requester_role or "").strip().lower() or None
     role_permissions: dict[str, set[SubscriptionExportScope]] = {
         "admin": set(SubscriptionExportScope),
         "analyst": set(SubscriptionExportScope),
@@ -2376,8 +2377,14 @@ def get_subscription_export_preflight(
     export_allowed = request.requested_scope in allowed_scopes
     blocked_reason = None
     permission_decision = "allow"
-    if not export_allowed:
+    if requested_role is not None and requested_role != role:
+        export_allowed = False
         blocked_reason = (
+            "Export blocked: requester_role does not match authenticated role context."
+        )
+        permission_decision = "explicit_deny"
+    if not export_allowed:
+        blocked_reason = blocked_reason or (
             "Export blocked: your role cannot export this scope. Audit reference logged."
         )
         permission_decision = "explicit_deny"
@@ -2408,6 +2415,7 @@ def get_subscription_export_preflight(
         "filters": request.filters,
         "comparison_period": request.comparison_period,
         "role": role,
+        "requested_role": requested_role,
     }
     return SubscriptionExportPreflightResponse(
         export_allowed=export_allowed,

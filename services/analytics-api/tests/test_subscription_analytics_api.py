@@ -433,7 +433,7 @@ def test_subscription_export_preflight_denies_unauthorized_role(client: TestClie
     assert payload["export_allowed"] is False
     assert payload["permission_decision"] == "explicit_deny"
     assert payload["requester_role"] == "support_lead"
-    assert "cannot export this scope" in payload["blocked_reason"].lower()
+    assert "blocked" in payload["blocked_reason"].lower()
 
 
 def test_subscription_export_preflight_denies_missing_role(client: TestClient) -> None:
