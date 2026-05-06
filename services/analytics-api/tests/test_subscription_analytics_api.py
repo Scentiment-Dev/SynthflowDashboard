@@ -262,6 +262,324 @@ def test_subscription_business_value_contract_exposes_stateful_metrics(client: T
     assert {"confirmed", "estimated", "pending", "blocked_by_data"}.issubset(states)
 
 
+def test_subscription_business_value_contains_required_p0_metric_family(client: TestClient) -> None:
+    response = client.get("/subscriptions/business-value")
+    assert response.status_code == 200
+    metrics = response.json()["metrics"]
+    metric_ids = {metric["metric_id"] for metric in metrics}
+    required_metric_ids = {
+        "net_business_value_impact",
+        "gross_value_protected",
+        "net_retained_recovered_value",
+        "confirmed_business_value_impact",
+        "estimated_business_value_impact",
+        "revenue_saved_estimate",
+        "gross_saved_value",
+        "confirmed_saved_revenue",
+        "net_saved_revenue",
+        "offer_cost",
+        "discount_cost",
+        "free_shipping_cost",
+        "revenue_at_risk",
+        "support_cost_avoided",
+        "cost_per_contained_call",
+        "net_value_per_contained_call",
+        "automation_roi",
+        "retention_roi_estimate",
+        "estimated_churn_prevented_count",
+        "confirmed_churn_prevented_count",
+        "revenue_leakage_after_save",
+        "high_value_churn_risk",
+        "stay_ai_confirmation_coverage",
+        "true_subscription_containment_rate",
+    }
+    assert required_metric_ids.issubset(metric_ids)
+
+
+def test_subscription_business_value_metric_contract_has_plain_language_and_audit_fields(
+    client: TestClient,
+) -> None:
+    response = client.get("/subscriptions/business-value")
+    assert response.status_code == 200
+    metric = response.json()["metrics"][0]
+    required_fields = [
+        "metric_id",
+        "display_label",
+        "plain_language_summary",
+        "value_state",
+        "formula_version",
+        "source_confirmation_status",
+        "trust_label",
+        "freshness_status",
+        "owner",
+        "timestamp",
+        "fingerprint",
+        "audit_reference",
+        "missing_data_reason",
+        "next_action_hint",
+        "support_label",
+        "support_summary",
+        "why_it_matters",
+        "what_to_do_next",
+        "blocked_reason_plain_language",
+    ]
+    for field in required_fields:
+        assert field in metric
+
+
+def test_subscription_business_value_confirmed_and_estimated_and_pending_and_blocked_are_distinct(
+    client: TestClient,
+) -> None:
+    response = client.get("/subscriptions/business-value")
+    assert response.status_code == 200
+    states = {metric["value_state"] for metric in response.json()["metrics"]}
+    assert {"confirmed", "estimated", "pending", "blocked_by_data"}.issubset(states)
+
+
+def test_subscription_business_value_source_confirmation_status_derived_per_metric(
+    client: TestClient,
+) -> None:
+    response = client.get("/subscriptions/business-value")
+    assert response.status_code == 200
+    metrics = {
+        metric["metric_id"]: metric
+        for metric in response.json()["metrics"]
+    }
+    assert (
+        metrics["confirmed_business_value_impact"]["source_confirmation_status"]
+        == "confirmed"
+    )
+    assert (
+        metrics["cost_too_high_funnel_sequence_metrics"]["source_confirmation_status"]
+        == "missing"
+    )
+
+
+def test_subscription_business_value_blocked_metrics_have_data_gap_next_action_hint(
+    client: TestClient,
+) -> None:
+    response = client.get("/subscriptions/business-value")
+    assert response.status_code == 200
+    blocked_metric = next(
+        metric
+        for metric in response.json()["metrics"]
+        if metric["value_state"] == "blocked_by_data"
+    )
+    assert "missing data dependencies" in blocked_metric["next_action_hint"].lower()
+
+
+def test_subscription_business_value_revenue_metrics_not_confirmed_without_confirmed_source(
+    client: TestClient,
+) -> None:
+    response = client.get("/subscriptions/business-value")
+    assert response.status_code == 200
+    revenue_metric_ids = {
+        "net_business_value_impact",
+        "gross_value_protected",
+        "net_retained_recovered_value",
+        "estimated_business_value_impact",
+        "revenue_saved_estimate",
+        "gross_saved_value",
+        "net_saved_revenue",
+        "revenue_at_risk",
+        "revenue_leakage_after_save",
+    }
+    for metric in response.json()["metrics"]:
+        if metric["metric_id"] in revenue_metric_ids:
+            assert not (
+                metric["value_state"] == "confirmed"
+                and metric["source_confirmation_status"] != "confirmed"
+            )
+
+
+def test_subscription_advanced_filter_contract_includes_required_dimensions(client: TestClient) -> None:
+    response = client.get("/subscriptions/advanced-filters")
+    assert response.status_code == 200
+    options = response.json()["options"]
+    filter_ids = {option["filter_id"] for option in options}
+    required_filter_ids = {
+        "date_preset",
+        "custom_date_range",
+        "comparison_period",
+        "cancellation_reason",
+        "offer_type",
+        "offer_version",
+        "subscription_status",
+        "product_sku",
+        "match_confidence",
+        "portal_state",
+        "outcome",
+        "escalation_state",
+        "repeat_contact",
+        "value_range",
+        "trust_label",
+        "synthflow_flow_version",
+        "stayai_action_type",
+        "stayai_offer_version",
+        "stayai_freshness_api_state",
+        "current_vs_future_flow_state",
+        "saved_view_id",
+        "saved_view_name",
+    }
+    assert required_filter_ids.issubset(filter_ids)
+    for option in options:
+        assert "is_disabled_reason" in option
+        if option["is_enabled"] is False:
+            assert option["is_disabled_reason"]
+
+
+def test_subscription_export_preflight_denies_unauthorized_role(client: TestClient) -> None:
+    response = client.post(
+        "/subscriptions/export/preflight",
+        json={
+            "requested_scope": "export_current_page",
+            "requested_format": "pdf",
+            "requester_role": "admin",
+            "filters": {"date_preset": "last_30_days"},
+            "comparison_period": "previous_period",
+            "included_widgets": ["outcome_funnel"],
+        },
+        headers={"x-scentiment-roles": "support_lead"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["export_allowed"] is False
+    assert payload["permission_decision"] == "explicit_deny"
+    assert payload["requester_role"] == "support_lead"
+    assert "blocked" in payload["blocked_reason"].lower()
+
+
+def test_subscription_export_preflight_denies_missing_role(client: TestClient) -> None:
+    response = client.post(
+        "/subscriptions/export/preflight",
+        json={
+            "requested_scope": "export_current_page",
+            "requested_format": "pdf",
+            "filters": {"date_preset": "last_30_days"},
+            "comparison_period": "none",
+            "included_widgets": ["outcome_funnel"],
+        },
+        headers={"x-scentiment-roles": "support_lead"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["requester_role"] == "support_lead"
+    assert payload["permission_decision"] == "explicit_deny"
+    assert payload["export_allowed"] is False
+
+
+def test_subscription_export_preflight_includes_required_manifest_metadata(client: TestClient) -> None:
+    response = client.post(
+        "/subscriptions/export/preflight",
+        json={
+            "requested_scope": "export_table_rows",
+            "requested_format": "csv",
+            "requester_role": "support_lead",
+            "filters": {"date_preset": "last_30_days", "outcome": "save"},
+            "comparison_period": "none",
+            "included_widgets": ["follow_up_table"],
+        },
+        headers={"x-scentiment-roles": "support_lead"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    required_fields = [
+        "export_allowed",
+        "blocked_reason",
+        "requested_scope",
+        "requested_format",
+        "filters",
+        "comparison_period",
+        "metric_definitions",
+        "trust_labels",
+        "freshness",
+        "formula_versions",
+        "owner",
+        "timestamp",
+        "fingerprint",
+        "audit_reference",
+        "requester_role",
+        "permission_decision",
+        "source_confirmation_status",
+        "included_widgets",
+        "excluded_widgets",
+        "missing_required_metadata",
+    ]
+    for field in required_fields:
+        assert field in payload
+
+
+def test_subscription_export_preflight_preserves_explicit_empty_included_widgets(
+    client: TestClient,
+) -> None:
+    response = client.post(
+        "/subscriptions/export/preflight",
+        json={
+            "requested_scope": "export_table_rows",
+            "requested_format": "csv",
+            "filters": {"date_preset": "last_30_days"},
+            "comparison_period": "none",
+            "included_widgets": [],
+        },
+        headers={"x-scentiment-roles": "support_lead"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["export_allowed"] is True
+    assert payload["included_widgets"] == []
+    assert payload["excluded_widgets"] == []
+
+
+def test_subscription_export_preflight_uses_union_of_authenticated_role_scopes(
+    client: TestClient,
+) -> None:
+    response = client.post(
+        "/subscriptions/export/preflight",
+        json={
+            "requested_scope": "export_table_rows",
+            "requested_format": "csv",
+            "requester_role": "support_lead",
+            "filters": {"date_preset": "last_30_days"},
+            "comparison_period": "none",
+            "included_widgets": ["follow_up_table"],
+        },
+        headers={"x-scentiment-roles": "compliance_manager,support_lead"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["export_allowed"] is True
+    assert payload["permission_decision"] == "allow"
+
+
+def test_subscription_follow_up_contract_exposes_actionability_fields(client: TestClient) -> None:
+    response = client.get("/subscriptions/follow-up")
+    assert response.status_code == 200
+    record = response.json()["records"][0]
+    required_fields = [
+        "customer_or_case_id",
+        "recommended_action",
+        "reason",
+        "priority",
+        "status",
+        "source_system",
+        "blocking_data_gap",
+        "stayai_confirmation_status",
+        "portal_completion_status",
+        "estimated_value_at_risk",
+        "last_event_at",
+        "owner_queue",
+        "sla_status",
+        "audit_reference",
+        "support_label",
+        "support_summary",
+        "why_it_matters",
+        "what_to_do_next",
+        "blocked_reason_plain_language",
+    ]
+    for field in required_fields:
+        assert field in record
+
+
 def test_subscription_business_value_missing_confirmation_degrades_trust(client: TestClient) -> None:
     response = client.get(
         "/subscriptions/business-value",

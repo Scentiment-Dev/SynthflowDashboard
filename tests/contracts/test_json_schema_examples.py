@@ -24,6 +24,9 @@ EXAMPLE_BY_SCHEMA = {
     "subscription_outcomes_response.schema.json": "subscription_outcomes_response.example.json",
     "subscription_business_value_response.schema.json": "subscription_business_value_response.example.json",
     "subscription_source_health.schema.json": "subscription_source_health.example.json",
+    "subscription_advanced_filters_response.schema.json": "subscription_advanced_filters_response.example.json",
+    "subscription_export_preflight_response.schema.json": "subscription_export_preflight_response.example.json",
+    "subscription_follow_up_response.schema.json": "subscription_follow_up_response.example.json",
 }
 
 ADDITIONAL_EXAMPLES_BY_SCHEMA = {

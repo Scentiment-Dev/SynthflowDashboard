@@ -1,0 +1,74 @@
+{
+  "module": "subscriptions",
+  "generated_from_fixture": true,
+  "scenario": "baseline",
+  "options": [
+    {
+      "filter_id": "date_preset",
+      "label": "Date preset",
+      "plain_language_help": "Quickly switch to common date windows like last 7 or last 30 days.",
+      "allowed_values": ["today", "last_7_days", "last_30_days", "last_90_days", "custom"],
+      "is_enabled": true,
+      "is_disabled_reason": null,
+      "data_dependency": "event_timestamp",
+      "source_system": "analytics_api",
+      "trust_impact": "Changes denominator and comparison context for all subscription metrics.",
+      "applies_to_pages": ["all_subscription_pages"]
+    },
+    {
+      "filter_id": "current_vs_future_flow_state",
+      "label": "Current vs future flow state",
+      "plain_language_help": "Compare production flow with planned future flow behavior.",
+      "allowed_values": ["current", "future", "compare"],
+      "is_enabled": false,
+      "is_disabled_reason": "Future-flow simulation feed is not available in fixture mode.",
+      "data_dependency": "future_flow_simulation_dataset",
+      "source_system": "analytics_api",
+      "trust_impact": "Disabled dimensions are excluded from export manifest filters.",
+      "applies_to_pages": ["outcomes", "business_value"]
+    }
+  ],
+  "applied_filters": {
+    "date_preset": "last_30_days",
+    "comparison_period": "none",
+    "saved_view": "default"
+  },
+  "metadata": {
+    "metric_id": "subscription_advanced_filter_contract",
+    "filters": {
+      "date_preset": "last_30_days",
+      "saved_view": "default"
+    },
+    "metric_definitions": [
+      "Filter options are governed by source-of-truth and data-dependency rules.",
+      "Disabled filters include explicit reasons and never silently disappear.",
+      "Shopify is context-only and does not finalize subscription outcome truth."
+    ],
+    "trust_label": "high",
+    "freshness_status": "fresh",
+    "formula_version": "v1.0.0",
+    "owner": "analytics",
+    "timestamp": "2026-05-06T12:00:00Z",
+    "fingerprint": "2b9fe4a106d38cbec4dcfcbb5535e8fecc8326f904fd4f1a8dc3d95c87af0303",
+    "audit_reference": "audit-subscription-advanced-filters-baseline-20260506",
+    "source_confirmation_status": "confirmed",
+    "presentation": {
+      "display_label": "Subscription Advanced Filters",
+      "short_label": "Advanced Filters",
+      "executive_summary": "Advanced filters expose required subscription dimensions and include disabled reasons where data dependencies are not yet available.",
+      "format_type": "filter_option_catalog",
+      "unit": "n/a",
+      "trend_direction": "unknown",
+      "comparison_label": "Comparison baseline unavailable in fixture preview",
+      "comparison_value": null,
+      "severity": "success",
+      "visual_tone": "positive",
+      "source_authority_explanation": "Stay.ai is the authoritative source for final subscription outcomes.",
+      "trust_explanation": "Trust is high because the required source-of-truth confirmation rules are satisfied.",
+      "freshness_explanation": "Data is fresh and within expected recency.",
+      "drilldown_hint": "Use filter_id values to bind UI controls and export manifests.",
+      "empty_state_copy": "No eligible records were available for this calculation window.",
+      "blocked_state_copy": "This metric is blocked until Stay.ai confirmation records are available."
+    }
+  }
+}

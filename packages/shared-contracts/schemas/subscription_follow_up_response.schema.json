@@ -1,99 +1,59 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Subscription Business Value Response",
+  "title": "Subscription Follow-up Response",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "module",
-    "generated_from_fixture",
-    "source_of_truth_system",
-    "source_confirmation_status",
-    "scenario",
-    "metrics",
-    "metadata"
-  ],
+  "required": ["module", "generated_from_fixture", "scenario", "records", "metadata"],
   "properties": {
     "module": { "type": "string", "const": "subscriptions" },
     "generated_from_fixture": { "type": "boolean", "const": true },
-    "source_of_truth_system": { "type": "string", "enum": ["stayai"] },
-    "source_confirmation_status": { "type": "string", "enum": ["confirmed", "pending", "missing"] },
     "scenario": { "type": "string" },
-    "metrics": {
+    "records": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "metric_id",
-          "display_label",
-          "plain_language_summary",
-          "value_state",
-          "format",
-          "formula_version",
-          "source_confirmation_status",
-          "trust_label",
-          "freshness_status",
-          "owner",
-          "timestamp",
-          "fingerprint",
+          "customer_or_case_id",
+          "recommended_action",
+          "reason",
+          "priority",
+          "status",
+          "source_system",
+          "blocking_data_gap",
+          "stayai_confirmation_status",
+          "portal_completion_status",
+          "estimated_value_at_risk",
+          "last_event_at",
+          "owner_queue",
+          "sla_status",
           "audit_reference",
-          "next_action_hint",
           "support_label",
           "support_summary",
           "why_it_matters",
           "what_to_do_next",
-          "metric_key",
-          "display_name",
-          "value",
-          "unit",
-          "state",
-          "formula",
-          "source_of_truth",
-          "data_dependencies",
-          "notes"
+          "blocked_reason_plain_language"
         ],
         "properties": {
-          "metric_id": { "type": "string" },
-          "display_label": { "type": "string" },
-          "plain_language_summary": { "type": "string" },
-          "value_state": {
-            "type": "string",
-            "enum": ["confirmed", "estimated", "unknown", "pending", "blocked_by_data"]
-          },
-          "format": { "type": "string" },
-          "formula_version": { "type": "string" },
-          "source_confirmation_status": {
-            "type": "string",
-            "enum": ["confirmed", "pending", "missing"]
-          },
-          "trust_label": { "type": "string", "enum": ["high", "medium", "low", "untrusted"] },
-          "freshness_status": { "type": "string", "enum": ["fresh", "stale", "unknown"] },
-          "owner": { "type": "string" },
-          "timestamp": { "type": "string", "format": "date-time" },
-          "fingerprint": { "type": "string" },
+          "customer_or_case_id": { "type": "string" },
+          "recommended_action": { "type": "string" },
+          "reason": { "type": "string" },
+          "priority": { "type": "string" },
+          "status": { "type": "string" },
+          "source_system": { "type": "string" },
+          "blocking_data_gap": { "type": ["string", "null"] },
+          "stayai_confirmation_status": { "type": "string", "enum": ["confirmed", "pending", "missing"] },
+          "portal_completion_status": { "type": "string" },
+          "estimated_value_at_risk": { "type": ["number", "null"] },
+          "last_event_at": { "type": "string", "format": "date-time" },
+          "owner_queue": { "type": "string" },
+          "sla_status": { "type": "string" },
           "audit_reference": { "type": "string" },
-          "missing_data_reason": { "type": ["string", "null"] },
-          "next_action_hint": { "type": "string" },
           "support_label": { "type": "string" },
           "support_summary": { "type": "string" },
           "why_it_matters": { "type": "string" },
           "what_to_do_next": { "type": "string" },
-          "blocked_reason_plain_language": { "type": ["string", "null"] },
-          "metric_key": { "type": "string" },
-          "display_name": { "type": "string" },
-          "value": { "type": ["number", "integer", "null"] },
-          "unit": { "type": "string" },
-          "state": {
-            "type": "string",
-            "enum": ["confirmed", "estimated", "unknown", "pending", "blocked_by_data"]
-          },
-          "formula": { "type": "string" },
-          "source_of_truth": { "type": "string" },
-          "data_dependencies": {
-            "type": "array",
-            "items": { "type": "string" }
-          },
-          "notes": { "type": ["string", "null"] }
+          "blocked_reason_plain_language": { "type": ["string", "null"] }
         }
       }
     },
@@ -103,6 +63,7 @@
       "required": [
         "metric_id",
         "filters",
+        "metric_definitions",
         "trust_label",
         "freshness_status",
         "formula_version",
@@ -110,13 +71,13 @@
         "timestamp",
         "fingerprint",
         "audit_reference",
-        "blocked_metrics_count",
         "source_confirmation_status",
         "presentation"
       ],
       "properties": {
         "metric_id": { "type": "string" },
         "filters": { "type": "object" },
+        "metric_definitions": { "type": "array", "items": { "type": "string" } },
         "trust_label": { "type": "string", "enum": ["high", "medium", "low", "untrusted"] },
         "freshness_status": { "type": "string", "enum": ["fresh", "stale", "unknown"] },
         "formula_version": { "type": "string" },
@@ -124,7 +85,6 @@
         "timestamp": { "type": "string", "format": "date-time" },
         "fingerprint": { "type": "string" },
         "audit_reference": { "type": "string" },
-        "blocked_metrics_count": { "type": "integer", "minimum": 0 },
         "source_confirmation_status": {
           "type": "string",
           "enum": ["confirmed", "pending", "missing"]

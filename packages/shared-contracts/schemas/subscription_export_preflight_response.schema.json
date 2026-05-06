@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Subscription Export Preflight Response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "module",
+    "export_allowed",
+    "blocked_reason",
+    "requested_scope",
+    "requested_format",
+    "filters",
+    "comparison_period",
+    "metric_definitions",
+    "trust_labels",
+    "freshness",
+    "formula_versions",
+    "owner",
+    "timestamp",
+    "fingerprint",
+    "audit_reference",
+    "requester_role",
+    "permission_decision",
+    "source_confirmation_status",
+    "included_widgets",
+    "excluded_widgets",
+    "missing_required_metadata"
+  ],
+  "properties": {
+    "module": { "type": "string", "const": "subscriptions" },
+    "export_allowed": { "type": "boolean" },
+    "blocked_reason": { "type": ["string", "null"] },
+    "requested_scope": {
+      "type": "string",
+      "enum": [
+        "export_current_page",
+        "export_widget",
+        "export_table_rows",
+        "export_filtered_csv",
+        "export_pdf_snapshot",
+        "export_audit_manifest"
+      ]
+    },
+    "requested_format": {
+      "type": "string",
+      "enum": ["csv", "pdf", "manifest", "csv_pdf_bundle", "json"]
+    },
+    "filters": { "type": "object" },
+    "comparison_period": { "type": "string" },
+    "metric_definitions": { "type": "array", "items": { "type": "string" } },
+    "trust_labels": { "type": "array", "items": { "type": "string" } },
+    "freshness": { "type": "string" },
+    "formula_versions": { "type": "array", "items": { "type": "string" } },
+    "owner": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "fingerprint": { "type": "string" },
+    "audit_reference": { "type": "string" },
+    "requester_role": { "type": "string" },
+    "permission_decision": { "type": "string", "enum": ["allow", "explicit_deny"] },
+    "source_confirmation_status": { "type": "string", "enum": ["confirmed", "pending", "missing"] },
+    "included_widgets": { "type": "array", "items": { "type": "string" } },
+    "excluded_widgets": { "type": "array", "items": { "type": "string" } },
+    "missing_required_metadata": { "type": "array", "items": { "type": "string" } }
+  }
+}

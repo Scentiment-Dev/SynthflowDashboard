@@ -4,7 +4,11 @@ from app.api.dependencies import require_api_permission
 from app.core.security import Permission, UserContext
 from app.schemas.source_truth import PortalSuccessValidationRequest, SourceTruthDecision
 from app.schemas.subscription import (
+    SubscriptionAdvancedFilterResponse,
     SubscriptionBusinessValueResponse,
+    SubscriptionExportPreflightRequest,
+    SubscriptionExportPreflightResponse,
+    SubscriptionFollowUpResponse,
     SourceSystem,
     SubscriptionActionConfirmationRequest,
     SubscriptionActionConfirmationResponse,
@@ -17,6 +21,9 @@ from app.services.subscription_service import (
     confirm_subscription_action,
     get_subscription_business_value,
     get_subscription_analytics,
+    get_subscription_export_preflight,
+    get_subscription_follow_up,
+    get_subscription_filter_options,
     get_subscription_outcomes,
     get_subscription_source_health,
     get_subscription_summary,
@@ -55,6 +62,30 @@ def business_value(
     _: UserContext = Depends(require_api_permission(Permission.READ_SUBSCRIPTIONS)),
 ) -> SubscriptionBusinessValueResponse:
     return get_subscription_business_value(scenario)
+
+
+@router.get("/advanced-filters", response_model=SubscriptionAdvancedFilterResponse)
+def advanced_filters(
+    scenario: str = "baseline",
+    _: UserContext = Depends(require_api_permission(Permission.READ_SUBSCRIPTIONS)),
+) -> SubscriptionAdvancedFilterResponse:
+    return get_subscription_filter_options(scenario)
+
+
+@router.post("/export/preflight", response_model=SubscriptionExportPreflightResponse)
+def export_preflight(
+    request: SubscriptionExportPreflightRequest,
+    user: UserContext = Depends(require_api_permission(Permission.READ_SUBSCRIPTIONS)),
+) -> SubscriptionExportPreflightResponse:
+    return get_subscription_export_preflight(request, authenticated_roles=user.roles)
+
+
+@router.get("/follow-up", response_model=SubscriptionFollowUpResponse)
+def follow_up(
+    scenario: str = "baseline",
+    _: UserContext = Depends(require_api_permission(Permission.READ_SUBSCRIPTIONS)),
+) -> SubscriptionFollowUpResponse:
+    return get_subscription_follow_up(scenario)
 
 
 @router.get("/source-health", response_model=SubscriptionSourceHealthResponse)

@@ -61,3 +61,19 @@ view, and the Cycle 001 module shell.
 - Metric definition, formula version, owner, timestamp, scenario, fingerprint,
   audit reference, metric definitions, and filters are rendered through the metadata
   panel. Trust, freshness, and source confirmation chips use color-coded tones.
+
+## Cycle 008 backend contract additions (subscription IA support)
+
+- `GET /subscriptions/business-value` now carries per-metric plain-language, trust, freshness,
+  formula version, fingerprint, audit reference, and source confirmation state fields.
+- `GET /subscriptions/advanced-filters` provides filter option catalog + disabled reasons for:
+  date preset, custom/comparison period, cancellation reason, offer type/version, subscription
+  status, SKU, confidence, portal state, outcome, escalation, repeat contact, value range, trust
+  label, Synthflow/Stay.ai version dimensions, current-vs-future flow, and saved views.
+- `POST /subscriptions/export/preflight` returns explicit permission decision, export-allowed
+  result, blocked reason, requested scope/format, applied filters, comparison period, metric
+  definitions, trust labels, freshness, formula versions, owner, timestamp, fingerprint, audit
+  reference, source confirmation status, and included/excluded widgets.
+- `GET /subscriptions/follow-up` returns action queue rows with recommended action, priority,
+  blocking data gap, confirmation status, portal completion status, estimated value at risk, SLA
+  status, queue ownership, and plain-language support guidance.

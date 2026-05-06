@@ -1,0 +1,66 @@
+{
+  "module": "subscriptions",
+  "generated_from_fixture": true,
+  "scenario": "baseline",
+  "records": [
+    {
+      "customer_or_case_id": "case-1001",
+      "recommended_action": "Confirm in Stay.ai",
+      "reason": "Missing Stay.ai final state for cancel request",
+      "priority": "high",
+      "status": "open",
+      "source_system": "stayai",
+      "blocking_data_gap": "stayai_final_state",
+      "stayai_confirmation_status": "pending",
+      "portal_completion_status": "completion_unknown",
+      "estimated_value_at_risk": 540.0,
+      "last_event_at": "2026-05-05T20:30:00Z",
+      "owner_queue": "support_lead",
+      "sla_status": "due_soon",
+      "audit_reference": "audit-follow-up-case-1001-20260505",
+      "support_label": "Awaiting official confirmation",
+      "support_summary": "This case still needs Stay.ai final state confirmation.",
+      "why_it_matters": "Final save/cancel reporting is blocked until official confirmation arrives.",
+      "what_to_do_next": "Open Stay.ai and verify the final subscription outcome.",
+      "blocked_reason_plain_language": "We cannot finalize this outcome without Stay.ai confirmation."
+    }
+  ],
+  "metadata": {
+    "metric_id": "subscription_follow_up_queue",
+    "filters": {
+      "queue": "open",
+      "priority": "high_or_medium"
+    },
+    "metric_definitions": [
+      "Follow-up queue includes records with pending confirmation, portal completion unknown, or low trust.",
+      "Stay.ai confirmation is required for final save/cancel truth.",
+      "Portal link sent does not imply portal completion."
+    ],
+    "trust_label": "medium",
+    "freshness_status": "fresh",
+    "formula_version": "v1.0.0",
+    "owner": "support_ops",
+    "timestamp": "2026-05-06T12:00:00Z",
+    "fingerprint": "30217ec01f69f2ef247f0421cefbf8ea2f7465ec6b89fbf1cc17c93877b24248",
+    "audit_reference": "audit-subscription-follow-up-baseline-20260506",
+    "source_confirmation_status": "pending",
+    "presentation": {
+      "display_label": "Subscription Follow-up Queue",
+      "short_label": "Follow-up",
+      "executive_summary": "Follow-up queue prioritizes cases needing human action with source-truth-safe status fields.",
+      "format_type": "action_queue",
+      "unit": "count",
+      "trend_direction": "unknown",
+      "comparison_label": "Comparison baseline unavailable in fixture preview",
+      "comparison_value": null,
+      "severity": "warning",
+      "visual_tone": "caution",
+      "source_authority_explanation": "Stay.ai is the authoritative source for final subscription outcomes.",
+      "trust_explanation": "Trust is medium because confirmations are still pending for part of the queue.",
+      "freshness_explanation": "Data is fresh and within expected recency.",
+      "drilldown_hint": "Use owner_queue and sla_status to triage support workloads.",
+      "empty_state_copy": "No eligible records were available for this calculation window.",
+      "blocked_state_copy": "This metric is blocked until Stay.ai confirmation records are available."
+    }
+  }
+}

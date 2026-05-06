@@ -1,0 +1,30 @@
+{
+  "module": "subscriptions",
+  "export_allowed": false,
+  "blocked_reason": "Export blocked: your role cannot export this scope. Audit reference logged.",
+  "requested_scope": "export_current_page",
+  "requested_format": "pdf",
+  "filters": {
+    "date_preset": "last_30_days",
+    "outcome": "save"
+  },
+  "comparison_period": "previous_period",
+  "metric_definitions": [
+    "confirmed_cancellations_total requires Stay.ai cancelled final state or approved official path",
+    "confirmed_retained_total requires Stay.ai retained/saved/active confirmed final state",
+    "portal link sent is not portal completion"
+  ],
+  "trust_labels": ["high", "medium", "low"],
+  "freshness": "stale",
+  "formula_versions": ["subscription_outcomes:v0.5.0", "business_value:v0.7.0"],
+  "owner": "analytics",
+  "timestamp": "2026-05-06T12:00:00Z",
+  "fingerprint": "subscription-export-preflight-example-fingerprint",
+  "audit_reference": "audit-subscription-export-preflight-abc123",
+  "requester_role": "viewer",
+  "permission_decision": "explicit_deny",
+  "source_confirmation_status": "pending",
+  "included_widgets": [],
+  "excluded_widgets": ["outcome_funnel", "business_value_headline"],
+  "missing_required_metadata": []
+}
