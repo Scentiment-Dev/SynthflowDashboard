@@ -355,6 +355,19 @@ def test_subscription_business_value_source_confirmation_status_derived_per_metr
     )
 
 
+def test_subscription_business_value_blocked_metrics_have_data_gap_next_action_hint(
+    client: TestClient,
+) -> None:
+    response = client.get("/subscriptions/business-value")
+    assert response.status_code == 200
+    blocked_metric = next(
+        metric
+        for metric in response.json()["metrics"]
+        if metric["value_state"] == "blocked_by_data"
+    )
+    assert "missing data dependencies" in blocked_metric["next_action_hint"].lower()
+
+
 def test_subscription_business_value_revenue_metrics_not_confirmed_without_confirmed_source(
     client: TestClient,
 ) -> None:

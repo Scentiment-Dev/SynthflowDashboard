@@ -2193,7 +2193,9 @@ def get_subscription_business_value(
             else SourceConfirmationStatus.MISSING
         )
         next_action_hint = (
-            "Wait for Stay.ai confirmation and refresh this page."
+            "Resolve missing data dependencies before using this metric."
+            if metric_state == BusinessValueState.BLOCKED_BY_DATA
+            else "Wait for Stay.ai confirmation and refresh this page."
             if metric_state in {BusinessValueState.PENDING, BusinessValueState.UNKNOWN}
             else "Use this metric in governed exports with manifest metadata."
         )
