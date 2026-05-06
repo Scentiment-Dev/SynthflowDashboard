@@ -100,6 +100,26 @@ describe('SubscriptionSubnav (Cycle 007 IA v2 prototype)', () => {
     expect(screen.getByText('Live')).toBeInTheDocument();
   });
 
+  it('falls back to item.label when shortLabel is not provided', () => {
+    const items: SubscriptionSubnavItem[] = SUBSCRIPTION_SUBNAV_ITEMS.map((item) =>
+      item.id === 'outcomes' ? { ...item, shortLabel: undefined } : item,
+    );
+    render(<SubscriptionSubnav items={items} activeId="command-center" />);
+
+    expect(screen.getByRole('tab', { name: /Outcome Summary/i })).toBeInTheDocument();
+  });
+
+  it('renders the attention badge on the active item using the active style', () => {
+    const items: SubscriptionSubnavItem[] = SUBSCRIPTION_SUBNAV_ITEMS.map((item) =>
+      item.id === 'command-center' ? { ...item, attentionCount: 5 } : item,
+    );
+    render(<SubscriptionSubnav items={items} activeId="command-center" />);
+
+    const badge = screen.getByLabelText('5 need attention');
+    expect(badge).toBeInTheDocument();
+    expect(badge.className).toContain('bg-white/20');
+  });
+
   it('exposes a stable lookup helper for subnav items', () => {
     expect(findSubscriptionSubnavItem('command-center')).toMatchObject({
       id: 'command-center',

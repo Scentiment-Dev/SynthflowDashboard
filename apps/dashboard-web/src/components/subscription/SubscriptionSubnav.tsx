@@ -61,9 +61,6 @@ export default function SubscriptionSubnav({
               : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50';
 
           const handleClick = () => {
-            if (isDisabled) {
-              return;
-            }
             onSelect?.(item);
           };
 
