@@ -117,7 +117,7 @@
   - `COVERAGE_RCFILE=.coveragerc.analytics pytest services/analytics-api/tests tests/contracts tests/integration --cov=services/analytics-api --cov=services/ingestion-worker --cov=packages/shared-contracts --cov-report=term-missing --cov-report=xml --cov-fail-under=95`
   - Result: passed, 94 tests, total coverage 99.10%
 - `gh pr checks 30 --watch`:
-  - Final output: all checks passed including `Cursor Bugbot` and `Coverage and Codecov Upload`.
+  - Final output: all required CI and Codecov checks passed; `Cursor Bugbot` resolved with a non-failing `skipping` state on the latest commit.
 
 ## Coverage percentage
 
@@ -125,7 +125,7 @@
 
 ## Bugbot status
 
-- PASS on PR #30 (`Cursor Bugbot`, 5m37s).
+- Non-failing `skipping` on latest PR #30 commit (`Cursor Bugbot`, 5m52s) after prior successful Bugbot run earlier in this PR cycle.
 
 ## Codecov status
 
@@ -160,4 +160,4 @@
 ## Completion statement
 
 - Backend contract implementation, validation, and PR-level checks are complete for Cycle 008 Agent A scope.
-- PR #30 is merge-ready with Bugbot, Codecov, and required CI checks green.
+- PR #30 is merge-ready with Codecov and required CI checks green, and Bugbot in non-blocking `skipping` state.
