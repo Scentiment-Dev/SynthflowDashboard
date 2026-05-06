@@ -1,13 +1,73 @@
-import { Activity, GitBranch, History, Sparkles, Workflow } from 'lucide-react';
+import {
+  Activity,
+  ArrowUpRight,
+  Compass,
+  Download,
+  GitBranch,
+  History,
+  Sparkles,
+  Workflow,
+} from 'lucide-react';
 import DashboardModulePage from '../components/dashboard/DashboardModulePage';
 import SubscriptionAnalyticsView from '../components/dashboard/subscription/SubscriptionAnalyticsView';
 import SubscriptionOutcomesView from '../components/dashboard/subscriptionOutcomes/SubscriptionOutcomesView';
 import SourceHealthView from '../components/dashboard/sourceHealth/SourceHealthView';
 import SectionHeader from '../components/design/SectionHeader';
+import StatusPill from '../components/design/StatusPill';
+import SubscriptionSubnav from '../components/subscription/SubscriptionSubnav';
+import SubscriptionPageHeader from '../components/subscription/SubscriptionPageHeader';
 
 export default function SubscriptionAnalyticsPage() {
   return (
     <div className="space-y-10">
+      <SubscriptionSubnav activeId="command-center" />
+
+      <SubscriptionPageHeader
+        id="subscription-command-center-heading"
+        eyebrow="Subscription command center · IA v2 prototype"
+        title="What changed in subscriptions today?"
+        description={
+          <>
+            Cycle 007 prototype: the redesigned subscription information architecture splits
+            this module into 10 focused subpages so a non-technical support user can find an
+            answer and the next action in seconds. Planned subpages ship in Cycle 008 once
+            their backend contracts and panel migrations land.
+          </>
+        }
+        meta={
+          <>
+            <StatusPill tone="brand" icon={<Compass className="h-3 w-3" />}>
+              IA v2 prototype
+            </StatusPill>
+            <StatusPill tone="success">Stay.ai source of truth</StatusPill>
+            <StatusPill tone="info">Shopify · context only</StatusPill>
+            <StatusPill tone="neutral">Trust labels · system-calculated</StatusPill>
+          </>
+        }
+        actions={
+          <>
+            <button
+              type="button"
+              disabled
+              aria-disabled
+              title="Advanced filter drawer ships in Cycle 008"
+              className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-400"
+            >
+              <ArrowUpRight className="h-3.5 w-3.5" /> Advanced filters · planned
+            </button>
+            <button
+              type="button"
+              disabled
+              aria-disabled
+              title="Export drawer ships in Cycle 008"
+              className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-400"
+            >
+              <Download className="h-3.5 w-3.5" /> Export this view · planned
+            </button>
+          </>
+        }
+      />
+
       <section
         aria-labelledby="subscription-hero-heading"
         className="surface-ink surface-grid-overlay relative overflow-hidden p-6 sm:p-9"
