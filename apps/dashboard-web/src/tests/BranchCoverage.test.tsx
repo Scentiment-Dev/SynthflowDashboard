@@ -315,7 +315,9 @@ describe('branch coverage for dashboard UI helpers', () => {
     unmount();
 
     const { unmount: unmount2 } = renderRoute('/some-unknown-route');
-    expect(screen.getByRole('heading', { name: /Internal analytics/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /Synthflow analytics dashboard/i }),
+    ).toBeInTheDocument();
     unmount2();
   });
 

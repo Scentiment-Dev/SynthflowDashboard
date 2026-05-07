@@ -112,8 +112,8 @@ export function formatBusinessValue(
   if (unit === 'ratio') {
     return `${value.toFixed(value % 1 === 0 ? 0 : 2)}×`;
   }
-  if (unit === 'count' || unit === 'percent') {
-    return value.toLocaleString();
+  if (unit === 'percent') {
+    return `${value.toLocaleString()}%`;
   }
   return value.toLocaleString();
 }

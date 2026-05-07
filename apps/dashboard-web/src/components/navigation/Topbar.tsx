@@ -92,11 +92,16 @@ export default function Topbar() {
   // generic "Internal analytics" label is the safe fallback.
   const isSubscriptionRoute = location.pathname.startsWith('/subscriptions');
   const fallbackEyebrow = isSubscriptionRoute ? 'Subscription analytics' : 'Internal analytics';
+  // The eyebrow and the H1 must NEVER render the identical string (otherwise
+  // the user sees the same text stacked twice). When neither PAGE_META nor a
+  // NAV_ITEMS link matches, the H1 falls back to the product name so the
+  // eyebrow ("Internal analytics" / "Subscription analytics") and the title
+  // ("Synthflow analytics dashboard") stay distinct.
   const meta =
     PAGE_META[location.pathname] ??
     (fallback
       ? { eyebrow: fallbackEyebrow, title: fallback.label }
-      : { eyebrow: fallbackEyebrow, title: fallbackEyebrow });
+      : { eyebrow: fallbackEyebrow, title: 'Synthflow analytics dashboard' });
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/75 backdrop-blur-xl">

@@ -26,7 +26,7 @@ afterEach(() => {
 });
 
 describe('Topbar fallback rendering', () => {
-  it('uses the generic Internal analytics title for unknown non-subscription paths', () => {
+  it('uses the product-name title and Internal analytics eyebrow for unknown non-subscription paths', () => {
     render(
       <DashboardFilterProvider>
         <MemoryRouter initialEntries={['/totally-unknown-path']}>
@@ -37,15 +37,17 @@ describe('Topbar fallback rendering', () => {
       </DashboardFilterProvider>,
     );
     expect(
-      screen.getByRole('heading', { name: /Internal analytics/i }),
+      screen.getByRole('heading', { name: /Synthflow analytics dashboard/i }),
     ).toBeInTheDocument();
+    expect(screen.getByText(/Internal analytics/i)).toBeInTheDocument();
   });
 
-  // Regression for Cursor Bugbot finding on PR #31: only routes under
-  // /subscriptions/* should render the "Subscription analytics" eyebrow;
-  // unknown routes outside that namespace must use a generic fallback so we
-  // never claim the dashboard is subscription-only.
-  it('falls back to Subscription analytics ONLY for unknown routes under /subscriptions/*', () => {
+  // Regression for Cursor Bugbot findings on PR #31:
+  //  1. Only routes under /subscriptions/* should render the "Subscription
+  //     analytics" eyebrow.
+  //  2. The eyebrow and the H1 MUST NEVER render the identical text (no
+  //     "stacked twin headers"); the H1 falls back to the product name.
+  it('uses Subscription analytics eyebrow + product-name title for unknown routes under /subscriptions/*', () => {
     render(
       <DashboardFilterProvider>
         <MemoryRouter initialEntries={['/subscriptions/some-future-page']}>
@@ -56,8 +58,9 @@ describe('Topbar fallback rendering', () => {
       </DashboardFilterProvider>,
     );
     expect(
-      screen.getByRole('heading', { name: /Subscription analytics/i }),
+      screen.getByRole('heading', { name: /Synthflow analytics dashboard/i }),
     ).toBeInTheDocument();
+    expect(screen.getByText(/Subscription analytics/i)).toBeInTheDocument();
   });
 
   it('falls back to raw filter values when not in PLATFORM/SEGMENT/RANGE label maps', async () => {

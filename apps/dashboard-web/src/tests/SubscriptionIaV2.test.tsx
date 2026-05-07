@@ -77,7 +77,8 @@ describe('subscription-v2 plain-language copy helpers', () => {
     expect(formatBusinessValue(4.3, 'ratio')).toBe('4.30×');
     expect(formatBusinessValue(4, 'ratio')).toBe('4×');
     expect(formatBusinessValue(1234, 'count')).toBe('1,234');
-    expect(formatBusinessValue(75, 'percent')).toBe('75');
+    expect(formatBusinessValue(75, 'percent')).toBe('75%');
+    expect(formatBusinessValue(7.5, 'percent')).toBe('7.5%');
     expect(formatBusinessValue(123, 'days')).toBe('123');
     expect(formatBusinessValue(null, 'usd')).toBe('—');
     expect(formatBusinessValue(undefined, 'usd')).toBe('—');
