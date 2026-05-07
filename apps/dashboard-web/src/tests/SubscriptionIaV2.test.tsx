@@ -103,7 +103,6 @@ describe('subscription-v2 plain-language copy helpers', () => {
 
   it('formatFriendlyTimestamp falls back to the raw iso when the Date toLocaleString throws', () => {
     const original = Date.prototype.toLocaleString;
-    // eslint-disable-next-line no-extend-native
     Date.prototype.toLocaleString = function fail() {
       throw new Error('locale data missing');
     };
@@ -112,21 +111,18 @@ describe('subscription-v2 plain-language copy helpers', () => {
         '2026-05-06T12:00:00Z',
       );
     } finally {
-      // eslint-disable-next-line no-extend-native
       Date.prototype.toLocaleString = original;
     }
   });
 
   it('formatRelativeAge falls back to "Updated recently" when the Date getTime throws', () => {
     const original = Date.prototype.getTime;
-    // eslint-disable-next-line no-extend-native
     Date.prototype.getTime = function fail() {
       throw new Error('time-zone db missing');
     };
     try {
       expect(formatRelativeAge('2026-05-06T11:30:00Z')).toBe('Updated recently');
     } finally {
-      // eslint-disable-next-line no-extend-native
       Date.prototype.getTime = original;
     }
   });

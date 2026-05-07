@@ -377,6 +377,76 @@ describe('StatusBanner action / detail branches', () => {
   });
 });
 
+describe('FollowUpPage selection scope (regression for Codex review #31)', () => {
+  it('drops hidden rows from the selected count when the reason filter changes', async () => {
+    render(
+      <MemoryRouter initialEntries={['/subscriptions/follow-up']}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId('follow-up-table')).toBeInTheDocument();
+    });
+
+    // Select case-1002 (portal-unknown row) while viewing all follow-ups.
+    const portalRow = screen.getByTestId('follow-up-row-case-1002');
+    fireEvent.click(within(portalRow).getByRole('checkbox'));
+    expect(screen.getByTestId('follow-up-bulk-actions')).toBeInTheDocument();
+
+    // Switch the reason chip to Pending Stay.ai. case-1002 is no longer visible,
+    // so the bulk-action bar must disappear because no visible row is selected.
+    fireEvent.click(screen.getByTestId('follow-up-reason-pending_stayai'));
+    await waitFor(() => {
+      expect(screen.queryByTestId('follow-up-bulk-actions')).toBeNull();
+    });
+
+    // Switch back to All follow-ups: the original case-1002 row is visible again
+    // AND its checkbox should still be checked because the underlying selection
+    // map is preserved across reason changes (only the visible-count derivation
+    // changes), so the bulk-action bar should reappear.
+    fireEvent.click(screen.getByTestId('follow-up-reason-all'));
+    await waitFor(() => {
+      expect(screen.getByTestId('follow-up-bulk-actions')).toBeInTheDocument();
+    });
+  });
+
+  it('clears the entire selection when the scenario changes', async () => {
+    render(
+      <MemoryRouter initialEntries={['/subscriptions/follow-up']}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId('follow-up-table')).toBeInTheDocument();
+    });
+
+    fireEvent.click(
+      within(screen.getByTestId('follow-up-row-case-1001')).getByRole('checkbox'),
+    );
+    expect(screen.getByTestId('follow-up-bulk-actions')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText(/Follow-up queue scenario/i), {
+      target: { value: 'pending_stayai_confirmation' },
+    });
+    await waitFor(() => {
+      expect(screen.queryByTestId('follow-up-bulk-actions')).toBeNull();
+    });
+
+    fireEvent.change(screen.getByLabelText(/Follow-up queue scenario/i), {
+      target: { value: 'baseline' },
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId('follow-up-table')).toBeInTheDocument();
+    });
+    // After scenario change, the selection map is reset, so the row in baseline
+    // must no longer be marked checked and the bulk-action bar must remain
+    // hidden.
+    const restoredRow = screen.getByTestId('follow-up-row-case-1001');
+    expect(within(restoredRow).getByRole('checkbox')).not.toBeChecked();
+    expect(screen.queryByTestId('follow-up-bulk-actions')).toBeNull();
+  });
+});
+
 describe('MetricDisclosure / PageActionBar branches', () => {
   it('MetricDisclosure renders the updated-age line without a timestamp suffix when only updatedAge is supplied', async () => {
     const { default: MetricDisclosure } = await import(

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import SubscriptionPageHeader from '../../subscription/SubscriptionPageHeader';
 import PageActionBar from '../PageActionBar';
 import StatusBanner from '../StatusBanner';
@@ -96,8 +96,20 @@ export default function FollowUpPage() {
     [reason, state.data.records],
   );
 
-  const selectedCount = Object.values(selected).filter(Boolean).length;
-  const allSelected = records.length > 0 && records.every((r) => selected[r.customer_or_case_id]);
+  // Bulk-action affordances must reflect only the rows the operator can currently
+  // see. If the reason filter or scenario changes, any selected rows that are no
+  // longer visible must NOT count toward the bulk-action bar so we never apply an
+  // action to cases the user is no longer reviewing.
+  const visibleSelectedIds = useMemo(
+    () => records.filter((record) => selected[record.customer_or_case_id]).map((r) => r.customer_or_case_id),
+    [records, selected],
+  );
+  const selectedCount = visibleSelectedIds.length;
+  const allSelected = records.length > 0 && visibleSelectedIds.length === records.length;
+
+  useEffect(() => {
+    setSelected({});
+  }, [scenario]);
 
   const totalValueAtRisk = records.reduce(
     (sum, r) => sum + (typeof r.estimated_value_at_risk === 'number' ? r.estimated_value_at_risk : 0),
