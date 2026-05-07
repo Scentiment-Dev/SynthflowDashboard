@@ -343,6 +343,20 @@ describe('PageActionBar integration seams', () => {
     expect(onOpen).toHaveBeenCalled();
     expect(onExport).toHaveBeenCalled();
   });
+
+  // Regression: the PR description documents these test IDs as the integration
+  // seam Agent C wires the Advanced Filter Drawer and Export Drawer into. They
+  // MUST exist on the actual buttons (not just on the outer section) so Agent
+  // C's tests can locate them. Caught by Cursor Bugbot on PR #31.
+  it('exposes the documented data-testid hooks for Agent C integration', () => {
+    render(
+      <MemoryRouter>
+        <PageActionBar />
+      </MemoryRouter>,
+    );
+    expect(screen.getByTestId('page-action-filter-button')).toBeInTheDocument();
+    expect(screen.getByTestId('page-action-export-button')).toBeInTheDocument();
+  });
 });
 
 describe('KpiCard L1 surface primitive', () => {

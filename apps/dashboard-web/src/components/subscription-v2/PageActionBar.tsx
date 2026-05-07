@@ -53,6 +53,7 @@ export default function PageActionBar({
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
+            data-testid="page-action-filter-button"
             onClick={onOpenFilters}
             disabled={filterButtonDisabled}
             aria-disabled={filterButtonDisabled || undefined}
@@ -87,6 +88,7 @@ export default function PageActionBar({
         </div>
         <button
           type="button"
+          data-testid="page-action-export-button"
           onClick={onExport}
           disabled={exportButtonDisabled}
           aria-disabled={exportButtonDisabled || undefined}
