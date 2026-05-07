@@ -13,6 +13,15 @@ import type {
   SourceHealthSystem,
   SubscriptionSourceHealthResponse,
 } from '../types/sourceHealth';
+import type {
+  SubscriptionBusinessValueResponse,
+  SubscriptionBusinessValueScenario,
+} from '../types/subscriptionBusinessValue';
+import type {
+  SubscriptionFollowUpResponse,
+  SubscriptionFollowUpScenario,
+} from '../types/subscriptionFollowUp';
+import type { SubscriptionAdvancedFilterResponse } from '../types/subscriptionFilters';
 
 export type ExportAuditRequest = {
   requested_by: string;
@@ -77,3 +86,25 @@ export const getSubscriptionSourceHealth = (
   sources?: SourceHealthSystem[],
 ) =>
   apiGet<SubscriptionSourceHealthResponse>(buildSubscriptionSourceHealthUrl(scenario, sources));
+
+export const buildSubscriptionBusinessValueUrl = (
+  scenario: SubscriptionBusinessValueScenario = 'baseline',
+) => `/subscriptions/business-value?scenario=${encodeURIComponent(scenario)}`;
+
+export const getSubscriptionBusinessValue = (
+  scenario: SubscriptionBusinessValueScenario = 'baseline',
+) => apiGet<SubscriptionBusinessValueResponse>(buildSubscriptionBusinessValueUrl(scenario));
+
+export const buildSubscriptionFollowUpUrl = (
+  scenario: SubscriptionFollowUpScenario = 'baseline',
+) => `/subscriptions/follow-up?scenario=${encodeURIComponent(scenario)}`;
+
+export const getSubscriptionFollowUp = (
+  scenario: SubscriptionFollowUpScenario = 'baseline',
+) => apiGet<SubscriptionFollowUpResponse>(buildSubscriptionFollowUpUrl(scenario));
+
+export const buildSubscriptionAdvancedFiltersUrl = (scenario = 'baseline') =>
+  `/subscriptions/advanced-filters?scenario=${encodeURIComponent(scenario)}`;
+
+export const getSubscriptionAdvancedFilters = (scenario = 'baseline') =>
+  apiGet<SubscriptionAdvancedFilterResponse>(buildSubscriptionAdvancedFiltersUrl(scenario));

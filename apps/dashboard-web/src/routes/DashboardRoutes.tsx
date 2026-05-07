@@ -14,7 +14,7 @@ export default function DashboardRoutes() {
     <Routes>
       <Route path="/" element={<Navigate to="/overview" replace />} />
       <Route path="/overview" element={<OverviewPage />} />
-      <Route path="/subscriptions" element={<SubscriptionAnalyticsPage />} />
+      <Route path="/subscriptions/*" element={<SubscriptionAnalyticsPage />} />
       <Route path="/cancellations" element={<CancellationPage />} />
       <Route path="/retention" element={<CancellationRetentionPage />} />
       <Route path="/order-status" element={<OrderStatusPage />} />

@@ -1,0 +1,178 @@
+import type {
+  SubscriptionAdvancedFilterResponse,
+  SubscriptionFilterOption,
+} from '../types/subscriptionFilters';
+
+const TIMESTAMP = '2026-05-06T12:00:00Z';
+
+const PRESENTATION = {
+  display_label: 'Subscription Advanced Filters',
+  short_label: 'Advanced Filters',
+  executive_summary:
+    'Advanced filters expose required subscription dimensions and include disabled reasons where data dependencies are not yet available.',
+  format_type: 'filter_option_catalog',
+  unit: 'n/a',
+  trend_direction: 'unknown',
+  comparison_label: 'Comparison baseline unavailable in fixture preview',
+  comparison_value: null,
+  severity: 'success',
+  visual_tone: 'positive',
+  source_authority_explanation:
+    'Stay.ai is the authoritative source for final subscription outcomes.',
+  trust_explanation:
+    'Trust is high because the required source-of-truth confirmation rules are satisfied.',
+  freshness_explanation: 'Data is fresh and within expected recency.',
+  drilldown_hint: 'Use filter_id values to bind UI controls and export manifests.',
+  empty_state_copy: 'No filter options available for this view yet.',
+  blocked_state_copy:
+    'This metric is blocked until Stay.ai confirmation records are available.',
+};
+
+const OPTIONS: SubscriptionFilterOption[] = [
+  {
+    filter_id: 'date_preset',
+    label: 'Date preset',
+    plain_language_help:
+      'Quickly switch to common date windows like last 7 or last 30 days.',
+    allowed_values: ['today', 'last_7_days', 'last_30_days', 'last_90_days', 'custom'],
+    is_enabled: true,
+    is_disabled_reason: null,
+    data_dependency: 'event_timestamp',
+    source_system: 'analytics_api',
+    trust_impact: 'Changes denominator and comparison context for all subscription metrics.',
+    applies_to_pages: ['all_subscription_pages'],
+  },
+  {
+    filter_id: 'comparison_period',
+    label: 'Comparison period',
+    plain_language_help: 'Compare the current window with the previous period or year.',
+    allowed_values: ['none', 'previous_period', 'previous_year'],
+    is_enabled: true,
+    is_disabled_reason: null,
+    data_dependency: 'historical_window',
+    source_system: 'analytics_api',
+    trust_impact: 'Adds delta calculations for KPI cards and trend strips.',
+    applies_to_pages: ['command_center', 'outcomes', 'business_value'],
+  },
+  {
+    filter_id: 'cancellation_reason',
+    label: 'Cancellation reason',
+    plain_language_help:
+      'Filter to one or more of the seven official cancellation reasons.',
+    allowed_values: [
+      'cost_too_high',
+      'dont_need_now',
+      'product_issue',
+      'switching_brand',
+      'service_issue',
+      'other',
+      'unknown',
+    ],
+    is_enabled: true,
+    is_disabled_reason: null,
+    data_dependency: 'cancellation_reason_taxonomy',
+    source_system: 'stayai',
+    trust_impact: 'Adjusts cancellation funnel and follow-up queue scope.',
+    applies_to_pages: ['cancellation_intake', 'cost_too_high', 'follow_up'],
+  },
+  {
+    filter_id: 'trust_label',
+    label: 'Trust label',
+    plain_language_help: 'Limit results to a particular trust band.',
+    allowed_values: ['high', 'medium', 'low', 'untrusted'],
+    is_enabled: true,
+    is_disabled_reason: null,
+    data_dependency: 'trust_classifier',
+    source_system: 'analytics_api',
+    trust_impact: 'Removes records below the chosen trust band from rendered totals.',
+    applies_to_pages: ['all_subscription_pages'],
+  },
+  {
+    filter_id: 'portal_state',
+    label: 'Portal state',
+    plain_language_help: 'Filter by the latest portal state (link sent, opened, completed).',
+    allowed_values: [
+      'link_sent',
+      'link_opened',
+      'portal_started',
+      'portal_completed',
+      'completion_unknown',
+    ],
+    is_enabled: true,
+    is_disabled_reason: null,
+    data_dependency: 'portal_event_state',
+    source_system: 'portal',
+    trust_impact: 'Affects portal funnel and follow-up queue scope.',
+    applies_to_pages: ['portal_handoff', 'follow_up'],
+  },
+  {
+    filter_id: 'offer_version',
+    label: 'Offer version',
+    plain_language_help:
+      'Compare retention offer versions to see which path is working.',
+    allowed_values: [],
+    is_enabled: false,
+    is_disabled_reason: 'Offer-version dimension is not yet wired to the data warehouse.',
+    data_dependency: 'offer_version_join',
+    source_system: 'stayai',
+    trust_impact:
+      'Disabled dimensions are excluded from export manifest filters.',
+    applies_to_pages: ['cost_too_high', 'business_value'],
+  },
+  {
+    filter_id: 'repeat_contact',
+    label: 'Repeat contact window',
+    plain_language_help:
+      'Show only customers who contacted us again within 1, 7, or 30 days.',
+    allowed_values: ['within_1_day', 'within_7_days', 'within_30_days'],
+    is_enabled: false,
+    is_disabled_reason: 'Repeat-contact join is not yet built.',
+    data_dependency: 'repeat_contact_window',
+    source_system: 'analytics_api',
+    trust_impact: 'Excluded from manifest until the join lands.',
+    applies_to_pages: ['containment', 'follow_up'],
+  },
+  {
+    filter_id: 'current_vs_future_flow_state',
+    label: 'Current vs future flow state',
+    plain_language_help: 'Compare production flow with planned future flow behavior.',
+    allowed_values: ['current', 'future', 'compare'],
+    is_enabled: false,
+    is_disabled_reason:
+      'Future-flow simulation feed is not available in this snapshot.',
+    data_dependency: 'future_flow_simulation_dataset',
+    source_system: 'analytics_api',
+    trust_impact: 'Disabled dimensions are excluded from export manifest filters.',
+    applies_to_pages: ['outcomes', 'business_value'],
+  },
+];
+
+export const SUBSCRIPTION_ADVANCED_FILTERS_FIXTURE: SubscriptionAdvancedFilterResponse = {
+  module: 'subscriptions',
+  generated_from_fixture: true,
+  scenario: 'baseline',
+  options: OPTIONS,
+  applied_filters: {
+    date_preset: 'last_30_days',
+    comparison_period: 'none',
+    saved_view: 'default',
+  },
+  metadata: {
+    metric_id: 'subscription_advanced_filter_contract',
+    filters: { date_preset: 'last_30_days', saved_view: 'default' },
+    metric_definitions: [
+      'Filter options are governed by source-of-truth and data-dependency rules.',
+      'Disabled filters include explicit reasons and never silently disappear.',
+      'Shopify is context-only and does not finalize subscription outcome truth.',
+    ],
+    trust_label: 'high',
+    freshness_status: 'fresh',
+    formula_version: 'v1.0.0',
+    owner: 'analytics',
+    timestamp: TIMESTAMP,
+    fingerprint: 'fixture-advanced-filters-baseline',
+    audit_reference: 'audit-advanced-filters-baseline',
+    source_confirmation_status: 'confirmed',
+    presentation: PRESENTATION,
+  },
+};

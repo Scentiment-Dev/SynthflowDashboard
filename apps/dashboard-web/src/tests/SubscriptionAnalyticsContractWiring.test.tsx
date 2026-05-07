@@ -655,17 +655,32 @@ describe('SubscriptionAnalyticsView integration', () => {
 });
 
 describe('SubscriptionAnalyticsPage routing', () => {
-  it('keeps the cycle-001 module shell mounted alongside the cycle-002 contract view', async () => {
+  it('renders the IA v2 Command Center on /subscriptions without stacking legacy panels', async () => {
     render(
       <MemoryRouter initialEntries={['/subscriptions']}>
         <App />
       </MemoryRouter>,
     );
     await waitFor(() => {
-      expect(screen.getByTestId('subscription-final-state-banner')).toBeInTheDocument();
       expect(
-        screen.getByRole('heading', { name: /Subscription Analytics/i }),
+        screen.getByRole('heading', { name: /What changed in subscriptions today\?/i }),
       ).toBeInTheDocument();
+    });
+    // Legacy stacked panels must NOT render on the Command Center route.
+    expect(screen.queryByTestId('subscription-final-state-banner')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: /Subscription shell state readiness/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('mounts the legacy contract-wired view only behind the Diagnostics route', async () => {
+    render(
+      <MemoryRouter initialEntries={['/subscriptions/diagnostics']}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId('subscription-final-state-banner')).toBeInTheDocument();
       expect(
         screen.getByRole('heading', { name: /Subscription shell state readiness/i }),
       ).toBeInTheDocument();

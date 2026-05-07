@@ -790,26 +790,26 @@ describe('SubscriptionOutcomesView integration', () => {
   });
 });
 
-describe('SubscriptionAnalyticsPage routing with cycle 005 outcomes', () => {
-  it('mounts the cycle 005 outcome section above the cycle 002 contract view', async () => {
+describe('SubscriptionAnalyticsPage routing with IA v2 sub-routes', () => {
+  it('mounts the legacy outcome section under the Outcomes route, not the Command Center', async () => {
     render(
-      <MemoryRouter initialEntries={['/subscriptions']}>
+      <MemoryRouter initialEntries={['/subscriptions/outcomes']}>
         <App />
       </MemoryRouter>,
     );
     await waitFor(() => {
       expect(screen.getByTestId('subscription-outcome-analytics-section')).toBeInTheDocument();
+    });
+  });
+
+  it('mounts the contract-wired view under the Diagnostics route only', async () => {
+    render(
+      <MemoryRouter initialEntries={['/subscriptions/diagnostics']}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
       expect(screen.getByTestId('subscription-final-state-banner')).toBeInTheDocument();
-      expect(
-        screen.getByRole('heading', {
-          name: /Cycle 005 subscription outcome analytics/i,
-        }),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole('heading', {
-          name: /Cycle 002 contract-wired subscription view/i,
-        }),
-      ).toBeInTheDocument();
     });
   });
 });

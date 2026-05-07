@@ -21,17 +21,17 @@ export default function Sidebar() {
             Scentiment
           </div>
           <h2 className="mt-3 text-xl font-semibold tracking-tight text-white">
-            Phone Support Analytics
+            Subscription analytics
           </h2>
           <p className="mt-2 text-[12px] leading-5 text-slate-300/90">
-            Stay.ai-anchored subscription intelligence for the post-call experience team.
+            Stay.ai-anchored subscription analytics for support and retention.
           </p>
           <div className="mt-4 flex items-center gap-2 text-[11px] font-medium text-emerald-300">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
             </span>
-            Source-of-truth lock active
+            Source-of-truth lock
           </div>
         </div>
       </div>
@@ -108,18 +108,13 @@ export default function Sidebar() {
           </span>
         </div>
         <p className="mt-2 leading-5">
-          Trust labels, freshness, and source authority ride with every metric. Exports require
-          fingerprint and audit reference.
+          Trust labels, freshness, and source authority ride with every metric. Exports
+          carry the matching audit reference.
         </p>
-        <div className="mt-3 flex items-center justify-between text-[11px] font-medium text-slate-500">
-          <span className="inline-flex items-center gap-1">
-            <Activity className="h-3 w-3 text-violet-500" />
-            v0.9 · cycle 006
-          </span>
-          <span className="inline-flex items-center gap-1 text-emerald-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            no-drift
-          </span>
+        <div className="mt-3 flex items-center gap-1 text-[11px] font-medium text-emerald-700">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          Source-of-truth lock
+          <Activity className="ml-auto h-3 w-3 text-violet-400" aria-hidden />
         </div>
       </div>
     </aside>

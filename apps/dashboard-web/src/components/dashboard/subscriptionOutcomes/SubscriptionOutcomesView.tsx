@@ -86,7 +86,6 @@ export default function SubscriptionOutcomesView() {
             className="display-title mt-2 text-xl tracking-tight text-slate-950 sm:text-2xl"
           >
             Subscription outcome analytics
-            <span className="sr-only"> · Cycle 005 subscription outcome analytics</span>
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
             The first production-priority subscription analytics module. Every metric on this view

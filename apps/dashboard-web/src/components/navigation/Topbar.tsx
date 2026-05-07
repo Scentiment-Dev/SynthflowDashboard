@@ -4,15 +4,58 @@ import { useDashboardFilters } from '../../context/DashboardFilterContext';
 import { NAV_ITEMS } from '../../constants/navigation';
 
 const PAGE_META: Record<string, { eyebrow: string; title: string }> = {
-  '/overview': { eyebrow: 'Executive command center', title: 'Cross-platform support intelligence' },
-  '/subscriptions': { eyebrow: 'Subscription analytics', title: 'Stay.ai subscription outcome intelligence' },
-  '/cancellations': { eyebrow: 'Cancellation analytics', title: 'Confirmed cancellation outcomes' },
-  '/retention': { eyebrow: 'Retention analytics', title: 'Save rate and retention journey' },
+  '/overview': { eyebrow: 'Today, across support', title: 'What changed in support today?' },
+  '/subscriptions': {
+    eyebrow: 'Subscription analytics',
+    title: 'Command Center',
+  },
+  '/subscriptions/outcomes': {
+    eyebrow: 'Subscription analytics',
+    title: 'Outcomes',
+  },
+  '/subscriptions/non-cancellation': {
+    eyebrow: 'Subscription analytics',
+    title: 'Non-Cancellation Actions',
+  },
+  '/subscriptions/cancellation-intake': {
+    eyebrow: 'Subscription analytics',
+    title: 'Cancellation Intake',
+  },
+  '/subscriptions/cost-too-high': {
+    eyebrow: 'Subscription analytics',
+    title: 'Cost Too High retention funnel',
+  },
+  '/subscriptions/business-value': {
+    eyebrow: 'Subscription analytics',
+    title: 'Business Value & Cost Savings',
+  },
+  '/subscriptions/portal-handoff': {
+    eyebrow: 'Subscription analytics',
+    title: 'Portal Handoff',
+  },
+  '/subscriptions/containment': {
+    eyebrow: 'Subscription analytics',
+    title: 'Containment quality',
+  },
+  '/subscriptions/follow-up': {
+    eyebrow: 'Subscription analytics',
+    title: 'Follow-Up Queue',
+  },
+  '/subscriptions/export-audit': {
+    eyebrow: 'Subscription analytics',
+    title: 'Export & Audit',
+  },
+  '/subscriptions/diagnostics': {
+    eyebrow: 'Subscription analytics',
+    title: 'Diagnostics (operator-only)',
+  },
+  '/cancellations': { eyebrow: 'Confirmed cancellations', title: 'Where customers actually cancelled' },
+  '/retention': { eyebrow: 'Calls we saved', title: 'Where we kept the subscription' },
   '/order-status': { eyebrow: 'Order status', title: 'Shopify order context analytics' },
   '/escalations': { eyebrow: 'Escalations', title: 'Live-agent handoff quality' },
-  '/data-quality': { eyebrow: 'Data quality', title: 'Source freshness, contracts, and trust' },
-  '/governance': { eyebrow: 'Governance', title: 'RBAC, exports, and audit controls' },
-  '/exports': { eyebrow: 'Governance', title: 'Export readiness and audit metadata' },
+  '/data-quality': { eyebrow: 'Data quality', title: 'How fresh is our data?' },
+  '/governance': { eyebrow: 'Governance', title: 'Who can see and export what' },
+  '/exports': { eyebrow: 'Exports', title: 'Recent exports and audit trail' },
 };
 
 const PLATFORM_LABEL: Record<string, string> = {
@@ -45,8 +88,8 @@ export default function Topbar() {
   const meta =
     PAGE_META[location.pathname] ??
     (fallback
-      ? { eyebrow: 'Internal analytics', title: fallback.label }
-      : { eyebrow: 'Internal analytics', title: 'Phone Support Analytics' });
+      ? { eyebrow: 'Subscription analytics', title: fallback.label }
+      : { eyebrow: 'Subscription analytics', title: 'Subscription analytics' });
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/75 backdrop-blur-xl">
@@ -58,11 +101,17 @@ export default function Topbar() {
 
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-2.5 shadow-sm">
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 font-semibold text-emerald-700 ring-1 ring-emerald-200">
-              <ShieldCheck className="h-3.5 w-3.5" /> No-drift enforced
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 font-semibold text-emerald-700 ring-1 ring-emerald-200"
+              title="These metrics use the same definitions as the official rulebook."
+            >
+              <ShieldCheck className="h-3.5 w-3.5" /> Trusted definitions on
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-2.5 py-1 font-semibold text-violet-700 ring-1 ring-violet-200">
-              <span className="h-1.5 w-1.5 rounded-full bg-violet-500 pulse-dot" /> Stay.ai source of truth
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-2.5 py-1 font-semibold text-violet-700 ring-1 ring-violet-200"
+              title="Stay.ai is the system that owns the official subscription record."
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-violet-500 pulse-dot" /> Stay.ai · source of truth
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium text-slate-600">
               <Calendar className="h-3.5 w-3.5 text-slate-400" />
