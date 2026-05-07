@@ -161,7 +161,9 @@ describe('SubscriptionPageToolbar', () => {
     await waitFor(() => {
       expect(onConfirmExport).toHaveBeenCalledWith('current_page');
     });
-    expect(screen.getByTestId('export-result-toast')).toHaveTextContent(/AUD-toolbar/);
+    await waitFor(() => {
+      expect(screen.getByTestId('export-result-toast')).toHaveTextContent(/AUD-toolbar/);
+    });
   });
 
   it('handles a chip-id with no `::` separator without throwing', () => {
