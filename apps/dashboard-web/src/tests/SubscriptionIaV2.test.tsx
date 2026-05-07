@@ -11,9 +11,8 @@ import ComingSoonPage from '../components/subscription-v2/pages/ComingSoonPage';
 import {
   BUSINESS_VALUE_STATE_LABEL,
   BUSINESS_VALUE_STATE_TONE,
-  FRESHNESS_LABEL,
-  FRESHNESS_TONE,
   PORTAL_STATE_LABEL,
+  PORTAL_STATE_TONE,
   PRIORITY_LABEL,
   PRIORITY_TONE,
   SLA_LABEL,
@@ -25,8 +24,10 @@ import {
   formatFriendlyTimestamp,
   formatRelativeAge,
 } from '../components/subscription-v2/copy';
+import { __resetSubscriptionAdvancedFiltersCache } from '../hooks/useSubscriptionAdvancedFilters';
 
 beforeEach(() => {
+  __resetSubscriptionAdvancedFiltersCache();
   vi.stubGlobal(
     'fetch',
     vi.fn().mockResolvedValue({
@@ -38,6 +39,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  __resetSubscriptionAdvancedFiltersCache();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -56,14 +58,13 @@ describe('subscription-v2 plain-language copy helpers', () => {
     expect(TRUST_TONE.high).toBe('success');
     expect(TRUST_TONE.untrusted).toBe('danger');
 
-    expect(FRESHNESS_LABEL.fresh).toBe('On time');
-    expect(FRESHNESS_TONE.stale).toBe('danger');
-
     expect(SLA_LABEL.on_track).toBe('On track');
     expect(SLA_TONE.breached).toBe('danger');
 
     expect(PORTAL_STATE_LABEL.portal_completed).toMatch(/Completion/);
     expect(PORTAL_STATE_LABEL.completion_unknown).toMatch(/unknown/i);
+    expect(PORTAL_STATE_TONE.portal_completed).toBe('success');
+    expect(PORTAL_STATE_TONE.completion_unknown).toBe('warning');
 
     expect(PRIORITY_LABEL.high).toBe('High priority');
     expect(PRIORITY_TONE.high).toBe('danger');

@@ -7,6 +7,8 @@ import { useSubscriptionFollowUp } from '../../../hooks/useSubscriptionFollowUp'
 import {
   formatBusinessValue,
   formatRelativeAge,
+  PORTAL_STATE_LABEL,
+  PORTAL_STATE_TONE,
   PRIORITY_LABEL,
   PRIORITY_TONE,
   SLA_LABEL,
@@ -348,10 +350,19 @@ export default function FollowUpPage() {
                         />
                       </td>
                       <td className="px-3 py-3">
-                        <StateChip
-                          tone={SOURCE_CONFIRMATION_TONE[record.stayai_confirmation_status]}
-                          label={SOURCE_CONFIRMATION_LABEL[record.stayai_confirmation_status]}
-                        />
+                        <div className="flex flex-col gap-1.5">
+                          <StateChip
+                            tone={SOURCE_CONFIRMATION_TONE[record.stayai_confirmation_status]}
+                            label={SOURCE_CONFIRMATION_LABEL[record.stayai_confirmation_status]}
+                          />
+                          <StateChip
+                            tone={PORTAL_STATE_TONE[record.portal_completion_status] ?? 'neutral'}
+                            label={
+                              PORTAL_STATE_LABEL[record.portal_completion_status] ??
+                              record.portal_completion_status
+                            }
+                          />
+                        </div>
                       </td>
                       <td className="px-3 py-3 font-medium text-slate-900">
                         {formatBusinessValue(record.estimated_value_at_risk, 'usd')}

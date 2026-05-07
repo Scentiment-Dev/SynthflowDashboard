@@ -11,7 +11,6 @@
 import type { TrustLabel } from '../../types/metrics';
 import type {
   BusinessValueState,
-  SubscriptionFreshnessStatus,
   SubscriptionSourceConfirmation,
 } from '../../types/subscriptionBusinessValue';
 
@@ -40,17 +39,6 @@ export const TRUST_TONE: Record<TrustLabel, StateChipTone> = {
   untrusted: 'danger',
 };
 
-export const FRESHNESS_LABEL: Record<SubscriptionFreshnessStatus, string> = {
-  fresh: 'On time',
-  stale: 'Too old to trust',
-  unknown: 'Status unknown',
-};
-
-export const FRESHNESS_TONE: Record<SubscriptionFreshnessStatus, StateChipTone> = {
-  fresh: 'success',
-  stale: 'danger',
-  unknown: 'neutral',
-};
 
 export const BUSINESS_VALUE_STATE_LABEL: Record<BusinessValueState, string> = {
   confirmed: 'Confirmed',
@@ -181,6 +169,17 @@ export const PORTAL_STATE_LABEL: Record<string, string> = {
   link_failed_optout: 'Link failed (opted out)',
   link_failed_expired: 'Link expired',
   completion_unknown: 'Completion unknown',
+};
+
+export const PORTAL_STATE_TONE: Record<string, StateChipTone> = {
+  link_sent: 'info',
+  link_opened: 'info',
+  portal_started: 'info',
+  portal_completed: 'success',
+  link_failed_bounce: 'danger',
+  link_failed_optout: 'danger',
+  link_failed_expired: 'warning',
+  completion_unknown: 'warning',
 };
 
 export const PRIORITY_LABEL: Record<string, string> = {

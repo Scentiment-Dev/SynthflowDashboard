@@ -12,8 +12,10 @@ import * as followUpHook from '../hooks/useSubscriptionFollowUp';
 import { SUBSCRIPTION_BUSINESS_VALUE_FIXTURES } from '../data/subscriptionBusinessValueFixtures';
 import { SUBSCRIPTION_FOLLOW_UP_FIXTURES } from '../data/subscriptionFollowUpFixtures';
 import { SUBSCRIPTION_OUTCOMES_FIXTURES } from '../data/subscriptionOutcomesFixtures';
+import { __resetSubscriptionAdvancedFiltersCache } from '../hooks/useSubscriptionAdvancedFilters';
 
 beforeEach(() => {
+  __resetSubscriptionAdvancedFiltersCache();
   vi.stubGlobal(
     'fetch',
     vi.fn().mockResolvedValue({ ok: false, status: 503, json: vi.fn().mockResolvedValue({}) }),
@@ -21,6 +23,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  __resetSubscriptionAdvancedFiltersCache();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });

@@ -2,7 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { useSubscriptionBusinessValue } from '../hooks/useSubscriptionBusinessValue';
 import { useSubscriptionFollowUp } from '../hooks/useSubscriptionFollowUp';
-import { useSubscriptionAdvancedFilters } from '../hooks/useSubscriptionAdvancedFilters';
+import {
+  useSubscriptionAdvancedFilters,
+  __resetSubscriptionAdvancedFiltersCache,
+} from '../hooks/useSubscriptionAdvancedFilters';
 import * as dashboardApi from '../services/dashboardApi';
 import { ApiClientError } from '../services/apiClient';
 import { SUBSCRIPTION_BUSINESS_VALUE_FIXTURES } from '../data/subscriptionBusinessValueFixtures';
@@ -11,10 +14,12 @@ import { SUBSCRIPTION_ADVANCED_FILTERS_FIXTURE } from '../data/subscriptionAdvan
 
 afterEach(() => {
   vi.restoreAllMocks();
+  __resetSubscriptionAdvancedFiltersCache();
 });
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  __resetSubscriptionAdvancedFiltersCache();
 });
 
 function BusinessValueProbe({ scenario = 'baseline' as const }) {
@@ -281,6 +286,31 @@ describe('useSubscriptionAdvancedFilters', () => {
     await Promise.resolve();
     await Promise.resolve();
     expect(true).toBe(true);
+  });
+
+  // Regression for Cursor Bugbot finding on PR #31: PageActionBar mounts on
+  // four separate pages, and previously each mount fired a fresh fetch. The
+  // hook now memoizes the resolved state per scenario at module scope so the
+  // network call only happens once per session. We verify two consecutive
+  // mounts of the hook only invoke the API once.
+  it('caches the resolved state across mounts so the API is hit at most once', async () => {
+    const apiSpy = vi
+      .spyOn(dashboardApi, 'getSubscriptionAdvancedFilters')
+      .mockResolvedValue(SUBSCRIPTION_ADVANCED_FILTERS_FIXTURE);
+
+    const first = render(<AdvancedFiltersProbe />);
+    await waitFor(() => {
+      expect(first.getByTestId('source')).toHaveTextContent('api');
+    });
+    first.unmount();
+
+    const second = render(<AdvancedFiltersProbe />);
+    await waitFor(() => {
+      expect(second.getByTestId('source')).toHaveTextContent('api');
+    });
+    second.unmount();
+
+    expect(apiSpy).toHaveBeenCalledTimes(1);
   });
 });
 
