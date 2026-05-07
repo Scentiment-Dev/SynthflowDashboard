@@ -918,9 +918,9 @@ describe('SourceHealthView integration', () => {
 });
 
 describe('SubscriptionAnalyticsPage routing with source-health view', () => {
-  it('mounts the source-health section above the subscription analytics view', async () => {
+  it('mounts the source-health section under the Diagnostics route, not the primary Command Center', async () => {
     render(
-      <MemoryRouter initialEntries={['/subscriptions']}>
+      <MemoryRouter initialEntries={['/subscriptions/diagnostics']}>
         <App />
       </MemoryRouter>,
     );

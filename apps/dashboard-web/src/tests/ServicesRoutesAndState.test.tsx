@@ -123,7 +123,7 @@ describe('frontend service and shell coverage', () => {
     const cases: Array<[string, RegExp]> = [
       ['/', /Executive Overview/i],
       ['/overview', /Executive Overview/i],
-      ['/subscriptions', /Subscription Analytics/i],
+      ['/subscriptions', /What changed in subscriptions today\?/i],
       ['/cancellations', /Cancellation Analytics/i],
       ['/retention', /Cancellation \/ Retention Analytics/i],
       ['/order-status', /Order Status Analytics/i],
@@ -224,7 +224,7 @@ describe('frontend service and shell coverage', () => {
     expect(screen.queryByText(/expected during skeleton development/i)).not.toBeInTheDocument();
   });
 
-  it('renders live API banner branch when summary request succeeds', async () => {
+  it('renders live API banner branch when summary request succeeds (under Diagnostics)', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
@@ -234,7 +234,7 @@ describe('frontend service and shell coverage', () => {
     );
 
     render(
-      <MemoryRouter initialEntries={['/subscriptions']}>
+      <MemoryRouter initialEntries={['/subscriptions/diagnostics']}>
         <App />
       </MemoryRouter>,
     );

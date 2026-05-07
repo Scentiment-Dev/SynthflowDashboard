@@ -25,10 +25,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <footer className="mx-auto max-w-[1400px] px-4 pb-10 pt-4 text-[11px] text-slate-400 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 pt-3">
             <span>
-              Scentiment internal analytics · Stay.ai owns subscription outcome truth · Shopify is
-              context only · Trust labels are system-calculated
+              Scentiment internal analytics · Stay.ai owns subscription outcome truth ·
+              Shopify is context only · Trust labels are system-calculated.
             </span>
-            <span className="font-mono text-slate-400">build 0.9 · cycle 006</span>
           </div>
         </footer>
       </div>

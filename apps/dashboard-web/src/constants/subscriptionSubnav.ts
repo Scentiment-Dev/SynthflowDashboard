@@ -1,15 +1,13 @@
 /**
- * Cycle 007 Subscription IA v2 — single source of truth for the 10 required
- * subscription subpages. The Cycle 007 prototype renders this list as the
- * SubscriptionSubnav under the existing /subscriptions hero. Items marked as
- * `planned` render as disabled pills with a "Planned" chip; the only
- * `prototype` item in Cycle 007 is `command-center`.
+ * Subscription analytics secondary navigation — single source of truth for the
+ * 10 required subscription subpages. Each item has a real route under
+ * `/subscriptions/...`. Items marked as `live` are fully implemented; items
+ * marked as `planned` (or the legacy `prototype` flag) route to a stub subpage
+ * that explains what the tab will show — the support user always has an answer
+ * when they click a tab.
  *
- * The IA v2 spec lives at:
+ * The IA spec lives at:
  *   docs/07_dashboard_ui_ux/subscription_analytics_information_architecture_v2.md
- *
- * The wireframe + component contracts live at:
- *   project-management/reports/cycle-007/design/subscription_ia_v2_wireframe_spec.md
  */
 
 export type SubscriptionSubnavStatus = 'planned' | 'prototype' | 'live';
@@ -43,22 +41,22 @@ export const SUBSCRIPTION_SUBNAV_ITEMS: SubscriptionSubnavItem[] = [
     shortLabel: 'Command',
     href: '/subscriptions',
     description: 'What changed in subscriptions today?',
-    status: 'prototype',
+    status: 'live',
   },
   {
     id: 'outcomes',
     label: 'Outcome Summary',
     shortLabel: 'Outcomes',
     href: '/subscriptions/outcomes',
-    description: 'Did calls end in confirmed save / cancel / pending?',
-    status: 'planned',
+    description: 'Did the call end in confirmed save / cancel / pending?',
+    status: 'live',
   },
   {
     id: 'non-cancellation',
     label: 'Non-Cancellation Actions',
     shortLabel: 'Non-Cancel',
     href: '/subscriptions/non-cancellation',
-    description: 'Skip, pause, frequency change, address change, SKU swap, reactivate, one-time add-on.',
+    description: 'Are skip / pause / frequency-change / SKU swap completing?',
     status: 'planned',
   },
   {
@@ -66,7 +64,7 @@ export const SUBSCRIPTION_SUBNAV_ITEMS: SubscriptionSubnavItem[] = [
     label: 'Cancellation Intake',
     shortLabel: 'Cancel Intake',
     href: '/subscriptions/cancellation-intake',
-    description: 'Which cancel reasons are coming in and where is the path going?',
+    description: 'Which cancel reasons are coming in?',
     status: 'planned',
   },
   {
@@ -74,7 +72,7 @@ export const SUBSCRIPTION_SUBNAV_ITEMS: SubscriptionSubnavItem[] = [
     label: 'Cost Too High Funnel',
     shortLabel: 'Cost Too High',
     href: '/subscriptions/cost-too-high',
-    description: 'Frequency change → 25% off → confirmed cancellation if both declined.',
+    description: 'Frequency change → 25% off → confirmed cancel — where do we lose them?',
     status: 'planned',
   },
   {
@@ -82,15 +80,15 @@ export const SUBSCRIPTION_SUBNAV_ITEMS: SubscriptionSubnavItem[] = [
     label: 'Business Value',
     shortLabel: 'Value',
     href: '/subscriptions/business-value',
-    description: 'Net business value: gross protected − offer cost + support avoided.',
-    status: 'planned',
+    description: 'Calls we saved — in dollars.',
+    status: 'live',
   },
   {
     id: 'portal-handoff',
-    label: 'Portal + Handoff',
+    label: 'Portal & Handoff',
     shortLabel: 'Portal',
     href: '/subscriptions/portal-handoff',
-    description: 'Link sent vs confirmed completion vs failure mode.',
+    description: 'Link sent vs confirmed completion vs failure.',
     status: 'planned',
   },
   {
@@ -106,15 +104,15 @@ export const SUBSCRIPTION_SUBNAV_ITEMS: SubscriptionSubnavItem[] = [
     label: 'Follow-Up Queue',
     shortLabel: 'Follow-Up',
     href: '/subscriptions/follow-up',
-    description: 'Who needs a human, and which were the failures?',
-    status: 'planned',
+    description: 'Calls that need a human.',
+    status: 'live',
   },
   {
     id: 'export-audit',
-    label: 'Export + Audit',
+    label: 'Export & Audit',
     shortLabel: 'Export',
     href: '/subscriptions/export-audit',
-    description: 'Pull a governed export with manifest, fingerprint, and audit reference.',
+    description: 'Pull a governed export.',
     status: 'planned',
   },
 ];

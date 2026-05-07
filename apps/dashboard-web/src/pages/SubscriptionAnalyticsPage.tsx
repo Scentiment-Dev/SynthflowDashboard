@@ -1,168 +1,114 @@
-import {
-  Activity,
-  ArrowUpRight,
-  Compass,
-  Download,
-  GitBranch,
-  History,
-  Sparkles,
-  Workflow,
-} from 'lucide-react';
-import DashboardModulePage from '../components/dashboard/DashboardModulePage';
-import SubscriptionAnalyticsView from '../components/dashboard/subscription/SubscriptionAnalyticsView';
-import SubscriptionOutcomesView from '../components/dashboard/subscriptionOutcomes/SubscriptionOutcomesView';
-import SourceHealthView from '../components/dashboard/sourceHealth/SourceHealthView';
-import SectionHeader from '../components/design/SectionHeader';
-import StatusPill from '../components/design/StatusPill';
-import SubscriptionSubnav from '../components/subscription/SubscriptionSubnav';
-import SubscriptionPageHeader from '../components/subscription/SubscriptionPageHeader';
+import { Route, Routes } from 'react-router-dom';
+import SubscriptionLayout from '../components/subscription-v2/SubscriptionLayout';
+import CommandCenterPage from '../components/subscription-v2/pages/CommandCenterPage';
+import OutcomesPage from '../components/subscription-v2/pages/OutcomesPage';
+import BusinessValuePage from '../components/subscription-v2/pages/BusinessValuePage';
+import FollowUpPage from '../components/subscription-v2/pages/FollowUpPage';
+import DiagnosticsPage from '../components/subscription-v2/pages/DiagnosticsPage';
+import ComingSoonPage from '../components/subscription-v2/pages/ComingSoonPage';
 
+/**
+ * Cycle 008 — Subscription analytics IA v2 router.
+ *
+ * Replaces the Cycle 006 / 007 stacked single-page subscription module with a
+ * 10-subpage router. Only one subpage mounts at a time. The Cycle 002 / 005
+ * legacy panels and the source-health view live behind the Diagnostics route
+ * so the customer-support surface is never stacked with operator-only panels.
+ */
 export default function SubscriptionAnalyticsPage() {
   return (
-    <div className="space-y-10">
-      <SubscriptionSubnav activeId="command-center" />
-
-      <SubscriptionPageHeader
-        id="subscription-command-center-heading"
-        eyebrow="Subscription command center · IA v2 prototype"
-        title="What changed in subscriptions today?"
-        description={
-          <>
-            Cycle 007 prototype: the redesigned subscription information architecture splits
-            this module into 10 focused subpages so a non-technical support user can find an
-            answer and the next action in seconds. Planned subpages ship in Cycle 008 once
-            their backend contracts and panel migrations land.
-          </>
-        }
-        meta={
-          <>
-            <StatusPill tone="brand" icon={<Compass className="h-3 w-3" />}>
-              IA v2 prototype
-            </StatusPill>
-            <StatusPill tone="success">Stay.ai source of truth</StatusPill>
-            <StatusPill tone="info">Shopify · context only</StatusPill>
-            <StatusPill tone="neutral">Trust labels · system-calculated</StatusPill>
-          </>
-        }
-        actions={
-          <>
-            <button
-              type="button"
-              disabled
-              aria-disabled
-              title="Advanced filter drawer ships in Cycle 008"
-              className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-400"
-            >
-              <ArrowUpRight className="h-3.5 w-3.5" /> Advanced filters · planned
-            </button>
-            <button
-              type="button"
-              disabled
-              aria-disabled
-              title="Export drawer ships in Cycle 008"
-              className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-400"
-            >
-              <Download className="h-3.5 w-3.5" /> Export this view · planned
-            </button>
-          </>
-        }
-      />
-
-      <section
-        aria-labelledby="subscription-hero-heading"
-        className="surface-ink surface-grid-overlay relative overflow-hidden p-6 sm:p-9"
-      >
-        <span className="ambient-glow -left-16 -top-20 bg-violet-500/40" />
-        <span
-          className="ambient-glow -bottom-24 right-0 bg-cyan-500/35"
-          style={{ animationDelay: '-7s' }}
-        />
-        <div className="relative grid gap-6 lg:grid-cols-[2fr,1fr] lg:items-end">
-          <div>
-            <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-violet-200">
-              <Sparkles className="h-3.5 w-3.5 text-violet-300" /> Subscription analytics · priority
-              module
-            </p>
-            <h1
-              id="subscription-hero-heading"
-              className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-[40px] md:leading-[1.05]"
-            >
-              Stay.ai subscription outcome intelligence
-            </h1>
-            <p className="mt-3 max-w-3xl text-[15px] leading-7 text-slate-200/90">
-              The first fully elevated analytics module. Stay.ai owns subscription outcome truth,
-              Shopify is context only, portal link delivery is never portal completion. Every KPI
-              ships with a source authority, trust label, freshness state, and exportable audit
-              metadata.
-            </p>
-          </div>
-          <dl className="grid grid-cols-3 gap-3 text-center text-white">
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3 backdrop-blur">
-              <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-violet-200/80">
-                Source of truth
-              </dt>
-              <dd className="mt-2 text-sm font-semibold">Stay.ai</dd>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3 backdrop-blur">
-              <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-200/80">
-                Context
-              </dt>
-              <dd className="mt-2 text-sm font-semibold">Shopify · Synthflow</dd>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3 backdrop-blur">
-              <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-200/80">
-                Trust mode
-              </dt>
-              <dd className="mt-2 text-sm font-semibold">System-calculated</dd>
-            </div>
-          </dl>
-        </div>
-      </section>
-
-      <SubscriptionOutcomesView />
-
-      <section aria-labelledby="subscription-source-health-section" className="space-y-4">
-        <SectionHeader
-          id="subscription-source-health-section"
-          eyebrow={
-            <span>
-              <Activity className="mr-1 inline-block h-3 w-3 -translate-y-0.5" /> Source health
-            </span>
+    <SubscriptionLayout>
+      <Routes>
+        <Route index element={<CommandCenterPage />} />
+        <Route path="outcomes" element={<OutcomesPage />} />
+        <Route
+          path="non-cancellation"
+          element={
+            <ComingSoonPage
+              eyebrow="Non-cancellation actions"
+              title="Are skip / pause / frequency-change / SKU swap completing?"
+              whatItWillShow="A per-action sparkbar list with completion rate, source authority, and trust chip for skip, pause, frequency change, address change, SKU swap, reactivate, and one-time add-on actions."
+              whyItIsBlocked="Stay.ai non-cancellation action joins are still being verified for production."
+              whatToUseInstead="Open the Outcome Summary page to see overall save / cancel / pending counts."
+              fallbackHref="/subscriptions/outcomes"
+              fallbackLabel="Open Outcome Summary"
+            />
           }
-          title="Source health, freshness, and lineage"
-          description="Operator-readable view of subscription source authority, freshness, conflicts, and lineage. Stay.ai retains final subscription truth; Shopify is context only; portal link sent is not portal completion."
         />
-        <SourceHealthView />
-      </section>
-
-      <section aria-labelledby="subscription-cycle002-section" className="space-y-4">
-        <SectionHeader
-          id="subscription-cycle002-section"
-          eyebrow="Contract-wired view"
-          title="Cycle 002 contract-wired subscription view"
-          description="Stay.ai-controlled subscription shell wired against the analytics-api contract. Retained alongside the elevated outcome view above for backward compatibility."
-        />
-        <SubscriptionAnalyticsView />
-      </section>
-
-      <section aria-labelledby="subscription-shell-section" className="space-y-4">
-        <SectionHeader
-          id="subscription-shell-section"
-          eyebrow={
-            <span>
-              <Workflow className="mr-1 inline-block h-3 w-3 -translate-y-0.5" /> Module shell
-            </span>
+        <Route
+          path="cancellation-intake"
+          element={
+            <ComingSoonPage
+              eyebrow="Cancellation intake"
+              title="Which cancel reasons are coming in?"
+              whatItWillShow="The seven official cancellation reasons with count, share, save rate, and primary next-step. Cost-too-high cancels link to the Cost Too High retention funnel."
+              whyItIsBlocked="The cancellation reason taxonomy is wired in the backend, but the page-level UI ships in a follow-up cycle."
+              whatToUseInstead="Use the Follow-Up Queue to act on individual customers needing a human today."
+              fallbackHref="/subscriptions/follow-up"
+              fallbackLabel="Open Follow-Up Queue"
+            />
           }
-          title="Cycle 001 dashboard module shell"
-          description="Original module shell retained for backward compatibility with shell-state and routing tests."
         />
-        <DashboardModulePage module="subscriptions" />
-      </section>
-
-      <p className="flex items-center justify-end gap-2 text-[11px] text-slate-400">
-        <History className="h-3 w-3" />
-        Legacy sections kept mounted for regression coverage <GitBranch className="h-3 w-3" />
-      </p>
-    </div>
+        <Route
+          path="cost-too-high"
+          element={
+            <ComingSoonPage
+              eyebrow="Cost too high retention"
+              title="Frequency change → 25% off → confirmed cancel — where do we lose them?"
+              whatItWillShow="A sequence-strict funnel showing retention offer effectiveness per offer version, plus the offer cost vs gross value protected mini-card."
+              whyItIsBlocked="Offer-version joins are not yet built. Tracked in the Cycle 008 plan."
+              whatToUseInstead="Open the Business Value page for the headline retention impact today."
+              fallbackHref="/subscriptions/business-value"
+              fallbackLabel="Open Business Value"
+            />
+          }
+        />
+        <Route path="business-value" element={<BusinessValuePage />} />
+        <Route
+          path="portal-handoff"
+          element={
+            <ComingSoonPage
+              eyebrow="Portal & handoff"
+              title="Link sent vs confirmed completion vs failure"
+              whatItWillShow="A four-stage portal funnel (link sent → opened → started → completion confirmed) with channel completion rates and the locked rule banner: a portal link sent is not portal completion."
+              whyItIsBlocked="Portal completion telemetry has gaps the team is closing in the next cycle."
+              whatToUseInstead="The Follow-Up Queue surfaces individual customers whose portal completion is unconfirmed."
+              fallbackHref="/subscriptions/follow-up"
+              fallbackLabel="Open Follow-Up Queue"
+            />
+          }
+        />
+        <Route
+          path="containment"
+          element={
+            <ComingSoonPage
+              eyebrow="Containment quality"
+              title="True containment: contained without repeat contact"
+              whatItWillShow="A true subscription containment KPI plus a 1 / 7 / 30-day repeat-contact heatmap and the locked exclusion rule for abandoned and drop-off calls."
+              whyItIsBlocked="Repeat-contact join is not yet built. Tracked in the Cycle 008 plan."
+              whatToUseInstead="Open the Outcome Summary page to see save and cancel mix today."
+              fallbackHref="/subscriptions/outcomes"
+              fallbackLabel="Open Outcome Summary"
+            />
+          }
+        />
+        <Route path="follow-up" element={<FollowUpPage />} />
+        <Route
+          path="export-audit"
+          element={
+            <ComingSoonPage
+              eyebrow="Governed exports"
+              title="Pull a governed export"
+              whatItWillShow="A page-resident export drawer with manifest preview (active filters, metric definitions, trust labels, freshness, formula versions, owner, time, fingerprint, audit reference) plus an export queue with status and audit links."
+              whyItIsBlocked="Export drawer ships in a separate PR coordinated with the second-designer agent so RBAC and manifest-mismatch behaviour stay consistent."
+              whatToUseInstead="Per-page export buttons on every subscription subpage — currently disabled with a clear reason — will activate as soon as the drawer lands."
+              fallbackHref="/subscriptions"
+              fallbackLabel="Back to Command Center"
+            />
+          }
+        />
+        <Route path="diagnostics" element={<DiagnosticsPage />} />
+      </Routes>
+    </SubscriptionLayout>
   );
 }
