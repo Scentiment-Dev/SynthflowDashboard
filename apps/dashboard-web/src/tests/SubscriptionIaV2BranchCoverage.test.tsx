@@ -377,6 +377,80 @@ describe('StatusBanner action / detail branches', () => {
   });
 });
 
+describe('FollowUpPage low_trust filter (regression for Bugbot review #31)', () => {
+  it('does NOT include a priority=low record whose reason is unrelated to trust', async () => {
+    vi.spyOn(followUpHook, 'useSubscriptionFollowUp').mockReturnValue({
+      data: {
+        ...SUBSCRIPTION_FOLLOW_UP_FIXTURES.baseline,
+        records: [
+          {
+            ...SUBSCRIPTION_FOLLOW_UP_FIXTURES.baseline.records[0],
+            customer_or_case_id: 'case-trust-decoy',
+            priority: 'low',
+            reason: 'Awaiting Stay.ai confirmation',
+            stayai_confirmation_status: 'pending',
+            support_label: 'Should not appear under low trust',
+          },
+        ],
+      },
+      loading: false,
+      error: null,
+      source: 'api',
+      permissionDenied: false,
+      scenario: 'baseline',
+    } as ReturnType<typeof followUpHook.useSubscriptionFollowUp>);
+
+    render(
+      <MemoryRouter initialEntries={['/subscriptions/follow-up']}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId('follow-up-reason-low_trust')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByTestId('follow-up-reason-low_trust'));
+    await waitFor(() => {
+      const matches = screen.getAllByText(/No follow-ups in this filter/i);
+      expect(matches.length).toBeGreaterThan(0);
+    });
+  });
+
+  it('DOES include a record whose stayai_confirmation_status is "missing"', async () => {
+    vi.spyOn(followUpHook, 'useSubscriptionFollowUp').mockReturnValue({
+      data: {
+        ...SUBSCRIPTION_FOLLOW_UP_FIXTURES.baseline,
+        records: [
+          {
+            ...SUBSCRIPTION_FOLLOW_UP_FIXTURES.baseline.records[0],
+            customer_or_case_id: 'case-missing-confirmation',
+            priority: 'high',
+            reason: 'Outcome unresolved',
+            stayai_confirmation_status: 'missing',
+            support_label: 'Should appear under low trust',
+          },
+        ],
+      },
+      loading: false,
+      error: null,
+      source: 'api',
+      permissionDenied: false,
+      scenario: 'baseline',
+    } as ReturnType<typeof followUpHook.useSubscriptionFollowUp>);
+
+    render(
+      <MemoryRouter initialEntries={['/subscriptions/follow-up']}>
+        <App />
+      </MemoryRouter>,
+    );
+    fireEvent.click(screen.getByTestId('follow-up-reason-low_trust'));
+    await waitFor(() => {
+      expect(
+        screen.getByTestId('follow-up-row-case-missing-confirmation'),
+      ).toBeInTheDocument();
+    });
+  });
+});
+
 describe('FollowUpPage selection scope (regression for Codex review #31)', () => {
   it('drops hidden rows from the selected count when the reason filter changes', async () => {
     render(

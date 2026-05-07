@@ -71,7 +71,17 @@ function matchesReason(record: SubscriptionFollowUpRecord, filter: ReasonFilter)
         record.portal_completion_status === 'link_sent'
       );
     case 'low_trust':
-      return record.priority === 'low' || record.reason.toLowerCase().includes('low trust');
+      // "Low trust" is a data-reliability signal, NOT operational priority.
+      // Priority is a triage field (low/medium/high) and a trustworthy record
+      // can still be priority=low. We surface low-trust rows by:
+      //   1. Stay.ai confirmation status === "missing" (the official outcome
+      //      has no final state, so the record cannot be fully trusted), OR
+      //   2. The follow-up reason text explicitly mentions "low trust"
+      //      (operator-authored override).
+      return (
+        record.stayai_confirmation_status === 'missing' ||
+        record.reason.toLowerCase().includes('low trust')
+      );
     default:
       return true;
   }
