@@ -376,3 +376,176 @@ describe('StatusBanner action / detail branches', () => {
     expect(screen.getByText('Stay.ai feed dropped')).toBeInTheDocument();
   });
 });
+
+describe('Patch coverage — additional Cycle 008 branches', () => {
+  it('Command Center renders the live banner branch when outcomes are sourced from the API', async () => {
+    vi.spyOn(outcomesHook, 'useSubscriptionOutcomes').mockReturnValue({
+      data: SUBSCRIPTION_OUTCOMES_FIXTURES.baseline,
+      loading: false,
+      error: null,
+      source: 'api',
+      permissionDenied: false,
+      scenario: 'baseline',
+    } as ReturnType<typeof outcomesHook.useSubscriptionOutcomes>);
+
+    render(
+      <MemoryRouter initialEntries={['/subscriptions']}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByTestId('subscription-status-banner-live'),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('Command Center renders the fixture-unreachable banner branch when outcomes fall back to fixture', async () => {
+    vi.spyOn(outcomesHook, 'useSubscriptionOutcomes').mockReturnValue({
+      data: SUBSCRIPTION_OUTCOMES_FIXTURES.baseline,
+      loading: false,
+      error: 'network down',
+      source: 'fixture',
+      permissionDenied: false,
+      scenario: 'baseline',
+    } as ReturnType<typeof outcomesHook.useSubscriptionOutcomes>);
+
+    render(
+      <MemoryRouter initialEntries={['/subscriptions']}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByTestId('subscription-status-banner-fixture_unreachable'),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('Command Center hides the headline business-value KPI when no metrics are returned', async () => {
+    vi.spyOn(outcomesHook, 'useSubscriptionOutcomes').mockReturnValue({
+      data: SUBSCRIPTION_OUTCOMES_FIXTURES.baseline,
+      loading: false,
+      error: null,
+      source: 'api',
+      permissionDenied: false,
+      scenario: 'baseline',
+    } as ReturnType<typeof outcomesHook.useSubscriptionOutcomes>);
+    vi.spyOn(businessValueHook, 'useSubscriptionBusinessValue').mockReturnValue({
+      data: { ...SUBSCRIPTION_BUSINESS_VALUE_FIXTURES.empty, metrics: [] },
+      loading: false,
+      error: null,
+      source: 'api',
+      permissionDenied: false,
+      scenario: 'empty',
+    } as ReturnType<typeof businessValueHook.useSubscriptionBusinessValue>);
+
+    render(
+      <MemoryRouter initialEntries={['/subscriptions']}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      expect(
+        screen.queryByTestId('command-center-kpi-business-value'),
+      ).toBeNull();
+    });
+  });
+
+  it('Command Center renders the plural attention copy when multiple items need attention', async () => {
+    const baseFixture = SUBSCRIPTION_OUTCOMES_FIXTURES.baseline;
+    vi.spyOn(outcomesHook, 'useSubscriptionOutcomes').mockReturnValue({
+      data: {
+        ...baseFixture,
+        metrics: {
+          ...baseFixture.metrics,
+          pending_stayai_confirmation_total: 2,
+          portal_link_sent_total: 0,
+          portal_completion_confirmed_total: 0,
+        },
+      },
+      loading: false,
+      error: null,
+      source: 'api',
+      permissionDenied: false,
+      scenario: 'baseline',
+    } as ReturnType<typeof outcomesHook.useSubscriptionOutcomes>);
+
+    render(
+      <MemoryRouter initialEntries={['/subscriptions']}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByText(/2 calls are still waiting for official confirmation/i),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('Follow-Up Queue renders empty-state copy and the Clear filters button when no records match', async () => {
+    vi.spyOn(followUpHook, 'useSubscriptionFollowUp').mockReturnValue({
+      data: SUBSCRIPTION_FOLLOW_UP_FIXTURES.empty,
+      loading: false,
+      error: null,
+      source: 'api',
+      permissionDenied: false,
+      scenario: 'empty',
+    } as ReturnType<typeof followUpHook.useSubscriptionFollowUp>);
+
+    render(
+      <MemoryRouter initialEntries={['/subscriptions/follow-up']}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      const matches = screen.getAllByText(/No follow-ups in this filter/i);
+      expect(matches.length).toBeGreaterThan(0);
+    });
+    fireEvent.click(screen.getByRole('button', { name: /Clear filters/i }));
+    expect(screen.getByTestId('follow-up-reason-all')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
+  it('Follow-Up Queue renders the missing-Stay.ai banner when the scenario is set to missing_stayai_final_state', async () => {
+    render(
+      <MemoryRouter initialEntries={['/subscriptions/follow-up']}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      expect(screen.getByLabelText(/Follow-up queue scenario/i)).toBeInTheDocument();
+    });
+    fireEvent.change(screen.getByLabelText(/Follow-up queue scenario/i), {
+      target: { value: 'missing_stayai_final_state' },
+    });
+    await waitFor(() => {
+      expect(
+        screen.getByTestId('subscription-status-banner-missing'),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('Business Value page renders the empty hero copy when metrics is empty', async () => {
+    vi.spyOn(businessValueHook, 'useSubscriptionBusinessValue').mockReturnValue({
+      data: { ...SUBSCRIPTION_BUSINESS_VALUE_FIXTURES.empty, metrics: [] },
+      loading: false,
+      error: null,
+      source: 'api',
+      permissionDenied: false,
+      scenario: 'empty',
+    } as ReturnType<typeof businessValueHook.useSubscriptionBusinessValue>);
+
+    render(
+      <MemoryRouter initialEntries={['/subscriptions/business-value']}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      const columns = screen.getAllByText(/No metrics in this state for the current view/i);
+      expect(columns.length).toBeGreaterThanOrEqual(3);
+    });
+  });
+});
