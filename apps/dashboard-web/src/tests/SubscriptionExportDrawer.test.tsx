@@ -251,6 +251,21 @@ describe('SubscriptionExportDrawer', () => {
     expect(onClose).toHaveBeenCalledTimes(4);
   });
 
+  it('ignores non-Escape keys in the document keydown handler', () => {
+    const onClose = vi.fn();
+    render(
+      <SubscriptionExportDrawer
+        open
+        onClose={onClose}
+        pageLabel="Command Center"
+        scopes={allowedScopes}
+        manifest={baseManifest}
+      />,
+    );
+    fireEvent.keyDown(document, { key: 'Enter' });
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it('falls back to the first listed scope when nothing is allowed and no defaultScope', () => {
     render(
       <SubscriptionExportDrawer
@@ -265,6 +280,20 @@ describe('SubscriptionExportDrawer', () => {
       (screen.getByTestId('export-scope-filtered_csv-input') as HTMLInputElement).checked,
     ).toBe(true);
     expect(screen.getByTestId('export-blocked-callout')).toBeInTheDocument();
+  });
+
+  it('shows no blocked callout when defaultScope is missing from provided scopes', () => {
+    render(
+      <SubscriptionExportDrawer
+        open
+        onClose={() => {}}
+        pageLabel="Command Center"
+        scopes={[{ scope: 'current_page', blockedReason: 'allowed' }]}
+        manifest={baseManifest}
+        defaultScope="audit_manifest"
+      />,
+    );
+    expect(screen.queryByTestId('export-blocked-callout')).toBeNull();
   });
 
   it('renders success toast without audit reference lines when the backend omits them', async () => {
@@ -411,5 +440,21 @@ describe('SubscriptionExportDrawer', () => {
     await waitFor(() => {
       expect(onConfirm).not.toHaveBeenCalled();
     });
+  });
+
+  it('returns early when onConfirm is missing even if an allowed scope is selected', () => {
+    render(
+      <SubscriptionExportDrawer
+        open
+        onClose={() => {}}
+        pageLabel="Command Center"
+        scopes={[{ scope: 'current_page', blockedReason: 'allowed' }]}
+        manifest={baseManifest}
+      />,
+    );
+    const button = screen.getByTestId('subscription-export-drawer-generate');
+    expect(button).toBeEnabled();
+    fireEvent.click(button);
+    expect(screen.queryByTestId('export-result-toast')).toBeNull();
   });
 });
