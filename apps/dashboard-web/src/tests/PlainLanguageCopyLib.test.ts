@@ -286,6 +286,8 @@ describe('plainLanguageCopy: export catalog', () => {
     expect(EXPORT_BLOCKED_REASON.backend_not_connected).toMatch(/export pipeline is not connected/);
     expect(EXPORT_BLOCKED_REASON.no_rows_selected).toMatch(/at least one row/);
     expect(EXPORT_BLOCKED_REASON.pending_audit_reference).toMatch(/audit reference/);
+    expect(EXPORT_BLOCKED_REASON.manifest_mismatch).toMatch(/metric definition has changed/);
+    expect(EXPORT_BLOCKED_REASON.request_failed).toMatch(/could not finish/);
   });
 
   it('exposes the manifest field labels', () => {

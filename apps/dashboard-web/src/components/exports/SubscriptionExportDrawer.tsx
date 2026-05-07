@@ -177,6 +177,10 @@ export default function SubscriptionExportDrawer({
       setSubmitting(true);
       const out = await Promise.resolve(onConfirm(selected));
       setResult(out);
+    } catch {
+      // Network/server failures or thrown errors — always surface as a blocked toast so the
+      // operator gets actionable copy instead of a silent stuck state.
+      setResult({ status: 'blocked', blockedReason: 'request_failed' });
     } finally {
       setSubmitting(false);
     }

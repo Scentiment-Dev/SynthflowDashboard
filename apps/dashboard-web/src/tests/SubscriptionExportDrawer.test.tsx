@@ -251,6 +251,146 @@ describe('SubscriptionExportDrawer', () => {
     expect(onClose).toHaveBeenCalledTimes(4);
   });
 
+  it('falls back to the first listed scope when nothing is allowed and no defaultScope', () => {
+    render(
+      <SubscriptionExportDrawer
+        open
+        onClose={() => {}}
+        pageLabel="Command Center"
+        scopes={[{ scope: 'filtered_csv', blockedReason: 'backend_not_connected' }]}
+        manifest={baseManifest}
+      />,
+    );
+    expect(
+      (screen.getByTestId('export-scope-filtered_csv-input') as HTMLInputElement).checked,
+    ).toBe(true);
+    expect(screen.getByTestId('export-blocked-callout')).toBeInTheDocument();
+  });
+
+  it('renders success toast without audit reference lines when the backend omits them', async () => {
+    const onConfirm = vi.fn((): ExportRequestResult => ({ status: 'allowed' }));
+    render(
+      <SubscriptionExportDrawer
+        open
+        onClose={() => {}}
+        pageLabel="Command Center"
+        scopes={allowedScopes}
+        manifest={baseManifest}
+        onConfirm={onConfirm}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('subscription-export-drawer-generate'));
+    await waitFor(() => {
+      expect(screen.getByTestId('export-result-toast')).toHaveTextContent(/Export ready/);
+    });
+    expect(screen.getByTestId('export-result-toast')).not.toHaveTextContent(/audit reference:/);
+  });
+
+  it('shows Generating while an async onConfirm is in flight', async () => {
+    const bridge: { resolve?: any } = {};
+    const pending = new Promise<ExportRequestResult>((resolve) => {
+      bridge.resolve = resolve;
+    });
+    const onConfirm = vi.fn(() => pending);
+    render(
+      <SubscriptionExportDrawer
+        open
+        onClose={() => {}}
+        pageLabel="Command Center"
+        scopes={allowedScopes}
+        manifest={baseManifest}
+        onConfirm={onConfirm}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('subscription-export-drawer-generate'));
+    expect(screen.getByTestId('subscription-export-drawer-generate')).toHaveTextContent(/Generating/);
+    bridge.resolve!({ status: 'allowed', audit_reference: 'late' });
+    await waitFor(() => {
+      expect(screen.getByTestId('export-result-toast')).toHaveTextContent(/late/);
+    });
+  });
+
+  it('shows a blocked toast when onConfirm rejects (network or server failure)', async () => {
+    const onConfirm = vi.fn(() => Promise.reject(new Error('simulated network failure')));
+    render(
+      <SubscriptionExportDrawer
+        open
+        onClose={() => {}}
+        pageLabel="Command Center"
+        scopes={allowedScopes}
+        manifest={baseManifest}
+        onConfirm={onConfirm}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('subscription-export-drawer-generate'));
+    await waitFor(() => {
+      expect(screen.getByTestId('export-result-toast')).toBeInTheDocument();
+    });
+    expect(screen.getByTestId('export-result-toast')).toHaveTextContent(/could not finish/i);
+    expect(screen.getByTestId('export-result-toast')).toHaveTextContent(/unavailable/i);
+    expect(onConfirm).toHaveBeenCalledWith('current_page');
+  });
+
+  it('shows a blocked toast when onConfirm throws synchronously', async () => {
+    const onConfirm = vi.fn(() => {
+      throw new Error('simulated sync failure');
+    });
+    render(
+      <SubscriptionExportDrawer
+        open
+        onClose={() => {}}
+        pageLabel="Command Center"
+        scopes={allowedScopes}
+        manifest={baseManifest}
+        onConfirm={onConfirm}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('subscription-export-drawer-generate'));
+    await waitFor(() => {
+      expect(screen.getByTestId('export-result-toast')).toBeInTheDocument();
+    });
+    expect(screen.getByTestId('export-result-toast')).toHaveTextContent(/could not finish/i);
+  });
+
+  it('clears the export result toast when the drawer is closed and reopened', async () => {
+    const onConfirm = vi.fn((): ExportRequestResult => ({ status: 'allowed', audit_reference: 'X1' }));
+    const { rerender } = render(
+      <SubscriptionExportDrawer
+        open
+        onClose={() => {}}
+        pageLabel="Command Center"
+        scopes={allowedScopes}
+        manifest={baseManifest}
+        onConfirm={onConfirm}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('subscription-export-drawer-generate'));
+    await waitFor(() => {
+      expect(screen.getByTestId('export-result-toast')).toHaveTextContent(/X1/);
+    });
+    rerender(
+      <SubscriptionExportDrawer
+        open={false}
+        onClose={() => {}}
+        pageLabel="Command Center"
+        scopes={allowedScopes}
+        manifest={baseManifest}
+        onConfirm={onConfirm}
+      />,
+    );
+    rerender(
+      <SubscriptionExportDrawer
+        open
+        onClose={() => {}}
+        pageLabel="Command Center"
+        scopes={allowedScopes}
+        manifest={baseManifest}
+        onConfirm={onConfirm}
+      />,
+    );
+    expect(screen.queryByTestId('export-result-toast')).toBeNull();
+  });
+
   it('does not call onConfirm when no scope is allowed and the user clicks generate (defensive)', async () => {
     const onConfirm = vi.fn(
       (): ExportRequestResult => ({ status: 'allowed' }),

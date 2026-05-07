@@ -542,7 +542,8 @@ export type ExportBlockedReasonKey =
   | 'backend_not_connected'
   | 'no_rows_selected'
   | 'pending_audit_reference'
-  | 'manifest_mismatch';
+  | 'manifest_mismatch'
+  | 'request_failed';
 
 export const EXPORT_BLOCKED_REASON: Record<ExportBlockedReasonKey, string> = {
   allowed: 'Allowed',
@@ -559,6 +560,8 @@ export const EXPORT_BLOCKED_REASON: Record<ExportBlockedReasonKey, string> = {
     'Your export is pending an audit reference. We will notify you when it lands.',
   manifest_mismatch:
     'Export blocked: a metric definition has changed since this view was rendered. Refresh and try again.',
+  request_failed:
+    'The export could not finish. Live data or the export service was unavailable. Wait a moment and try again.',
 };
 
 export const EXPORT_MANIFEST_FIELD_LABEL = {

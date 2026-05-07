@@ -193,6 +193,22 @@ describe('SubscriptionFilterDrawer rendering', () => {
     expect(onApply).toHaveBeenCalledWith(defaults);
   });
 
+  it('clears a filter key when the last selected value is toggled off', () => {
+    const onApply = vi.fn();
+    render(
+      <SubscriptionFilterDrawer
+        open
+        onClose={() => {}}
+        state={baseState}
+        applied={{ trust_label: ['high'] }}
+        onApply={onApply}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('subscription-filter-trust_label-value-high'));
+    fireEvent.click(screen.getByTestId('subscription-filter-drawer-apply'));
+    expect(onApply).toHaveBeenCalledWith({});
+  });
+
   it('renders saved-views placeholder when no views and explicit not-yet-connected reason', () => {
     render(
       <SubscriptionFilterDrawer

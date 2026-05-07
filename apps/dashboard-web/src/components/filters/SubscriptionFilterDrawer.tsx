@@ -65,7 +65,6 @@ export type SavedView = {
 
 type DraftAction =
   | { type: 'toggle'; filterId: string; value: string }
-  | { type: 'set'; filterId: string; values: string[] }
   | { type: 'clear-all' }
   | { type: 'replace'; next: AppliedFilters };
 
@@ -84,18 +83,10 @@ function draftReducer(state: AppliedFilters, action: DraftAction): AppliedFilter
       }
       return out;
     }
-    case 'set': {
-      const out = { ...state };
-      if (action.values.length === 0) delete out[action.filterId];
-      else out[action.filterId] = action.values;
-      return out;
-    }
     case 'clear-all':
       return {};
     case 'replace':
       return { ...action.next };
-    default:
-      return state;
   }
 }
 
