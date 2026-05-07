@@ -75,8 +75,14 @@ describe('subscription-v2 plain-language copy helpers', () => {
 
   it('formatBusinessValue handles usd, ratio, count, percent, missing, and NaN inputs', () => {
     expect(formatBusinessValue(86540, 'usd')).toBe('$86,540');
-    expect(formatBusinessValue(4.3, 'ratio')).toBe('4.30×');
+    expect(formatBusinessValue(4.3, 'ratio')).toBe('4.3×');
     expect(formatBusinessValue(4, 'ratio')).toBe('4×');
+    // Integers render with no decimal even when the value is technically a float.
+    expect(formatBusinessValue(4.0, 'ratio')).toBe('4×');
+    // 3.14159 rounds to 3.1× (one decimal, matches jsdoc contract).
+    expect(formatBusinessValue(3.14159, 'ratio')).toBe('3.1×');
+    // 4.05 rounds to 4.1×; trailing zeros are never displayed.
+    expect(formatBusinessValue(4.05, 'ratio')).toBe('4.1×');
     expect(formatBusinessValue(1234, 'count')).toBe('1,234');
     expect(formatBusinessValue(75, 'percent')).toBe('75%');
     expect(formatBusinessValue(7.5, 'percent')).toBe('7.5%');

@@ -83,7 +83,12 @@ export const SOURCE_CONFIRMATION_TONE: Record<SubscriptionSourceConfirmation, St
 
 /**
  * Format a numeric value with currency / count semantics for support-user views.
- * Counts use locale formatting; currency uses USD; ratios use up to one decimal.
+ *  - `usd`    : USD currency with no fractional cents (e.g. "$86,540").
+ *  - `ratio`  : numeric ratio with at most ONE decimal place, trailing zeros
+ *               stripped, suffixed with the multiplication sign (e.g. "4.1×",
+ *               "4×"). Matches the documented jsdoc contract.
+ *  - `percent`: locale-formatted number with a "%" suffix (e.g. "75%").
+ *  - default  : locale-formatted count (e.g. "1,234").
  */
 export function formatBusinessValue(
   value: number | null | undefined,
@@ -98,7 +103,12 @@ export function formatBusinessValue(
     }).format(value);
   }
   if (unit === 'ratio') {
-    return `${value.toFixed(value % 1 === 0 ? 0 : 2)}×`;
+    // Round to 1 decimal place, then strip a trailing ".0" so integers render
+    // as "4×" and fractional values render as "4.1×" (never "4.10×").
+    const rounded = Math.round(value * 10) / 10;
+    const formatted =
+      rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(1);
+    return `${formatted}×`;
   }
   if (unit === 'percent') {
     return `${value.toLocaleString()}%`;

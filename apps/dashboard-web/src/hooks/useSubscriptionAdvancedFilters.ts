@@ -29,6 +29,12 @@ function isAdvancedFiltersResponseShape(
 // mount. This keeps the perf win from the success path without locking the
 // user into an error state across the whole session.
 //
+// Closure safety: the cached value only ever stores either (a) the raw API
+// response payload, or (b) the module-level `SUBSCRIPTION_ADVANCED_FILTERS_FIXTURE`
+// singleton wrapped in a fresh state object. It NEVER closes over per-
+// component state, so consuming a cached value from a different component
+// instance is safe.
+//
 // `__resetSubscriptionAdvancedFiltersCache` is exported so tests (and any
 // future "force refresh" UI affordance) can wipe the cache.
 const RESOLVED_CACHE = new Map<string, SubscriptionAdvancedFilterApiState>();
@@ -76,11 +82,14 @@ export function useSubscriptionAdvancedFilters(
 
     let promise = IN_FLIGHT_CACHE.get(scenario);
     if (!promise) {
+      // The promise chain references the module-level fixture singleton
+      // directly (NOT the per-instance `fixture` from useMemo) so the in-
+      // flight promise doesn't close over any component state.
       promise = getSubscriptionAdvancedFilters(scenario)
         .then((response): SubscriptionAdvancedFilterApiState => {
           if (!isAdvancedFiltersResponseShape(response)) {
             return {
-              data: fixture,
+              data: SUBSCRIPTION_ADVANCED_FILTERS_FIXTURE,
               loading: false,
               error: 'subscription advanced filters response shape mismatch',
               source: 'fixture',
@@ -96,7 +105,7 @@ export function useSubscriptionAdvancedFilters(
           };
         })
         .catch((error: unknown): SubscriptionAdvancedFilterApiState => ({
-          data: fixture,
+          data: SUBSCRIPTION_ADVANCED_FILTERS_FIXTURE,
           loading: false,
           error: errorMessage(error),
           source: 'fixture',
