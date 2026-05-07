@@ -2,10 +2,13 @@ import { useMemo, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SubscriptionPageHeader from '../../subscription/SubscriptionPageHeader';
-import PageActionBar from '../PageActionBar';
+import SubscriptionPageToolbar from '../SubscriptionPageToolbar';
 import StatusBanner from '../StatusBanner';
 import StateChip from '../StateChip';
 import MetricDisclosure from '../MetricDisclosure';
+import type { AppliedFilters } from '../../filters/SubscriptionFilterDrawer';
+import type { ExportRequestResult, ExportScopeAvailability } from '../../exports/SubscriptionExportDrawer';
+import type { ExportScopeKey } from '../../../lib/plainLanguageCopy';
 import { useSubscriptionBusinessValue } from '../../../hooks/useSubscriptionBusinessValue';
 import {
   BUSINESS_VALUE_STATE_LABEL,
@@ -87,9 +90,41 @@ const COLUMN_GROUPS: Array<{
  * `BusinessValueState` (confirmed / estimated / pending+blocked). Every card
  * carries a state chip and a Level 2 disclosure. No raw enums on Level 1.
  */
+const BUSINESS_VALUE_DEFAULT_FILTERS: AppliedFilters = {
+  date_preset: ['last_30_days'],
+};
+
 export default function BusinessValuePage() {
   const [scenario, setScenario] = useState<SubscriptionBusinessValueScenario>('baseline');
+  const [applied, setApplied] = useState<AppliedFilters>(BUSINESS_VALUE_DEFAULT_FILTERS);
   const state = useSubscriptionBusinessValue(scenario);
+
+  const trustForExport = state.data.metadata.trust_label;
+  const exportScopes = useMemo<ExportScopeAvailability[]>(() => {
+    const lowTrust = trustForExport === 'low' || trustForExport === 'untrusted';
+    const missingFinalState = scenario === 'missing_stayai_final_state';
+    return [
+      {
+        scope: 'current_page',
+        blockedReason: missingFinalState
+          ? 'missing_metadata'
+          : lowTrust
+            ? 'low_trust'
+            : 'allowed',
+      },
+      {
+        scope: 'selected_widget',
+        blockedReason: missingFinalState ? 'missing_metadata' : 'allowed',
+      },
+      {
+        scope: 'pdf_snapshot',
+        blockedReason: lowTrust ? 'low_trust' : 'allowed',
+      },
+      { scope: 'audit_manifest', blockedReason: 'allowed' },
+      { scope: 'filtered_csv', blockedReason: 'allowed' },
+      { scope: 'selected_rows', blockedReason: 'no_rows_selected' },
+    ];
+  }, [scenario, trustForExport]);
 
   const headlineMetric = useMemo(
     () =>
@@ -147,10 +182,42 @@ export default function BusinessValuePage() {
         }
       />
 
-      <PageActionBar
-        activeFilters={[{ id: 'date_preset', label: 'Last 30 days' }]}
-        filterDisabledReason="Filter drawer ships in a follow-up PR. Default Last 30 days is applied."
-        exportDisabledReason="Export drawer ships in a follow-up PR. Use Export & Audit for now."
+      <SubscriptionPageToolbar
+        pageLabel="Business Value"
+        applied={applied}
+        defaults={BUSINESS_VALUE_DEFAULT_FILTERS}
+        onApply={setApplied}
+        savedViewsDisabledReason="Saved view persistence ships once the backend store is connected."
+        exportScopes={exportScopes}
+        exportManifest={{
+          filters: ['Last 30 days', `Scenario: ${scenario}`],
+          metric_definitions: state.data.metrics.map((m) => m.display_label),
+          trust_labels: [state.data.metadata.trust_label],
+          freshness: state.data.metadata.freshness_status,
+          formula_versions: state.data.metrics.map((m) => `${m.metric_id} ${m.formula_version}`),
+          owner: state.data.metadata.owner,
+          timestamp: state.data.metadata.timestamp,
+          fingerprint: state.data.metadata.fingerprint,
+          audit_reference: state.data.metadata.audit_reference,
+          requester_role: 'support_agent',
+          permission_decision: state.permissionDenied ? 'deny' : 'allow',
+          source_confirmation_status: state.data.metadata.source_confirmation_status,
+          included_widgets: ['Headline', 'Confirmed column', 'Estimated column', 'Pending column'],
+          excluded_widgets: ['Diagnostics drawer'],
+        }}
+        onConfirmExport={(scope: ExportScopeKey): ExportRequestResult => {
+          if (scenario === 'missing_stayai_final_state') {
+            return {
+              status: 'blocked',
+              blockedReason: 'missing_metadata',
+            };
+          }
+          return {
+            status: 'pending',
+            audit_reference: state.data.metadata.audit_reference,
+            fingerprint: `${state.data.metadata.fingerprint}-${scope}`,
+          };
+        }}
       />
 
       {state.source === 'fixture' ? (

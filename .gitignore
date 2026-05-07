@@ -16,4 +16,5 @@ logs/
 .DS_Store
 .idea/
 .vscode/
-exports/
+# Root-level export output only (do not use bare `exports/` — it ignores dashboard UI package).
+/exports/

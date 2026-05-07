@@ -36,6 +36,7 @@
     "autoprefixer": "latest",
     "eslint": "latest",
     "jsdom": "latest",
+    "playwright": "^1.59.1",
     "postcss": "latest",
     "tailwindcss": "latest",
     "vitest": "latest"
