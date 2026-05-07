@@ -35,6 +35,21 @@ describe('SubscriptionSubnav (Cycle 008 IA v2)', () => {
     expect(activeLink).toHaveAttribute('aria-current', 'page');
   });
 
+  // Regression for Cursor Bugbot finding on PR #31: when no `activeId` prop
+  // is supplied (the default in production routing), the subnav must let
+  // React Router v6's NavLink set `aria-current="page"` automatically on the
+  // matching link instead of forcibly clearing it. This is the screen-reader
+  // landmark for the current page.
+  it('lets React Router NavLink manage aria-current when activeId is NOT provided', () => {
+    renderSubnav();
+
+    const matchedLink = screen.getByRole('link', { name: /Command/i });
+    expect(matchedLink).toHaveAttribute('aria-current', 'page');
+
+    const otherLink = screen.getByRole('link', { name: /Outcomes/i });
+    expect(otherLink).not.toHaveAttribute('aria-current');
+  });
+
   it('renders Coming soon chips on planned items but never on the active item', () => {
     renderSubnav({ activeId: 'command-center' });
 

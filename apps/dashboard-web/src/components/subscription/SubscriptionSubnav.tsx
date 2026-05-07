@@ -63,7 +63,16 @@ export default function SubscriptionSubnav({
                 to={item.href}
                 end={item.href === '/subscriptions'}
                 onClick={handleClick}
-                aria-current={isActive ? 'page' : undefined}
+                // Only pass `aria-current` when an explicit `activeId` is
+                // supplied (route-aware outer controller / test-driver use
+                // case). When `activeId` is undefined, React Router v6 sets
+                // `aria-current="page"` automatically on the matched link;
+                // overriding it with `undefined` would suppress that
+                // accessibility landmark for screen readers. Caught by
+                // Cursor Bugbot on PR #31.
+                {...(activeId !== undefined
+                  ? { 'aria-current': isActive ? 'page' : undefined }
+                  : {})}
                 className={({ isActive: routeActive }) => {
                   const active = isActive ?? routeActive;
                   const stateClass = active

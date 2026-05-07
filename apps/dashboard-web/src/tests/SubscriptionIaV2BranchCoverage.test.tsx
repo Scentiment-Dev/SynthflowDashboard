@@ -28,6 +28,36 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+describe('SubscriptionLayout subnav suppression on diagnostics', () => {
+  // Regression for Cursor Bugbot finding on PR #31: the Diagnostics page is
+  // intentionally NOT in SUBSCRIPTION_SUBNAV_ITEMS (operator-only L2/L3
+  // surface). The subnav must therefore be hidden on that route to avoid
+  // the confusing UX of a subnav with no active tab.
+  it('hides the Subscription subnav on the diagnostics route', async () => {
+    render(
+      <MemoryRouter initialEntries={['/subscriptions/diagnostics']}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      expect(screen.queryByRole('navigation', { name: /Subscription analytics/i })).toBeNull();
+    });
+  });
+
+  it('still shows the Subscription subnav on Command Center and other live subpages', async () => {
+    render(
+      <MemoryRouter initialEntries={['/subscriptions']}>
+        <App />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByRole('navigation', { name: /Subscription analytics/i }),
+      ).toBeInTheDocument();
+    });
+  });
+});
+
 describe('Topbar fallback rendering', () => {
   it('uses the product-name title and Internal analytics eyebrow for unknown non-subscription paths', () => {
     render(
