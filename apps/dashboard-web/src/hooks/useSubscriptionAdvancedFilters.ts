@@ -21,11 +21,16 @@ function isAdvancedFiltersResponseShape(
 // navigations within a session and is only consumed by `PageActionBar`'s
 // "X dimensions available" status pills. Without this cache the same fetch
 // fires on every page mount (Command Center, Outcomes, Business Value,
-// Follow-Up). The cache stores the resolved/fallback state per scenario so
-// every subsequent hook instance returns it synchronously without a refetch.
+// Follow-Up).
 //
-// `__resetSubscriptionAdvancedFiltersCache` is exported for tests so each
-// test starts from a clean slate without polluting later runs.
+// IMPORTANT: we ONLY cache successful API resolutions (`source === 'api'`).
+// Errors, permission-denied responses, and shape-mismatch fallbacks are NOT
+// cached, so a transient 403 / network blip will be retried on the next
+// mount. This keeps the perf win from the success path without locking the
+// user into an error state across the whole session.
+//
+// `__resetSubscriptionAdvancedFiltersCache` is exported so tests (and any
+// future "force refresh" UI affordance) can wipe the cache.
 const RESOLVED_CACHE = new Map<string, SubscriptionAdvancedFilterApiState>();
 const IN_FLIGHT_CACHE = new Map<string, Promise<SubscriptionAdvancedFilterApiState>>();
 
@@ -98,7 +103,12 @@ export function useSubscriptionAdvancedFilters(
           permissionDenied: isPermissionDenied(error),
         }))
         .then((resolved) => {
-          RESOLVED_CACHE.set(scenario, resolved);
+          // Only cache successful API responses. Error / fallback states must
+          // remain re-fetchable so transient failures don't permanently
+          // pollute the session.
+          if (resolved.source === 'api' && resolved.error === null) {
+            RESOLVED_CACHE.set(scenario, resolved);
+          }
           IN_FLIGHT_CACHE.delete(scenario);
           return resolved;
         });

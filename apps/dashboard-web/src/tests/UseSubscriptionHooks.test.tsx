@@ -312,6 +312,32 @@ describe('useSubscriptionAdvancedFilters', () => {
 
     expect(apiSpy).toHaveBeenCalledTimes(1);
   });
+
+  // Regression for Cursor Bugbot follow-up finding on PR #31: only successful
+  // API responses are cached. A transient error or fixture-fallback MUST NOT
+  // be locked in for the rest of the session - the next mount must re-fetch
+  // so a one-off 503 or 403 does not permanently degrade the action bar.
+  it('does NOT cache error / fixture-fallback states (retries on next mount)', async () => {
+    const apiSpy = vi
+      .spyOn(dashboardApi, 'getSubscriptionAdvancedFilters')
+      .mockRejectedValueOnce(new Error('transient network blip'))
+      .mockResolvedValueOnce(SUBSCRIPTION_ADVANCED_FILTERS_FIXTURE);
+
+    const first = render(<AdvancedFiltersProbe />);
+    await waitFor(() => {
+      expect(first.getByTestId('source')).toHaveTextContent('fixture');
+      expect(first.getByTestId('error')).toHaveTextContent('transient network blip');
+    });
+    first.unmount();
+
+    const second = render(<AdvancedFiltersProbe />);
+    await waitFor(() => {
+      expect(second.getByTestId('source')).toHaveTextContent('api');
+    });
+    second.unmount();
+
+    expect(apiSpy).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('shape validator branches (granular)', () => {

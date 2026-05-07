@@ -272,8 +272,9 @@ export default function CommandCenterPage() {
             <li className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-amber-200/80 bg-amber-50/60 px-4 py-3">
               <div>
                 <p className="text-sm font-semibold text-amber-900">
-                  {portalUnknownCount} customer{portalUnknownCount === 1 ? "'s" : "s'"} portal
-                  completion is unconfirmed
+                  {portalUnknownCount === 1
+                    ? "1 customer's portal completion is unconfirmed"
+                    : `${portalUnknownCount} customers have an unconfirmed portal completion`}
                 </p>
                 <p className="text-[12px] text-amber-800/90">
                   The customer received the link, but we have not confirmed they finished
