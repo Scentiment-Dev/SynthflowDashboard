@@ -477,7 +477,7 @@ describe('FollowUpPage low_trust filter (regression for Bugbot review #31)', () 
 });
 
 describe('FollowUpPage selection scope (regression for Codex review #31)', () => {
-  it('drops hidden rows from the selected count when the reason filter changes', async () => {
+  it('clears the selection when the reason filter changes (no ghost selections resurface)', async () => {
     render(
       <MemoryRouter initialEntries={['/subscriptions/follow-up']}>
         <App />
@@ -492,21 +492,26 @@ describe('FollowUpPage selection scope (regression for Codex review #31)', () =>
     fireEvent.click(within(portalRow).getByRole('checkbox'));
     expect(screen.getByTestId('follow-up-bulk-actions')).toBeInTheDocument();
 
-    // Switch the reason chip to Pending Stay.ai. case-1002 is no longer visible,
-    // so the bulk-action bar must disappear because no visible row is selected.
+    // Switch the reason chip to Pending Stay.ai. case-1002 is no longer
+    // visible, AND the selection map is wiped on reason change, so the
+    // bulk-action bar must disappear.
     fireEvent.click(screen.getByTestId('follow-up-reason-pending_stayai'));
     await waitFor(() => {
       expect(screen.queryByTestId('follow-up-bulk-actions')).toBeNull();
     });
 
-    // Switch back to All follow-ups: the original case-1002 row is visible again
-    // AND its checkbox should still be checked because the underlying selection
-    // map is preserved across reason changes (only the visible-count derivation
-    // changes), so the bulk-action bar should reappear.
+    // Switch back to All follow-ups. The selection map was reset on the
+    // reason change, so case-1002 must NOT resurface as still-selected; the
+    // bulk-action bar must remain hidden until the operator explicitly
+    // re-selects rows under the current scope. (Cursor Bugbot finding on
+    // PR #31: prevent ghost selections from earlier filters resurfacing.)
     fireEvent.click(screen.getByTestId('follow-up-reason-all'));
     await waitFor(() => {
-      expect(screen.getByTestId('follow-up-bulk-actions')).toBeInTheDocument();
+      expect(screen.getByTestId('follow-up-table')).toBeInTheDocument();
     });
+    const restoredRow = screen.getByTestId('follow-up-row-case-1002');
+    expect(within(restoredRow).getByRole('checkbox')).not.toBeChecked();
+    expect(screen.queryByTestId('follow-up-bulk-actions')).toBeNull();
   });
 
   it('clears the entire selection when the scenario changes', async () => {

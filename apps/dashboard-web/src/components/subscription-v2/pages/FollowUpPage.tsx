@@ -108,10 +108,14 @@ export default function FollowUpPage() {
     [reason, state.data.records],
   );
 
-  // Bulk-action affordances must reflect only the rows the operator can currently
-  // see. If the reason filter or scenario changes, any selected rows that are no
-  // longer visible must NOT count toward the bulk-action bar so we never apply an
-  // action to cases the user is no longer reviewing.
+  // Selection scope rule (resolved across two PR reviews):
+  //   - Selection map is wiped whenever the scenario or reason filter changes,
+  //     so "current scope == current selection" always holds and ghost
+  //     entries from a prior filter cannot resurface when the user switches
+  //     back. (Cursor Bugbot finding on PR #31.)
+  //   - The bulk-action bar additionally derives its visible-row count from
+  //     `records` so even within a single filter view we never count a row
+  //     the operator cannot see. (Codex review on PR #31.)
   const visibleSelectedIds = useMemo(
     () => records.filter((record) => selected[record.customer_or_case_id]).map((r) => r.customer_or_case_id),
     [records, selected],
@@ -121,7 +125,7 @@ export default function FollowUpPage() {
 
   useEffect(() => {
     setSelected({});
-  }, [scenario]);
+  }, [scenario, reason]);
 
   const totalValueAtRisk = records.reduce(
     (sum, r) => sum + (typeof r.estimated_value_at_risk === 'number' ? r.estimated_value_at_risk : 0),
