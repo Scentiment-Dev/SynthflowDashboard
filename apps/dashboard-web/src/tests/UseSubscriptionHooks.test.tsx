@@ -119,6 +119,21 @@ describe('useSubscriptionBusinessValue', () => {
     await Promise.resolve();
     expect(true).toBe(true);
   });
+
+  it('ignores late rejections after unmount without throwing', async () => {
+    let rejectLater: () => void = () => {};
+    vi.spyOn(dashboardApi, 'getSubscriptionBusinessValue').mockReturnValueOnce(
+      new Promise((_resolve, reject) => {
+        rejectLater = () => reject(new Error('too late'));
+      }),
+    );
+    const { unmount } = render(<BusinessValueProbe />);
+    unmount();
+    rejectLater();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(true).toBe(true);
+  });
 });
 
 describe('useSubscriptionFollowUp', () => {
@@ -183,6 +198,21 @@ describe('useSubscriptionFollowUp', () => {
     await Promise.resolve();
     expect(true).toBe(true);
   });
+
+  it('ignores late rejections after unmount', async () => {
+    let rejectLater: () => void = () => {};
+    vi.spyOn(dashboardApi, 'getSubscriptionFollowUp').mockReturnValueOnce(
+      new Promise((_resolve, reject) => {
+        rejectLater = () => reject(new Error('too late'));
+      }),
+    );
+    const { unmount } = render(<FollowUpProbe />);
+    unmount();
+    rejectLater();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(true).toBe(true);
+  });
 });
 
 describe('useSubscriptionAdvancedFilters', () => {
@@ -233,6 +263,21 @@ describe('useSubscriptionAdvancedFilters', () => {
     const { unmount } = render(<AdvancedFiltersProbe />);
     unmount();
     resolveLater();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(true).toBe(true);
+  });
+
+  it('ignores late rejections after unmount', async () => {
+    let rejectLater: () => void = () => {};
+    vi.spyOn(dashboardApi, 'getSubscriptionAdvancedFilters').mockReturnValueOnce(
+      new Promise((_resolve, reject) => {
+        rejectLater = () => reject(new Error('too late'));
+      }),
+    );
+    const { unmount } = render(<AdvancedFiltersProbe />);
+    unmount();
+    rejectLater();
     await Promise.resolve();
     await Promise.resolve();
     expect(true).toBe(true);

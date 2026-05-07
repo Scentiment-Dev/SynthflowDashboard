@@ -377,6 +377,52 @@ describe('StatusBanner action / detail branches', () => {
   });
 });
 
+describe('MetricDisclosure / PageActionBar branches', () => {
+  it('MetricDisclosure renders the updated-age line without a timestamp suffix when only updatedAge is supplied', async () => {
+    const { default: MetricDisclosure } = await import(
+      '../components/subscription-v2/MetricDisclosure'
+    );
+    render(
+      <MetricDisclosure
+        summary="Plain language definition"
+        updatedAge="Updated 5 min ago"
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: /Show metric definition/i }));
+    expect(screen.getByText(/Updated 5 min ago/)).toBeInTheDocument();
+    expect(screen.queryByText(/·/)).toBeNull();
+  });
+
+  it('PageActionBar omits the "not yet wired" pill when every advanced filter dimension is enabled', async () => {
+    const advancedFiltersHook = await import(
+      '../hooks/useSubscriptionAdvancedFilters'
+    );
+    const fixture = await import(
+      '../data/subscriptionAdvancedFiltersFixtures'
+    );
+    vi.spyOn(advancedFiltersHook, 'useSubscriptionAdvancedFilters').mockReturnValue({
+      data: {
+        ...fixture.SUBSCRIPTION_ADVANCED_FILTERS_FIXTURE,
+        options: fixture.SUBSCRIPTION_ADVANCED_FILTERS_FIXTURE.options.map((opt) => ({
+          ...opt,
+          is_enabled: true,
+        })),
+      },
+      loading: false,
+      error: null,
+      source: 'api',
+      permissionDenied: false,
+    } as ReturnType<typeof advancedFiltersHook.useSubscriptionAdvancedFilters>);
+
+    const { default: PageActionBar } = await import(
+      '../components/subscription-v2/PageActionBar'
+    );
+    render(<PageActionBar />);
+    expect(screen.queryByText(/not\s+yet wired/i)).toBeNull();
+    expect(screen.getByText(/dimensions available/i)).toBeInTheDocument();
+  });
+});
+
 describe('Patch coverage — additional Cycle 008 branches', () => {
   it('Command Center renders the live banner branch when outcomes are sourced from the API', async () => {
     vi.spyOn(outcomesHook, 'useSubscriptionOutcomes').mockReturnValue({
