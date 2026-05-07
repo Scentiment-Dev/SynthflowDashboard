@@ -85,11 +85,18 @@ export default function Topbar() {
   const { filters, resetFilters } = useDashboardFilters();
   const location = useLocation();
   const fallback = NAV_ITEMS.find((item) => item.href === location.pathname);
+  // Eyebrow scope rule: only show "Subscription analytics" when the current
+  // route is actually under /subscriptions/*. The dashboard also covers
+  // overview, cancellations, retention, order status, escalations, data
+  // quality, governance, and exports, so for any non-subscription route the
+  // generic "Internal analytics" label is the safe fallback.
+  const isSubscriptionRoute = location.pathname.startsWith('/subscriptions');
+  const fallbackEyebrow = isSubscriptionRoute ? 'Subscription analytics' : 'Internal analytics';
   const meta =
     PAGE_META[location.pathname] ??
     (fallback
-      ? { eyebrow: 'Subscription analytics', title: fallback.label }
-      : { eyebrow: 'Subscription analytics', title: 'Subscription analytics' });
+      ? { eyebrow: fallbackEyebrow, title: fallback.label }
+      : { eyebrow: fallbackEyebrow, title: fallbackEyebrow });
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/75 backdrop-blur-xl">

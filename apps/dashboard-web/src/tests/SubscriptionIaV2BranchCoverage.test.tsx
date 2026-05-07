@@ -26,10 +26,29 @@ afterEach(() => {
 });
 
 describe('Topbar fallback rendering', () => {
-  it('falls back to the generic Subscription analytics title when the path is unknown', () => {
+  it('uses the generic Internal analytics title for unknown non-subscription paths', () => {
     render(
       <DashboardFilterProvider>
         <MemoryRouter initialEntries={['/totally-unknown-path']}>
+          <Routes>
+            <Route path="*" element={<Topbar />} />
+          </Routes>
+        </MemoryRouter>
+      </DashboardFilterProvider>,
+    );
+    expect(
+      screen.getByRole('heading', { name: /Internal analytics/i }),
+    ).toBeInTheDocument();
+  });
+
+  // Regression for Cursor Bugbot finding on PR #31: only routes under
+  // /subscriptions/* should render the "Subscription analytics" eyebrow;
+  // unknown routes outside that namespace must use a generic fallback so we
+  // never claim the dashboard is subscription-only.
+  it('falls back to Subscription analytics ONLY for unknown routes under /subscriptions/*', () => {
+    render(
+      <DashboardFilterProvider>
+        <MemoryRouter initialEntries={['/subscriptions/some-future-page']}>
           <Routes>
             <Route path="*" element={<Topbar />} />
           </Routes>

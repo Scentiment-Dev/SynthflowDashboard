@@ -46,12 +46,6 @@ export const FRESHNESS_LABEL: Record<SubscriptionFreshnessStatus, string> = {
   unknown: 'Status unknown',
 };
 
-export const FRESHNESS_TOOLTIP: Record<SubscriptionFreshnessStatus, string> = {
-  fresh: 'Data refreshed within the expected window.',
-  stale: 'Data is older than our trust threshold. Open data quality.',
-  unknown: "We don't have a freshness reading yet. Check data quality.",
-};
-
 export const FRESHNESS_TONE: Record<SubscriptionFreshnessStatus, StateChipTone> = {
   fresh: 'success',
   stale: 'danger',
