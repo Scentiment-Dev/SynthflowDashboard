@@ -2,12 +2,6 @@ name: Backend Tests
 
 on:
   workflow_call:
-  pull_request:
-    paths:
-      - 'services/analytics-api/**'
-      - 'packages/shared-contracts/**'
-      - 'tests/contracts/**'
-      - '.github/workflows/backend-tests.yml'
 
 permissions:
   contents: read

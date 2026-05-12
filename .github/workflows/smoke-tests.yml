@@ -2,13 +2,6 @@ name: Smoke Tests
 
 on:
   workflow_call:
-  pull_request:
-    paths:
-      - 'docker-compose.yml'
-      - 'services/**'
-      - 'apps/dashboard-web/**'
-      - 'tests/smoke/**'
-      - '.github/workflows/smoke-tests.yml'
 
 permissions:
   contents: read

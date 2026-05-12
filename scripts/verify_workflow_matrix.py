@@ -7,7 +7,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 
 EXPECTED = {
-    "ci.yml": ["repo-validation", "backend-tests", "ingestion-tests", "frontend-tests", "dbt-tests", "contract-tests", "smoke-tests"],
+    "ci.yml": ["repo-validation", "backend-tests", "ingestion-tests", "frontend-tests", "dbt-tests", "contract-tests", "smoke-tests", "coverage-codecov"],
     "backend-tests.yml": ["backend"],
     "ingestion-tests.yml": ["ingestion"],
     "frontend-tests.yml": ["frontend"],

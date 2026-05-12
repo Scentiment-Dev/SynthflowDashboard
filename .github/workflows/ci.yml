@@ -22,6 +22,10 @@ jobs:
         run: python -S scripts/validate_wave8_agent_system.py
       - name: Validate Wave 9 QA/CI layer
         run: python -S scripts/validate_wave9_qa_ci.py
+      - name: Validate Wave 10 final pack
+        run: python -S scripts/validate_wave10_final_pack.py
+      - name: Validate workflow matrix
+        run: python -S scripts/verify_workflow_matrix.py
       - name: Generate repo manifest
         run: python -S scripts/generate_repo_manifest.py
 
@@ -69,7 +73,7 @@ jobs:
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: apps/dashboard-web/package-lock.json
+          cache-dependency-path: apps/dashboard-web/package.json
       - name: Install frontend dependencies
         working-directory: apps/dashboard-web
         run: npm install
@@ -81,27 +85,7 @@ jobs:
           test -f coverage.xml
           test -f coverage-ingestion.xml
           test -f apps/dashboard-web/coverage/lcov.info
-      - name: Upload backend coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./coverage.xml,./coverage-ingestion.xml
-          flags: backend
-          use_oidc: true
-          fail_ci_if_error: true
-          override_commit: ${{ github.event.pull_request.head.sha || github.sha }}
-          override_branch: ${{ github.head_ref || github.ref_name }}
-          override_pr: ${{ github.event.pull_request.number }}
-      - name: Upload frontend coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./apps/dashboard-web/coverage/lcov.info
-          flags: frontend
-          use_oidc: true
-          fail_ci_if_error: true
-          override_commit: ${{ github.event.pull_request.head.sha || github.sha }}
-          override_branch: ${{ github.head_ref || github.ref_name }}
-          override_pr: ${{ github.event.pull_request.number }}
-      - name: Upload combined coverage to Codecov project status
+      - name: Upload coverage bundle to Codecov
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage.xml,./coverage-ingestion.xml,./apps/dashboard-web/coverage/lcov.info

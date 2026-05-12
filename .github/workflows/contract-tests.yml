@@ -2,13 +2,6 @@ name: Contract Tests
 
 on:
   workflow_call:
-  pull_request:
-    paths:
-      - 'packages/shared-contracts/**'
-      - 'services/analytics-api/app/schemas/**'
-      - 'services/ingestion-worker/app/pipelines/normalize_events.py'
-      - 'tests/contracts/**'
-      - '.github/workflows/contract-tests.yml'
 
 permissions:
   contents: read
