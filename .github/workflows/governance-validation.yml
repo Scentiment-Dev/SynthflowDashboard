@@ -19,7 +19,7 @@ jobs:
   governance:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Validate no-drift anchors
         run: python -S scripts/validate_no_drift_rules.py
       - name: Validate Wave 9 governance QA surface
