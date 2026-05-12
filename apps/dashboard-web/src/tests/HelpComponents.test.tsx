@@ -262,6 +262,19 @@ describe('WidgetActionMenu', () => {
       'false',
     );
   });
+
+  it('closes after selecting an item without an onSelect handler', () => {
+    render(
+      <WidgetActionMenu
+        widgetLabel="KPI"
+        items={[{ id: 'no-handler', label: 'Open details' }]}
+      />,
+    );
+    const trigger = screen.getByTestId('widget-action-menu-trigger');
+    fireEvent.click(trigger);
+    fireEvent.click(screen.getByTestId('widget-action-menu-item-no-handler'));
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
 });
 
 describe('MetricHelpDrawer', () => {
@@ -321,6 +334,13 @@ describe('MetricHelpDrawer', () => {
     const onClose = vi.fn();
     render(<MetricHelpDrawer open onClose={onClose} title="Saves" summary="x" />);
     fireEvent.click(screen.getByTestId('metric-help-drawer'));
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('ignores non-escape keyboard presses', () => {
+    const onClose = vi.fn();
+    render(<MetricHelpDrawer open onClose={onClose} title="Saves" summary="x" />);
+    fireEvent.keyDown(document, { key: 'Enter' });
     expect(onClose).not.toHaveBeenCalled();
   });
 });
