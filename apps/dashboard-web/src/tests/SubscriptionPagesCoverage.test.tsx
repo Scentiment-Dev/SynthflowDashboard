@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import BusinessValuePage from '../components/subscription-v2/pages/BusinessValuePage';
 import CommandCenterPage from '../components/subscription-v2/pages/CommandCenterPage';
 import { SUBSCRIPTION_FOLLOW_UP_FIXTURES } from '../data/subscriptionFollowUpFixtures';
+import { SUBSCRIPTION_OUTCOMES_FIXTURES } from '../data/subscriptionOutcomesFixtures';
 
 vi.mock('../hooks/useSubscriptionFollowUp', async () => {
   const actual = await vi.importActual<typeof import('../hooks/useSubscriptionFollowUp')>(
@@ -12,6 +13,16 @@ vi.mock('../hooks/useSubscriptionFollowUp', async () => {
   return {
     ...actual,
     useSubscriptionFollowUp: vi.fn(actual.useSubscriptionFollowUp),
+  };
+});
+
+vi.mock('../hooks/useSubscriptionOutcomes', async () => {
+  const actual = await vi.importActual<typeof import('../hooks/useSubscriptionOutcomes')>(
+    '../hooks/useSubscriptionOutcomes',
+  );
+  return {
+    ...actual,
+    useSubscriptionOutcomes: vi.fn(actual.useSubscriptionOutcomes),
   };
 });
 
@@ -125,6 +136,49 @@ describe('CommandCenterPage coverage guards', () => {
     await waitFor(() => {
       expect(
         screen.getByText(/1 customer's portal completion is unconfirmed/i),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('renders the all-clear message when there is no pending or follow-up work', async () => {
+    const followUpHooks = await import('../hooks/useSubscriptionFollowUp');
+    vi.mocked(followUpHooks.useSubscriptionFollowUp).mockReturnValue({
+      data: {
+        ...SUBSCRIPTION_FOLLOW_UP_FIXTURES.empty,
+      },
+      loading: false,
+      error: null,
+      source: 'fixture',
+      permissionDenied: false,
+      scenario: 'empty',
+    });
+
+    const outcomesHooks = await import('../hooks/useSubscriptionOutcomes');
+    vi.mocked(outcomesHooks.useSubscriptionOutcomes).mockReturnValue({
+      data: {
+        ...SUBSCRIPTION_OUTCOMES_FIXTURES.baseline,
+        metrics: {
+          ...SUBSCRIPTION_OUTCOMES_FIXTURES.baseline.metrics,
+          pending_stayai_confirmation_total: 0,
+        },
+      },
+      loading: false,
+      error: null,
+      source: 'fixture',
+      permissionDenied: false,
+      scenario: 'baseline',
+    });
+
+    render(
+      <MemoryRouter>
+        <CommandCenterPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Nothing needs attention right now\./i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/All Stay\.ai-controlled subscription states are clear\./i),
       ).toBeInTheDocument();
     });
   });
