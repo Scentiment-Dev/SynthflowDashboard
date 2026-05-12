@@ -2,12 +2,6 @@ name: dbt Tests
 
 on:
   workflow_call:
-  pull_request:
-    paths:
-      - 'data/dbt/**'
-      - 'data/warehouse/**'
-      - 'packages/shared-contracts/**'
-      - '.github/workflows/dbt-tests.yml'
 
 permissions:
   contents: read
@@ -30,5 +24,5 @@ jobs:
         run: dbt parse --profiles-dir .
       - name: dbt list nodes
         run: dbt ls --profiles-dir .
-      - name: dbt test anchor (integration environment)
-        run: echo "dbt test --profiles-dir . is executed in warehouse-integrated pipelines."
+      - name: dbt test execution note
+        run: echo "This workflow validates dbt parse/list only. Warehouse-integrated dbt test runs in environment-coupled pipelines."

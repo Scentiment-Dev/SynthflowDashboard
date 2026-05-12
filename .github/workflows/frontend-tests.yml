@@ -2,11 +2,6 @@ name: Frontend Tests
 
 on:
   workflow_call:
-  pull_request:
-    paths:
-      - 'apps/dashboard-web/**'
-      - 'packages/shared-contracts/**'
-      - '.github/workflows/frontend-tests.yml'
 
 permissions:
   contents: read
