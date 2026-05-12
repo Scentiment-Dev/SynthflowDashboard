@@ -41,6 +41,23 @@ describe('BusinessValuePage coverage guards', () => {
       );
     });
   });
+
+  it('uses the pending export path on baseline and returns audit metadata', async () => {
+    render(
+      <MemoryRouter>
+        <BusinessValuePage />
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByTestId('page-action-export-button'));
+    fireEvent.click(screen.getByTestId('subscription-export-drawer-generate'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('export-result-toast')).toHaveTextContent(
+        /pending an audit reference/i,
+      );
+    });
+  });
 });
 
 describe('CommandCenterPage coverage guards', () => {
@@ -72,6 +89,43 @@ describe('CommandCenterPage coverage guards', () => {
 
     await waitFor(() => {
       expect(screen.getByText('1 item need a look.')).toBeInTheDocument();
+    });
+  });
+
+  it('renders singular portal-handoff wording when exactly one portal completion is unknown', async () => {
+    const hooks = await import('../hooks/useSubscriptionFollowUp');
+    const mocked = vi.mocked(hooks.useSubscriptionFollowUp);
+    mocked.mockReturnValue({
+      data: {
+        ...SUBSCRIPTION_FOLLOW_UP_FIXTURES.baseline,
+        records: [
+          {
+            ...SUBSCRIPTION_FOLLOW_UP_FIXTURES.baseline.records[0],
+            portal_completion_status: 'completion_unknown',
+          },
+          {
+            ...SUBSCRIPTION_FOLLOW_UP_FIXTURES.baseline.records[1],
+            portal_completion_status: 'portal_started',
+          },
+        ],
+      },
+      loading: false,
+      error: null,
+      source: 'fixture',
+      permissionDenied: false,
+      scenario: 'baseline',
+    });
+
+    render(
+      <MemoryRouter>
+        <CommandCenterPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/1 customer's portal completion is unconfirmed/i),
+      ).toBeInTheDocument();
     });
   });
 });
