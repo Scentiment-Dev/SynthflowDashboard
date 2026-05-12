@@ -296,9 +296,4 @@ make clean
 
 Then reinstall and rerun.
 
----
-
-## License and Internal Use
-
-This repository contains implementation and operational artifacts for Scentiment analytics delivery workflows. Follow internal governance and security policies for access, deployment, and data handling.
 
