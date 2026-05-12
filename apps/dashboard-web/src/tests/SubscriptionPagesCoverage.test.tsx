@@ -182,4 +182,26 @@ describe('CommandCenterPage coverage guards', () => {
       ).toBeInTheDocument();
     });
   });
+
+  it('renders the permission-denied status banner action when fixture access is denied', async () => {
+    const outcomesHooks = await import('../hooks/useSubscriptionOutcomes');
+    vi.mocked(outcomesHooks.useSubscriptionOutcomes).mockReturnValue({
+      data: SUBSCRIPTION_OUTCOMES_FIXTURES.baseline,
+      loading: false,
+      error: 'forbidden',
+      source: 'fixture',
+      permissionDenied: true,
+      scenario: 'baseline',
+    });
+
+    render(
+      <MemoryRouter>
+        <CommandCenterPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /ask my manager for access/i })).toBeInTheDocument();
+    });
+  });
 });
