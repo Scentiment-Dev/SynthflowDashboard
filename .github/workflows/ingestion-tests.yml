@@ -2,12 +2,6 @@ name: Ingestion Worker Tests
 
 on:
   workflow_call:
-  pull_request:
-    paths:
-      - 'services/ingestion-worker/**'
-      - 'packages/shared-contracts/**'
-      - 'tests/contracts/**'
-      - '.github/workflows/ingestion-tests.yml'
 
 permissions:
   contents: read

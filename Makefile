@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-.PHONY: install dev stop test test-backend test-ingestion test-frontend test-contract smoke lint typecheck dbt-test dbt-build data-validate validate-structure validate-no-drift validate-wave8 validate-wave9 qa-evidence quality-gates manifest clean
+.PHONY: install dev stop test test-backend test-ingestion test-frontend test-contract smoke lint typecheck dbt-test dbt-build data-validate validate-structure validate-no-drift validate-wave8 validate-wave9 validate-wave10 qa-evidence quality-gates manifest clean
 
 install:
 	cd apps/dashboard-web && npm install

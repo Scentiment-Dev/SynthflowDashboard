@@ -245,9 +245,13 @@ This is required for reproducibility and downstream governance.
 
 - `PROJECT_OVERVIEW.md` — concise project summary
 - `PROJECT_STRUCTURE.md` — zone ownership and structure lock context
+- `CONTRIBUTING.md` — contribution and validation workflow expectations
+- `SECURITY.md` — vulnerability disclosure and security handling policy
 - `docs/07_dashboard_ui_ux/` — UX systems, copy, IA, support-user workflows
 - `docs/10_qa_acceptance/` — QA and acceptance patterns
 - `docs/11_security_governance_rbac/` — security/governance references
+- `docs/01_project_control/BRANCHING_STRATEGY.md` — branch naming and stale branch lifecycle policy
+- `docs/01_project_control/REQUIRED_CHECKS_REFERENCE.md` — branch-protection required check reference
 - `HANDOFF_README.md` — handoff expectations/context
 
 ---
@@ -295,5 +299,3 @@ make clean
 ```
 
 Then reinstall and rerun.
-
-
