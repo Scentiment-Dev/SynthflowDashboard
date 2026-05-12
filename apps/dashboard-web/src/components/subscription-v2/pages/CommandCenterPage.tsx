@@ -1,12 +1,15 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import SubscriptionPageHeader from '../../subscription/SubscriptionPageHeader';
-import PageActionBar from '../PageActionBar';
+import SubscriptionPageToolbar from '../SubscriptionPageToolbar';
 import KpiCard from '../KpiCard';
 import StateChip from '../StateChip';
 import StatusBanner from '../StatusBanner';
 import MetricDisclosure from '../MetricDisclosure';
+import type { AppliedFilters } from '../../filters/SubscriptionFilterDrawer';
+import type { ExportRequestResult, ExportScopeAvailability } from '../../exports/SubscriptionExportDrawer';
+import type { ExportScopeKey } from '../../../lib/plainLanguageCopy';
 import { useSubscriptionOutcomes } from '../../../hooks/useSubscriptionOutcomes';
 import { useSubscriptionBusinessValue } from '../../../hooks/useSubscriptionBusinessValue';
 import { useSubscriptionFollowUp } from '../../../hooks/useSubscriptionFollowUp';
@@ -39,10 +42,25 @@ function pickHeadlineMetric(
  * raw governance metadata are NOT mounted on this page; they live behind their
  * own subnav routes (Outcomes, Diagnostics) per the IA v2 spec.
  */
+const COMMAND_CENTER_DEFAULT_FILTERS: AppliedFilters = {
+  date_preset: ['last_30_days'],
+  comparison_period: ['previous_period'],
+};
+
+const COMMAND_CENTER_EXPORT_SCOPES: ExportScopeAvailability[] = [
+  { scope: 'current_page', blockedReason: 'allowed' },
+  { scope: 'selected_widget', blockedReason: 'allowed' },
+  { scope: 'pdf_snapshot', blockedReason: 'allowed' },
+  { scope: 'audit_manifest', blockedReason: 'allowed' },
+  { scope: 'filtered_csv', blockedReason: 'backend_not_connected' },
+  { scope: 'selected_rows', blockedReason: 'no_rows_selected' },
+];
+
 export default function CommandCenterPage() {
   const outcomes = useSubscriptionOutcomes('baseline');
   const businessValue = useSubscriptionBusinessValue('baseline');
   const followUp = useSubscriptionFollowUp('baseline');
+  const [applied, setApplied] = useState<AppliedFilters>(COMMAND_CENTER_DEFAULT_FILTERS);
 
   const headlineMetric = useMemo(
     () => pickHeadlineMetric(businessValue.data.metrics),
@@ -104,10 +122,34 @@ export default function CommandCenterPage() {
         }
       />
 
-      <PageActionBar
-        activeFilters={[{ id: 'date_preset', label: 'Last 30 days' }]}
-        filterDisabledReason="Filter drawer ships in a follow-up PR. Default Last 30 days is applied."
-        exportDisabledReason="Export drawer ships in a follow-up PR. Use Export & Audit for now."
+      <SubscriptionPageToolbar
+        pageLabel="Command Center"
+        applied={applied}
+        defaults={COMMAND_CENTER_DEFAULT_FILTERS}
+        onApply={setApplied}
+        savedViewsDisabledReason="Saved view persistence ships once the backend store is connected."
+        exportScopes={COMMAND_CENTER_EXPORT_SCOPES}
+        exportManifest={{
+          filters: ['Last 30 days', 'Previous period comparison'],
+          metric_definitions: outcomes.data.metadata.metric_definitions,
+          trust_labels: [outcomes.data.metadata.trust_label],
+          freshness: outcomes.data.metadata.freshness_status,
+          formula_versions: [outcomes.data.metadata.formula_version],
+          owner: outcomes.data.metadata.owner,
+          timestamp: outcomes.data.metadata.timestamp,
+          fingerprint: outcomes.data.metadata.fingerprint,
+          audit_reference: outcomes.data.metadata.audit_reference,
+          requester_role: 'support_agent',
+          permission_decision: 'allow',
+          source_confirmation_status: outcomes.data.metadata.source_confirmation_status,
+          included_widgets: ['KPI strip', 'Attention panel', 'Outcome path summary'],
+          excluded_widgets: ['Diagnostics drawer'],
+        }}
+        onConfirmExport={(scope: ExportScopeKey): ExportRequestResult => ({
+          status: 'pending',
+          audit_reference: outcomes.data.metadata.audit_reference,
+          fingerprint: `${outcomes.data.metadata.fingerprint}-${scope}`,
+        })}
       />
 
       {outcomes.source === 'fixture' ? (
