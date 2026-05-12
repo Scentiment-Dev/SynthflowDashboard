@@ -86,7 +86,7 @@ jobs:
           test -f coverage-ingestion.xml
           test -f apps/dashboard-web/coverage/lcov.info
       - name: Upload coverage bundle to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           files: ./coverage.xml,./coverage-ingestion.xml,./apps/dashboard-web/coverage/lcov.info
           use_oidc: true
