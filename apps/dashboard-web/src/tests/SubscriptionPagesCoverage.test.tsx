@@ -204,4 +204,21 @@ describe('CommandCenterPage coverage guards', () => {
       expect(screen.getByRole('button', { name: /ask my manager for access/i })).toBeInTheDocument();
     });
   });
+
+  it('executes the command-center export confirm callback and shows pending toast', async () => {
+    render(
+      <MemoryRouter>
+        <CommandCenterPage />
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByTestId('page-action-export-button'));
+    fireEvent.click(screen.getByTestId('subscription-export-drawer-generate'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('export-result-toast')).toHaveTextContent(
+        /pending an audit reference/i,
+      );
+    });
+  });
 });
