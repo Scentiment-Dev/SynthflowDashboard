@@ -24,7 +24,7 @@ jobs:
       - name: Generate QA evidence packet
         run: python -S scripts/qa_collect_evidence.py
       - name: Upload QA evidence artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: qa-evidence
           path: .qa-evidence/
